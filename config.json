@@ -1,0 +1,88 @@
+{
+  "site_name": "Signal Desk",
+  "location": { "name": "Oakville, Ontario", "lat": 43.4675, "lon": -79.6877, "alert_bbox": [-79.95, 43.35, -79.55, 43.6] },
+  "alerts": {
+    "ntfy_topic": "signaldesk-oakville-0f2a7df8",
+    "morning_briefing": "06:30",
+    "breaking_angles": ["Breaking", "GO alerts", "Accidents", "Traffic", "Road closures"],
+    "max_breaking_per_run": 3
+  },
+  "quotes": [
+    ["S&P/TSX", "^GSPTSE"], ["S&P 500", "^GSPC"], ["Nasdaq", "^IXIC"], ["Tadawul", "^TASI.SR"],
+    ["Brent", "BZ=F"], ["Gold", "GC=F"], ["USD/CAD", "CAD=X"], ["CAD/EGP", "CADEGP=X"], ["USD/EGP", "EGP=X"]
+  ],
+  "topics": [
+    { "id": "oakville", "name": "Oakville", "gl": "CA", "hl": "en",
+      "exclude": "Washington|\\bWA\\b|Missouri|St\\. Louis|Connecticut|Tacoma|Thurston|Lewis County|Chronicle|Oakville, CT|Oakville, MO",
+      "feeds": [
+        ["Breaking", "Oakville police OR fire OR emergency", "", "", "2d", "Oakville|Halton"],
+        ["GO alerts", "GO Transit Lakeshore West delay OR cancelled OR closure OR suspended", "", "", "2d", "\\bGO\\b|Lakeshore|Metrolinx"],
+        ["Accidents", "Halton police Oakville crash OR collision", "", "", "2d", "Oakville|QEW|Halton|403|407"],
+        ["Traffic", "QEW Oakville OR 403 Oakville traffic OR closure", "", "", "2d", "Oakville|QEW|Halton|403|407"],
+        ["Road closures", "Oakville road closure OR Halton highway closures", "", "", "3d", "Oakville|Halton|QEW"],
+        ["City", "\"Town of Oakville\" council", "", "", "7d"],
+        ["Transit", "\"Oakville Transit\"", "", "", "30d"],
+        ["GO Transit", "GO Transit Lakeshore West", "", "", "7d"],
+        ["Business", "Oakville Ontario business", "", "", "7d", "Oakville"],
+        ["Development", "Oakville development OR housing OR condos", "", "", "7d", "Oakville"],
+        ["Election", "Oakville election 2026", "", "", "7d", "Oakville"],
+        ["Ward 7", "\"Ward 7\" Oakville", "", "", "30d", "Oakville", "Cambridge|Bradford|Barrie|Guelph|Kitchener|Ottawa|Hamilton"],
+        ["Ward 7", "\"Nav Nanda\" OR \"Bilal Kader\"", "", "", "60d"],
+        ["Ward 7", "site:insidehalton.com \"Ward 7\" Oakville", "", "", "60d", "Oakville"],
+        ["Outings", "things to do Oakville", "", "", "7d", "Oakville"],
+        ["Community", "site:oakvillenews.org", "", "", "3d"]
+      ] },
+    { "id": "ontario", "name": "Ontario", "gl": "CA", "hl": "en", "feeds": [
+        ["Breaking", "Ontario breaking news", "", "", "2d"],
+        ["Politics", "Queen's Park OR \"Ford government\" Ontario", "", "", "3d"],
+        ["Transit", "Metrolinx OR \"GO Transit\" OR TTC", "", "", "3d"],
+        ["Economy", "Ontario economy OR jobs OR manufacturing", "", "", "3d"],
+        ["Outings", "Toronto events this weekend", "", "", "7d"],
+        ["Community", "Halton Region OR Mississauga OR Burlington", "", "", "3d"]
+      ] },
+    { "id": "canada", "name": "Canada", "gl": "CA", "hl": "en", "feeds": [
+        ["Politics", "Canada Parliament OR \"federal government\" Carney", "", "", "3d"],
+        ["Indicators", "\"Statistics Canada\" inflation OR jobs OR GDP", "", "", "7d"],
+        ["Rates", "\"Bank of Canada\"", "", "", "7d"],
+        ["Markets", "TSX stocks", "", "", "2d"],
+        ["Finance", "Canadian dollar OR loonie OR Canadian banks", "", "", "3d"],
+        ["Community", "Canada community news", "", "", "3d"]
+      ] },
+    { "id": "egypt", "name": "Egypt", "gl": "EG", "hl": "en", "feeds": [
+        ["Breaking", "Egypt breaking news", "", "", "2d"],
+        ["Cairo", "Cairo Egypt", "", "", "3d"],
+        ["Alexandria", "Alexandria Egypt", "", "", "7d"],
+        ["Politics", "Egypt government OR cabinet", "", "", "3d"],
+        ["Economy", "\"Central Bank of Egypt\" OR Egypt inflation", "", "", "7d"],
+        ["Markets", "EGX30 OR \"Egyptian pound\"", "", "", "7d"],
+        ["Investment", "Egypt investment OR IMF OR \"Suez Canal\"", "", "", "7d"],
+        ["Arabic · Breaking", "مصر أخبار عاجلة", "EG", "ar", "2d"],
+        ["Arabic · Cairo", "القاهرة", "EG", "ar", "2d"],
+        ["Arabic · Alexandria", "الإسكندرية", "EG", "ar", "3d"],
+        ["Arabic · Economy", "البنك المركزي المصري OR البورصة المصرية", "EG", "ar", "7d"]
+      ] },
+    { "id": "gulf", "name": "Gulf", "gl": "AE", "hl": "en", "feeds": [
+        ["UAE", "UAE news Dubai OR \"Abu Dhabi\"", "", "", "3d"],
+        ["Saudi", "Saudi Arabia economy OR \"Vision 2030\"", "", "", "3d"],
+        ["Qatar & GCC", "Qatar OR Kuwait OR Bahrain OR Oman news", "", "", "3d"],
+        ["Markets", "Tadawul OR \"Dubai Financial Market\" OR ADX stocks", "", "", "3d"],
+        ["Energy", "OPEC+ oil output", "", "", "7d"],
+        ["Arabic · Gulf", "الإمارات OR السعودية OR قطر أخبار", "AE", "ar", "2d"],
+        ["Arabic · Markets", "تداول OR سوق دبي المالي OR سوق أبوظبي", "SA", "ar", "3d"]
+      ] },
+    { "id": "usa", "name": "USA", "gl": "US", "hl": "en", "feeds": [
+        ["Politics", "White House OR Congress", "", "", "2d"],
+        ["Policy", "US tariffs trade policy", "", "", "3d"],
+        ["Rates", "\"Federal Reserve\"", "", "", "7d"],
+        ["Indicators", "US inflation OR \"jobs report\" OR GDP", "", "", "7d"],
+        ["Markets", "Wall Street stocks \"S&P 500\" OR Nasdaq", "", "", "2d"]
+      ] },
+    { "id": "international", "name": "International", "gl": "US", "hl": "en", "feeds": [
+        ["World", "world news politics", "", "", "2d"],
+        ["Diplomacy", "G7 OR G20 OR \"United Nations\" summit", "", "", "3d"],
+        ["Economy", "global economy IMF OR \"World Bank\"", "", "", "7d"],
+        ["Energy", "oil prices Brent", "", "", "3d"],
+        ["Markets", "global markets Europe Asia stocks", "", "", "2d"]
+      ] }
+  ]
+}
