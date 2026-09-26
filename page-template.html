@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Signal Desk</title>
+<meta name="description" content="Oakville weather, GO trains, markets and news for the family.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Signal Desk">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0B7A84">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+__CSS__
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.bar{top:0;padding-top:calc(14px + env(safe-area-inset-top,0px));margin-top:calc(-1 * env(safe-area-inset-top,0px))}
+.topbtns{display:flex;gap:8px;align-items:center}
+.ghostbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 12px;font-size:13px;font-weight:600;min-height:40px}
+.stale{color:var(--amber)}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+/* warnings */
+.warn{border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;background:var(--amber-soft);border:1px solid color-mix(in srgb, var(--amber) 35%, transparent);color:var(--ink);text-decoration:none}
+.warn.warning{background:color-mix(in srgb, var(--danger) 14%, var(--surface));border-color:color-mix(in srgb, var(--danger) 45%, transparent)}
+.warn strong{font-size:15px}
+.warn span{font-size:13px;color:var(--muted)}
+
+/* weather */
+.wx{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.wx-now{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:16px}
+.wx-icon{font-size:44px;line-height:1;grid-row:span 2}
+.wx-temp{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.wx-temp small{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);margin-left:6px}
+.wx-sub{font-size:13px;color:var(--muted)}
+.wear{margin:0 16px 14px;background:var(--accent-soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.wear ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.hours{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 16px 14px}
+.hours::-webkit-scrollbar{display:none}
+.hr{flex:0 0 54px;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--bg);border-radius:10px;padding:8px 4px;font-variant-numeric:tabular-nums}
+.hr .t{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.hr .i{font-size:18px}
+.hr .d{font-weight:600;font-size:14px}
+.hr .p{font-family:var(--mono);font-size:10px;color:var(--accent)}
+.days{border-top:1px solid var(--line)}
+.day{display:grid;grid-template-columns:52px 28px 1fr auto;gap:10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-bottom:0;text-align:left;font:inherit;color:inherit}
+.day:first-child{border-top:0}
+.day .dn{font-weight:600}
+.day .di{font-size:20px;text-align:center}
+.range{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.range .track{flex:1;height:6px;border-radius:3px;background:var(--surface-2);position:relative;min-width:40px}
+.range .fill{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#4F9BD9,#E3A33B)}
+.day .dp{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:34px;text-align:right}
+.daywear{grid-column:1/-1;font-size:13px;color:var(--muted);padding-top:2px}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,20,30,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet-card{background:var(--surface);color:var(--ink);width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.sheet-card h3{font-family:var(--display);font-stretch:80%;font-size:20px;margin:0}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.toggle input{width:22px;height:22px;accent-color:var(--accent)}
+.alertbox{background:var(--bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.alertbox code{font-family:var(--mono);font-size:13px;user-select:all;word-break:break-all}
+.alertbox a{color:var(--accent);font-weight:600}
+.primary{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:11px 16px;font-weight:600;min-height:44px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="bar-row">
+      <div>
+        <div class="brand">Signal<span>Desk</span></div>
+        <div class="stamp" id="stamp">Loading…</div>
+      </div>
+      <div class="topbtns">
+        <button class="ghostbtn" id="custBtn" type="button">Settings</button>
+        <button class="refresh" id="refreshBtn" type="button" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+    <nav class="rail" id="rail" aria-label="Sections"></nav>
+  </header>
+
+  <main class="stack" id="main">
+    <div class="empty">Loading the latest…</div>
+  </main>
+
+  <footer>
+    <span>Updates about every 15 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, markets from Yahoo Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
+  </footer>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-label="Settings">
+    <h3>Settings</h3>
+    <span class="label">Show these sections</span>
+    <div id="toggles"></div>
+    <span class="label">Phone alerts</span>
+    <div class="alertbox">
+      <span>Get breaking Oakville news, GO and traffic alerts, weather warnings and a 6:30 a.m. briefing:</span>
+      <span>1. Install the free <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">ntfy app</a> (iPhone) or from Google Play (Android).</span>
+      <span>2. In ntfy, tap <b>+</b> and subscribe to this topic:</span>
+      <code id="topicName">__TOPIC__</code>
+      <button class="ghostbtn" id="copyTopic" type="button">Copy topic name</button>
+    </div>
+    <button class="primary" id="closeSheet" type="button">Done</button>
+  </div>
+</div>
+
+<script>
+const GO = __GO__;
+const $ = s => document.querySelector(s);
+const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+const store = { get(k, d){ try { const v = localStorage.getItem("sd:" + k); return v == null ? d : JSON.parse(v); } catch(_){ return d; } }, set(k, v){ try { localStorage.setItem("sd:" + k, JSON.stringify(v)); } catch(_){} } };
+const TRAVEL = ["GO alerts", "Accidents", "Traffic", "Road closures", "GO Transit", "Transit"];
+let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
+
+function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }]; (D ? D.topics : []).forEach(t => s.push(t)); s.push({ id: "markets", name: "Markets" }); return s; }
+function visible(id){ return !hidden.has(id); }
+
+async function load(force){
+  $("#refreshBtn").classList.add("spin");
+  try {
+    const r = await fetch("data.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 60000)), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    D = await r.json();
+    render();
+  } catch (e) {
+    if (!D) $("#main").innerHTML = '<div class="empty">Could not load. Check your connection and tap Refresh.</div>';
+  }
+  $("#refreshBtn").classList.remove("spin");
+}
+
+function renderStamp(){
+  if (!D) return;
+  const age = Date.now() / 1000 - D.generated;
+  const s = $("#stamp"); s.textContent = "Updated " + ago(D.generated); s.classList.toggle("stale", age > 45 * 60);
+}
+
+function renderRail(){
+  const rail = $("#rail"); rail.textContent = "";
+  const mk = (id, label) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(view === id)); b.onclick = () => { view = id; store.set("view", id); render(); window.scrollTo({ top: 0 }); }; rail.appendChild(b); };
+  mk("all", "All");
+  sections().filter(s => visible(s.id)).forEach(s => mk(s.id, s.name));
+}
+
+/* ---------- weather ---------- */
+function dayName(iso, i){ if (i === 0) return "Today"; if (i === 1) return "Tmrw"; return new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { weekday: "short" }); }
+function fmtHour(t){ let h = Number(t.slice(0, 2)); const ap = h >= 12 ? "p" : "a"; h = h % 12 || 12; return h + ap; }
+function weatherCard(full){
+  const W = D.weather; if (!W) return el("div", "empty", "Weather is unavailable right now.");
+  const box = el("div", "wx");
+  const now = el("div", "wx-now"), d0 = W.days[0], c = W.current;
+  now.appendChild(el("div", "wx-icon", c.icon));
+  const t = el("div", "wx-temp", c.temp + "°"); t.appendChild(el("small", "", "feels " + c.feels + "°")); now.appendChild(t);
+  now.appendChild(el("div", "wx-sub", c.label + " · High " + d0.max + "° Low " + d0.min + "° · Wind " + c.wind + " km/h" + (d0.pop ? " · " + d0.pop + "% rain" : "")));
+  box.appendChild(now);
+  const wear = el("div", "wear"); wear.appendChild(el("span", "label", "What to wear today"));
+  const ul = el("ul"); d0.wear.forEach(w => ul.appendChild(el("li", "", w))); wear.appendChild(ul);
+  box.appendChild(wear);
+  const hrs = el("div", "hours");
+  W.hours.slice(0, full ? 24 : 12).forEach(h => { const x = el("div", "hr"); x.appendChild(el("span", "t", fmtHour(h.t))); x.appendChild(el("span", "i", h.icon)); x.appendChild(el("span", "d", h.temp + "°")); x.appendChild(el("span", "p", h.pop ? h.pop + "%" : "")); hrs.appendChild(x); });
+  box.appendChild(hrs);
+  const days = el("div", "days");
+  const lo = Math.min(...W.days.map(d => d.min)), hi = Math.max(...W.days.map(d => d.max)), span = (hi - lo) || 1;
+  W.days.forEach((d, i) => {
+    const row = el("button", "day"); row.type = "button";
+    row.appendChild(el("span", "dn", dayName(d.date, i)));
+    row.appendChild(el("span", "di", d.icon));
+    const r = el("span", "range"); r.appendChild(el("span", "", d.min + "°"));
+    const tr = el("span", "track"), f = el("span", "fill"); f.style.left = ((d.min - lo) / span * 100) + "%"; f.style.right = ((hi - d.max) / span * 100) + "%"; tr.appendChild(f); r.appendChild(tr);
+    r.appendChild(el("span", "", d.max + "°")); row.appendChild(r);
+    row.appendChild(el("span", "dp", d.pop ? d.pop + "%" : ""));
+    const wearLine = el("span", "daywear", d.label + ". Wear: " + d.wear.join("; ") + "."); wearLine.hidden = !(full && i < 2);
+    row.appendChild(wearLine);
+    row.onclick = () => { wearLine.hidden = !wearLine.hidden; };
+    days.appendChild(row);
+  });
+  box.appendChild(days);
+  return box;
+}
+function warningsBlock(){
+  const w = D.warnings || []; if (!w.length) return null;
+  const s = el("div", "stack");
+  w.forEach(a => { const x = el("a", "warn " + a.type); x.href = "https://weather.gc.ca/en/location/index.html?coords=43.467,-79.688"; x.target = "_blank"; x.rel = "noopener"; x.appendChild(el("strong", "", "⚠️ " + a.name)); x.appendChild(el("span", "", a.summary)); s.appendChild(x); });
+  return s;
+}
+
+/* ---------- GO ---------- */
+const toMin = t => { const [h, m] = t.split(":").map(Number); const v = h * 60 + m; return v < 180 ? v + 1440 : v; };
+function torontoNow(){
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+  const g = k => (parts.find(p => p.type === k) || {}).value;
+  let dow = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(g("weekday")); let mins = (Number(g("hour")) % 24) * 60 + Number(g("minute"));
+  if (mins < 180){ mins += 1440; dow = (dow + 6) % 7; }
+  return { dow, mins };
+}
+function goTrips(dir, dow){
+  const list = GO[(dow === 0 || dow === 6 ? "we_" : "wk_") + dir];
+  return list.filter(([, , , d]) => !d || (d === "MTh" && dow >= 1 && dow <= 4) || (d === "F" && dow === 5) || (d === "Sa" && dow === 6) || (d === "Su" && dow === 0))
+    .map(([dep, arr, bus]) => ({ dep, arr, bus: bus === "B", dur: ((toMin(arr) - toMin(dep)) + 1440) % 1440 }));
+}
+function fmt12(t){ let [h, m] = t.split(":").map(Number); h = h % 24; const ap = h >= 12 ? "p.m." : "a.m."; h = h % 12 || 12; return h + ":" + String(m).padStart(2, "0") + " " + ap; }
+function item(it){
+  const a = el("a", "hl"); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
+  const m = el("div", "hl-meta"); m.appendChild(el("span", "tag", it.a));
+  if (Date.now() / 1000 - it.ts < 6 * 3600) m.appendChild(el("span", "new", "New"));
+  m.appendChild(el("span", "", (it.s || "") + " · " + ago(it.ts)));
+  a.appendChild(m); const tt = el("span", "hl-title", it.t); tt.dir = "auto"; a.appendChild(tt);
+  return a;
+}
+function goCard(){
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "GO Lakeshore West")); head.appendChild(el("span", "stamp", "Oakville GO ⇄ Union")); g.appendChild(head);
+  const box = el("div", "goboard");
+  const tabs = el("div", "gotabs");
+  [["east", "Oakville → Union"], ["west", "Union → Oakville"]].forEach(([d, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(goDir === d)); b.onclick = () => { goDir = d; store.set("goDir", d); render(); }; tabs.appendChild(b); });
+  box.appendChild(tabs);
+  const now = torontoNow();
+  let trips = goTrips(goDir, now.dow).filter(t => toMin(t.dep) >= now.mins), tomorrow = false;
+  if (!trips.length){ trips = goTrips(goDir, (now.dow + 1) % 7); tomorrow = true; }
+  const tbl = el("div", "gotable");
+  trips.slice(0, 4).forEach((t, i) => {
+    const r = el("div", "gorow" + (i === 0 ? " first" : "")); const w = toMin(t.dep) - now.mins;
+    r.appendChild(el("span", "godep", fmt12(t.dep)));
+    const mid = el("span", "gomid"); mid.appendChild(el("span", "", "Arrives " + fmt12(t.arr) + " · " + t.dur + " min"));
+    if (t.bus) mid.appendChild(el("span", "gotag bus", "Bus")); else if (t.dur <= 36) mid.appendChild(el("span", "gotag", "Express"));
+    r.appendChild(mid);
+    r.appendChild(el("span", "gowait", tomorrow ? "Tomorrow" : w < 1 ? "Now" : w < 60 ? "in " + w + " min" : "in " + Math.floor(w / 60) + " h " + (w % 60) + " min"));
+    tbl.appendChild(r);
+  });
+  box.appendChild(tbl);
+  const all = el("details", "goall"); all.appendChild(el("summary", "", (tomorrow ? "Tomorrow's" : "Today's") + " full schedule (" + trips.length + (tomorrow ? "" : " left") + ")"));
+  const grid = el("div", "gogrid");
+  trips.forEach(t => grid.appendChild(el("span", t.bus ? "bus" : (t.dur <= 36 ? "exp" : ""), fmt12(t.dep).replace(" a.m.", "a").replace(" p.m.", "p") + " → " + fmt12(t.arr).replace(" a.m.", "a").replace(" p.m.", "p"))));
+  all.appendChild(grid); box.appendChild(all);
+  box.appendChild(el("span", "gonote", "Scheduled times. Holidays run the weekend schedule. Check live departures during disruptions."));
+  g.appendChild(box);
+  [["Live GO departures", "Real-time times and delays", "https://www.gotransit.com/en"], ["Live traffic and closures", "511 Ontario for the QEW and 403", "https://511on.ca"]].forEach(([t, s, h]) => { const a = el("a", "hl"); a.href = h; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t + " ↗")); a.appendChild(el("span", "hl-snip", s)); g.appendChild(a); });
+  const alerts = ((D.headlines || {}).oakville || []).filter(it => TRAVEL.includes(it.a)).slice(0, 5);
+  const lab = el("div", "hl"); lab.appendChild(el("span", "label", "Travel alerts · GO, accidents, traffic, closures")); g.appendChild(lab);
+  if (!alerts.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "No travel alerts right now.")); g.appendChild(e); }
+  alerts.forEach(it => g.appendChild(item(it)));
+  return g;
+}
+
+/* ---------- markets ---------- */
+function spark(points){
+  const ns = "http://www.w3.org/2000/svg"; const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 100 26"); svg.setAttribute("preserveAspectRatio", "none");
+  if (!points || points.length < 5) return svg;
+  const min = Math.min(...points), max = Math.max(...points), span = (max - min) || 1;
+  const xy = points.map((p, i) => [(i / (points.length - 1)) * 100, 24 - ((p - min) / span) * 22]);
+  const up = points[points.length - 1] >= points[0];
+  const line = document.createElementNS(ns, "polyline"); line.setAttribute("points", xy.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" "));
+  line.setAttribute("fill", "none"); line.setAttribute("stroke", up ? "var(--up)" : "var(--down)"); line.setAttribute("stroke-width", "1.5"); line.setAttribute("vector-effect", "non-scaling-stroke"); svg.appendChild(line);
+  return svg;
+}
+function marketsStrip(){
+  const box = el("div", "markets");
+  (D.quotes || []).forEach(q => {
+    const t = el("div", "tick" + (q.price == null ? " off" : "")); t.appendChild(el("span", "label", q.label));
+    if (q.price == null){ t.appendChild(el("span", "px", "Unavailable")); box.appendChild(t); return; }
+    const dec = q.price < 10 ? 4 : 2;
+    t.appendChild(el("span", "px", q.price.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec })));
+    const p = q.pct || 0; t.appendChild(el("span", "chg " + (p > 0.005 ? "up" : p < -0.005 ? "down" : "flat"), (p > 0.005 ? "▲ " : p < -0.005 ? "▼ " : "") + Math.abs(p).toFixed(2) + "%"));
+    t.appendChild(spark(q.spark)); box.appendChild(t);
+  });
+  return box;
+}
+
+/* ---------- headlines ---------- */
+function topicGroup(t, limit){
+  const items = (D.headlines || {})[t.id] || [];
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", t.name)); head.appendChild(el("span", "stamp", items.length + " stories")); g.appendChild(head);
+  if (!items.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "Nothing new in the last few days.")); g.appendChild(e); }
+  let list = items;
+  if (t.id === "oakville" && limit) list = items.filter(it => !TRAVEL.includes(it.a));
+  list.slice(0, limit || 60).forEach(it => g.appendChild(item(it)));
+  if (limit && list.length > limit){ const more = el("button", "hl", "See all " + items.length + " " + t.name + " stories"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => { view = t.id; store.set("view", view); render(); window.scrollTo({ top: 0 }); }; g.appendChild(more); }
+  return g;
+}
+
+function render(){
+  if (!D) return;
+  if (view !== "all" && !sections().some(s => s.id === view)) view = "all";
+  renderStamp(); renderRail();
+  const main = $("#main"); main.textContent = "";
+  const add = n => n && main.appendChild(n);
+  add(warningsBlock());
+  if (view === "all"){
+    if (visible("weather")) add(weatherCard(false));
+    if (visible("oakville")) add(goCard());
+    if (visible("markets")) add(marketsStrip());
+    D.topics.filter(t => visible(t.id)).forEach(t => add(topicGroup(t, 5)));
+  } else if (view === "weather") add(weatherCard(true));
+  else if (view === "markets") add(marketsStrip());
+  else { const t = D.topics.find(x => x.id === view); if (t.id === "oakville") add(goCard()); add(topicGroup(t, 0)); }
+}
+
+/* ---------- settings ---------- */
+function openSheet(){
+  const box = $("#toggles"); box.textContent = "";
+  sections().forEach(s => {
+    const lab = el("label", "toggle"); lab.appendChild(el("span", "", s.name));
+    const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = visible(s.id); cb.id = "tg-" + s.id;
+    cb.onchange = () => { if (cb.checked) hidden.delete(s.id); else hidden.add(s.id); store.set("hidden", [...hidden]); render(); };
+    lab.appendChild(cb); box.appendChild(lab);
+  });
+  $("#sheet").hidden = false;
+}
+$("#custBtn").onclick = openSheet;
+$("#closeSheet").onclick = () => { $("#sheet").hidden = true; };
+$("#sheet").onclick = e => { if (e.target.id === "sheet") $("#sheet").hidden = true; };
+$("#copyTopic").onclick = async () => { const b = $("#copyTopic"); try { await navigator.clipboard.writeText($("#topicName").textContent); b.textContent = "Copied"; } catch(_){ const r = document.createRange(); r.selectNodeContents($("#topicName")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected, tap Copy"; } setTimeout(() => b.textContent = "Copy topic name", 2000); };
+$("#refreshBtn").onclick = () => load(true);
+
+load(false);
+setInterval(() => { if (document.visibilityState === "visible") load(false); }, 5 * 60 * 1000);
+setInterval(() => { if (D && !document.querySelector(".goall[open]") && $("#sheet").hidden) { renderStamp(); if (view === "all" || view === "oakville") render(); } }, 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(false); });
+if (navigator.serviceWorker) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
