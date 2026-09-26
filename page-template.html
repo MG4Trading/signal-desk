@@ -68,6 +68,9 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .alertbox{background:var(--bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
 .alertbox code{font-family:var(--mono);font-size:13px;user-select:all;word-break:break-all}
 .alertbox a{color:var(--accent);font-weight:600}
+.subrail{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.subrail::-webkit-scrollbar{display:none}
+.subrail .chip{min-height:32px;padding:5px 12px;font-size:12px}
 .primary{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:11px 16px;font-weight:600;min-height:44px}
 </style>
 </head>
@@ -122,6 +125,7 @@ const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
 const store = { get(k, d){ try { const v = localStorage.getItem("sd:" + k); return v == null ? d : JSON.parse(v); } catch(_){ return d; } }, set(k, v){ try { localStorage.setItem("sd:" + k, JSON.stringify(v)); } catch(_){} } };
 const TRAVEL = ["GO alerts", "Accidents", "Traffic", "Road closures", "GO Transit", "Transit"];
+let angle = "all";
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
@@ -149,7 +153,7 @@ function renderStamp(){
 
 function renderRail(){
   const rail = $("#rail"); rail.textContent = "";
-  const mk = (id, label) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(view === id)); b.onclick = () => { view = id; store.set("view", id); render(); window.scrollTo({ top: 0 }); }; rail.appendChild(b); };
+  const mk = (id, label) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(view === id)); b.onclick = () => { view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }; rail.appendChild(b); };
   mk("all", "All");
   sections().filter(s => visible(s.id)).forEach(s => mk(s.id, s.name));
 }
@@ -272,7 +276,9 @@ function marketsStrip(){
     if (q.price == null){ t.appendChild(el("span", "px", "Unavailable")); box.appendChild(t); return; }
     const dec = q.price < 10 ? 4 : 2;
     t.appendChild(el("span", "px", q.price.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec })));
-    const p = q.pct || 0; t.appendChild(el("span", "chg " + (p > 0.005 ? "up" : p < -0.005 ? "down" : "flat"), (p > 0.005 ? "▲ " : p < -0.005 ? "▼ " : "") + Math.abs(p).toFixed(2) + "%"));
+    const p = q.pct || 0;
+    if (q.note) t.appendChild(el("span", "chg flat", q.note));
+    else t.appendChild(el("span", "chg " + (p > 0.005 ? "up" : p < -0.005 ? "down" : "flat"), (p > 0.005 ? "▲ " : p < -0.005 ? "▼ " : "") + Math.abs(p).toFixed(2) + "%"));
     t.appendChild(spark(q.spark)); box.appendChild(t);
   });
   return box;
@@ -286,6 +292,7 @@ function topicGroup(t, limit){
   if (!items.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "Nothing new in the last few days.")); g.appendChild(e); }
   let list = items;
   if (t.id === "oakville" && limit) list = items.filter(it => !TRAVEL.includes(it.a));
+  if (!limit && angle !== "all") list = items.filter(it => it.a === angle);
   list.slice(0, limit || 60).forEach(it => g.appendChild(item(it)));
   if (limit && list.length > limit){ const more = el("button", "hl", "See all " + items.length + " " + t.name + " stories"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => { view = t.id; store.set("view", view); render(); window.scrollTo({ top: 0 }); }; g.appendChild(more); }
   return g;
@@ -305,7 +312,18 @@ function render(){
     D.topics.filter(t => visible(t.id)).forEach(t => add(topicGroup(t, 5)));
   } else if (view === "weather") add(weatherCard(true));
   else if (view === "markets") add(marketsStrip());
-  else { const t = D.topics.find(x => x.id === view); if (t.id === "oakville") add(goCard()); add(topicGroup(t, 0)); }
+  else {
+    const t = D.topics.find(x => x.id === view);
+    const angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];
+    if (angles.length > 1){
+      const sub = el("div", "subrail");
+      ["all", ...angles].forEach(a => { const b = el("button", "chip", a === "all" ? "Everything" : a); b.type = "button"; b.setAttribute("aria-pressed", String(angle === a)); b.onclick = () => { angle = a; render(); }; sub.appendChild(b); });
+      if (!angles.includes(angle)) angle = "all";
+      add(sub);
+    }
+    if (t.id === "oakville" && angle === "all") add(goCard());
+    add(topicGroup(t, 0));
+  }
 }
 
 /* ---------- settings ---------- */
