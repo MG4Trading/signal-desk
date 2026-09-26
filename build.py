@@ -19,6 +19,7 @@ TZ = ZoneInfo("America/Toronto")
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
 NOW = time.time()
 DRY = os.environ.get("SD_DRY_RUN") == "1"
+PER_ANGLE = 8
 
 cfg = json.load(open(os.path.join(ROOT, "config.json"), encoding="utf-8"))
 
@@ -124,13 +125,18 @@ def gather_news():
                 headlines[t["id"]].extend([x for x in prev_h.get(t["id"], []) if x.get("a") == f[0]])
     for tid, items in headlines.items():
         items.sort(key=lambda x: -x["ts"])
-        seen, keep = set(), []
+        seen, keep, per = set(), [], {}
         for it in items:
             key = re.sub(r"[^a-z0-9؀-ۿ]+", " ", it["t"].lower()).strip()[:80]
             if key in seen or it["l"] in seen:
                 continue
-            seen.add(key); seen.add(it["l"]); keep.append(it)
-        headlines[tid] = keep[:45]
+            seen.add(key); seen.add(it["l"])
+            # keep the newest few per category so quieter ones (like Ward 7) are not crowded out
+            if per.get(it["a"], 0) >= PER_ANGLE:
+                continue
+            per[it["a"]] = per.get(it["a"], 0) + 1
+            keep.append(it)
+        headlines[tid] = keep[:120]
     log(f"news: {sum(len(v) for v in headlines.values())} stories, {len(failed)} feeds failed")
     return headlines, failed
 
@@ -138,8 +144,17 @@ def gather_news():
 def gather_quotes():
     def one(pair):
         label, sym = pair
-        txt = get("https://query1.finance.yahoo.com/v8/finance/chart/" + urllib.parse.quote(sym) + "?range=1d&interval=15m")
-        r = json.loads(txt)["chart"]["result"][0]
+        last = None
+        for host in ("query1", "query2"):
+            try:
+                txt = get(f"https://{host}.finance.yahoo.com/v8/finance/chart/" + urllib.parse.quote(sym) + "?range=1d&interval=15m",
+                          headers={"Accept": "application/json,text/plain,*/*", "Referer": "https://finance.yahoo.com/"})
+                r = json.loads(txt)["chart"]["result"][0]
+                break
+            except Exception as e:
+                last = e
+        else:
+            raise last
         meta = r["meta"]
         closes = [c for c in (r["indicators"]["quote"][0].get("close") or []) if isinstance(c, (int, float))]
         prev = meta.get("chartPreviousClose") or meta.get("previousClose")
@@ -148,13 +163,26 @@ def gather_quotes():
         return {"label": label, "price": price, "pct": ((price - prev) / prev * 100) if prev and price else 0,
                 "spark": [round(c, 4) for c in closes[::step]]}
     prev_q = {q["label"]: q for q in prev_data.get("quotes", []) if q.get("price") is not None}
-    out = []
-    with ThreadPoolExecutor(max_workers=5) as ex:
+    out, errors = [], []
+    with ThreadPoolExecutor(max_workers=3) as ex:
         for pair, fu in [(p, ex.submit(one, p)) for p in cfg["quotes"]]:
             try:
                 out.append(fu.result())
-            except Exception:
+            except Exception as e:
+                errors.append(f"{pair[0]}: {e}")
                 out.append(prev_q.get(pair[0], {"label": pair[0], "price": None}))
+    if errors:
+        log("quotes errors:", "; ".join(errors[:4]))
+    # currencies: fall back to a free daily exchange-rate source when live quotes are unavailable
+    if any(q.get("price") is None for q in out if q["label"] in ("USD/CAD", "CAD/EGP", "USD/EGP")):
+        try:
+            rates = json.loads(get("https://open.er-api.com/v6/latest/USD"))["rates"]
+            fx = {"USD/CAD": rates["CAD"], "USD/EGP": rates["EGP"], "CAD/EGP": rates["EGP"] / rates["CAD"]}
+            for q in out:
+                if q.get("price") is None and q["label"] in fx:
+                    q.update({"price": round(fx[q["label"]], 4), "pct": 0, "spark": [], "note": "daily rate"})
+        except Exception as e:
+            log("fx fallback failed:", e)
     return out
 
 # ---------------------------------------------------------------- weather
