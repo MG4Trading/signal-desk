@@ -441,6 +441,52 @@ function marketsTable(){
   return g;
 }
 
+/* ---------- businesses for sale ---------- */
+let mkTab = store.get("mkTab", "mk"), bizArea = "all", bizSort = "new";
+function mkTabs(){
+  const t = el("div", "gotabs"); t.style.cssText = "grid-template-columns:1fr 1fr";
+  [["mk", "Markets"], ["biz", "Businesses for sale"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(mkTab === k)); b.onclick = () => { mkTab = k; store.set("mkTab", k); render(); }; t.appendChild(b); });
+  return t;
+}
+function bizView(){
+  const B = D.biz || {}, all = B.items || [], out = [];
+  const chips = el("div", "subrail");
+  [["all", "All areas"], ["Oakville & Halton", "Oakville & Halton"], ["GTA", "Rest of GTA"]].forEach(([k, lab]) => { const b = el("button", "chip", lab); b.type = "button"; b.setAttribute("aria-pressed", String(bizArea === k)); b.onclick = () => { bizArea = k; render(); }; chips.appendChild(b); });
+  [["new", "Newest"], ["low", "Price: low to high"], ["high", "Price: high to low"]].forEach(([k, lab]) => { const b = el("button", "chip", lab); b.type = "button"; b.setAttribute("aria-pressed", String(bizSort === k)); b.onclick = () => { bizSort = k; render(); }; chips.appendChild(b); });
+  out.push(chips);
+  let L = all.filter(x => bizArea === "all" || x.area === bizArea);
+  if (bizSort !== "new") L = L.slice().sort((a, b) => (a.p == null) - (b.p == null) || (bizSort === "low" ? a.p - b.p : b.p - a.p));
+  const priced = L.filter(x => x.p).map(x => x.p).sort((a, b) => a - b);
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Businesses for sale")); head.appendChild(el("span", "stamp", B.at ? L.length + " listings · checked " + ago(B.at) : "")); g.appendChild(head);
+  if (priced.length){ const st = el("div", "stats"); const one = (v, lab) => { const x = el("div", "stat"); x.appendChild(el("b", "", v)); x.appendChild(el("small", "", lab)); st.appendChild(x); };
+    const k = v => v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "M" : "$" + Math.round(v / 1000) + "k";
+    one(k(priced[Math.floor(priced.length / 2)]), "median asking"); one(k(priced[0]) + "–" + k(priced[priced.length - 1]).slice(1), "range"); one(String(L.length), "listings"); g.appendChild(st); }
+  if (!L.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", B.at ? "No listings in this area right now. Try the searches below." : "First check runs within the hour.")); g.appendChild(e); }
+  L.forEach(x => {
+    const a = el("a", "home"); a.href = x.l; a.target = "_blank"; a.rel = "noopener"; a.style.alignItems = "start";
+    const img = document.createElement("img"); img.loading = "lazy"; img.alt = ""; if (x.img) img.src = x.img; a.appendChild(img);
+    const t = el("div", "hl"); t.style.cssText = "padding:0;border:0;gap:3px";
+    const m = el("div", "hl-meta"); m.appendChild(el("span", "pr", x.p ? money(x.p) : "Price on request")); m.appendChild(el("span", "tag", x.kind));
+    if (x.ts && Date.now() / 1000 - x.ts < 3 * 86400) m.appendChild(el("span", "new", "New")); t.appendChild(m);
+    const tt = el("span", "hl-title", x.t); tt.dir = "auto"; t.appendChild(tt);
+    if (x.facts && x.facts.length){ const f = el("div", "sigs"); f.style.cssText = "display:flex;flex-wrap:wrap;gap:4px"; x.facts.forEach(z => f.appendChild(el("span", "pill-sig", z))); t.appendChild(f); }
+    const d = el("span", "hl-snip", x.d.slice(0, 220) + (x.d.length > 220 ? "…" : "")); d.dir = "auto"; t.appendChild(d);
+    t.appendChild(el("span", "hl-snip", [x.place, x.also && x.also.length ? "also listed in " + x.also.slice(0, 3).join(", ") : "", x.ts ? ago(x.ts) : "", "Kijiji ↗"].filter(Boolean).join(" · ")));
+    a.appendChild(t); g.appendChild(a);
+  });
+  out.push(g);
+  const links = el("div", "group"); const lh = el("div", "group-head"); lh.appendChild(el("strong", "", "More listings and brokers")); links.appendChild(lh);
+  [["BizBuySell · Oakville", "Largest marketplace, with financials on many listings", "https://www.bizbuysell.com/ontario/oakville-businesses-for-sale/"],
+   ["BizBuySell · Toronto and GTA", "", "https://www.bizbuysell.com/ontario/toronto-businesses-for-sale/"],
+   ["BusinessesForSale.com · Ontario", "Broker and owner listings", "https://ca.businessesforsale.com/canadian/search/businesses-for-sale-in-ontario"],
+   ["REALTOR.ca · businesses for sale", "Pick Commercial, then Business, and search Oakville", "https://www.realtor.ca/"],
+   ["Kijiji · business for sale, Oakville", "The source for the list above", "https://www.kijiji.ca/b-other-business-industrial/oakville-halton-region/business-for-sale/k0c145l1700277?sort=dateDesc"],
+   ["Franchise opportunities in Canada", "Canadian Franchise Association directory", "https://www.cfa.ca/"]].forEach(([t, s2, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t + " ↗")); if (s2) a.appendChild(el("span", "hl-snip", s2)); links.appendChild(a); });
+  const note = el("div", "hl"); note.appendChild(el("span", "hl-snip", "Before making an offer: ask for 3 years of financials and tax returns, check the lease terms and any franchise fees, and have an accountant and a lawyer review the deal.")); links.appendChild(note);
+  out.push(links);
+  return out;
+}
+
 /* ---------- market deep dive ---------- */
 let mkSel = store.get("mkSel", "S&P/TSX"), mkRange = store.get("mkRange", "1Y"), mkAngle = "all";
 const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(v != null && Math.abs(v) >= 100 ? 0 : 1) + "%";
@@ -861,7 +907,7 @@ function render(){
   else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); add(hadithCard()); add(surahCard()); }
   else if (view === "kitchen"){ add(kitchenView()); }
   else if (view === "fun"){ funView().forEach(add); }
-  else if (view === "markets"){ add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); }
+  else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
   else {
     const t = topic(view);
     let angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];

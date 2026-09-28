@@ -508,6 +508,69 @@ def gather_extras():
     log("extras:", ", ".join(k for k in out if k not in ("date", "generated", "day_no")))
     return out
 
+# ---------------------------------------------------------------- businesses for sale
+BIZ_INC = re.compile(r"business|franchise|restaurant|clinic|salon|caf[eé]|store|gas station|route|company|turn-?key|bakery|pizza|daycare|spa\b|gym|laundromat|car wash|e-?commerce", re.I)
+BIZ_SALE = re.compile(r"for sale|sale\b|opportunit|established|take over|retiring|turn-?key|profitable", re.I)
+BIZ_EXC = re.compile(r"rack|mezzanine|ladder|pallet|forklift|shelving|container|carpet|\bpos\b|cash register|mobile sign|equipment|free for buyers|find your perfect|wanted|we buy|i will buy|looking (?:to|for)|for rent|for lease|appliances|closing sale|must go|liquidat", re.I)
+BIZ_TYPES = [("Food & restaurant", r"restaurant|caf[eé]|pizza|bakery|food|kitchen|grill|shawarma|coffee"), ("Franchise", r"franchise"),
+             ("Health & beauty", r"clinic|salon|spa\b|massage|dental|physio|beauty|barber"), ("Retail", r"store|shop|retail|convenience|gas station"),
+             ("Services", r"cleaning|rental|route|vending|daycare|school|repair|delivery|moving|landscap|sign"), ("Online", r"online|e-?commerce|website|amazon|shopify")]
+
+
+def gather_biz():
+    prev = prev_data.get("biz") or {}
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("items"):
+        return prev
+    searches = [("Oakville & Halton", "oakville-halton-region", "1700277", "business-for-sale"),
+                ("Oakville & Halton", "oakville-halton-region", "1700277", "franchise-for-sale"),
+                ("GTA", "gta-greater-toronto-area", "1700272", "business-for-sale"),
+                ("GTA", "gta-greater-toronto-area", "1700272", "franchise-for-sale"),
+                ("GTA", "gta-greater-toronto-area", "1700272", "restaurant-for-sale")]
+    items, seen_url, seen_desc, ok = [], set(), {}, 0
+    for area, slug, loc, kw in searches:
+        url = f"https://www.kijiji.ca/b-other-business-industrial/{slug}/{kw}/k0c145l{loc}?sort=dateDesc"
+        try:
+            ap = next_data(get(url, timeout=25)).get("props", {}).get("pageProps", {}).get("__APOLLO_STATE__", {})
+            ok += 1
+        except Exception as e:
+            log("biz", kw, e); continue
+        for k, v in ap.items():
+            if not k.startswith("StandardListing:"):
+                continue
+            t = (v.get("title") or "").strip(); d = re.sub(r"\s+", " ", v.get("description") or "").strip(); u = v.get("url") or ""
+            if not u or u in seen_url or BIZ_EXC.search(t) or not BIZ_INC.search(t + " " + d[:200]) or not BIZ_SALE.search(t + " " + d[:300]):
+                continue
+            seen_url.add(u)
+            place = ((v.get("location") or {}).get("name") or "").replace(" / Halton Region", "").replace(" / Peel Region", "").replace(" / York Region", "").replace(" / Durham Region", "").replace("City of ", "")
+            key = d[:90].lower()
+            if key in seen_desc:
+                if place and place not in seen_desc[key]["also"] and place != seen_desc[key]["place"]:
+                    seen_desc[key]["also"].append(place)
+                continue
+            amt = (v.get("price") or {}).get("amount")
+            price = round(amt / 100) if amt and amt >= 100000 else None
+            try:
+                listed = int(datetime.fromisoformat((v.get("activationDate") or v.get("sortingDate")).replace("Z", "+00:00")).timestamp())
+            except Exception:
+                listed = 0
+            facts = []
+            m = re.search(r"\$\s?([\d,.]+)\s?([kKmM])?\s*(?:down|down payment)", t + " " + d)
+            if m: facts.append("Down payment $" + m.group(1) + (m.group(2) or "").upper())
+            for lab, pat in (("Sales", r"(?:annual )?(?:sales|revenue)[^$.]{0,25}\$\s?([\d,.]+\s?[kKmM]?)"), ("Profit", r"(?:net )?(?:profit|income|cash ?flow|SDE|EBITDA)[^$.]{0,25}\$\s?([\d,.]+\s?[kKmM]?)"),
+                             ("Rent", r"rent[^$.]{0,20}\$\s?([\d,.]+\s?[kKmM]?)"), ("Years", r"(\d{1,2}\+?\s?years)")):
+                m = re.search(pat, d, re.I)
+                if m: facts.append(lab + " " + (("$" + m.group(1)) if lab != "Years" else m.group(1)))
+            kind = next((name for name, pat in BIZ_TYPES if re.search(pat, t + " " + d[:300], re.I)), "Other")
+            it = {"t": t[:100], "d": d[:420], "l": u, "p": price, "place": place, "area": "Oakville & Halton" if re.search(r"oakville|burlington|milton|halton", place, re.I) else area,
+                  "kind": kind, "facts": facts[:4], "ts": listed, "img": (v.get("imageUrls") or [""])[0], "also": []}
+            seen_desc[key] = it; items.append(it)
+        time.sleep(1)
+    if not ok:
+        return prev or {"at": 0, "items": []}
+    items.sort(key=lambda x: -x["ts"])
+    log(f"biz: {len(items)} businesses for sale")
+    return {"at": int(NOW), "items": items[:60]}
+
 # ---------------------------------------------------------------- weather
 WMO = {
     0: ("Clear", "☀️"), 1: ("Mainly clear", "🌤️"), 2: ("Partly cloudy", "⛅"), 3: ("Cloudy", "☁️"),
@@ -902,7 +965,11 @@ def main():
         quotes = gather_quotes()
     except Exception as e:
         log("quotes failed", e); quotes = prev_data.get("quotes", [])
-    deep = rates = housing = None
+    deep = rates = housing = biz = None
+    try:
+        biz = gather_biz()
+    except Exception as e:
+        log("biz failed", e); biz = prev_data.get("biz")
     try:
         deep = gather_deep(quotes)
     except Exception as e:
@@ -941,7 +1008,7 @@ def main():
         "repo": os.environ.get("GITHUB_REPOSITORY", ""),
         "topics": [{"id": t["id"], "name": t["name"], "links": t.get("links", []), "in_markets": bool(t.get("in_markets"))} for t in cfg["topics"]],
         "headlines": headlines, "quotes": quotes, "weather": weather, "warnings": ec,
-        "rentals": rentals, "events": events, "deep": deep, "rates": rates, "housing": housing,
+        "rentals": rentals, "events": events, "deep": deep, "rates": rates, "housing": housing, "biz": biz,
         "failed": failed, "location": cfg["location"]["name"],
     }
     run_alerts(headlines, weather, ec)
