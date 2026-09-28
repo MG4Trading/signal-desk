@@ -141,48 +141,83 @@ def gather_news():
     return headlines, failed
 
 # ---------------------------------------------------------------- markets
+def _num(x):
+    try:
+        return float(str(x).replace(",", "").replace("%", "").replace("+", ""))
+    except Exception:
+        return None
+
+
+def _iso(t):
+    try:
+        t = re.sub(r"([+-]\d\d)(\d\d)$", r"\1:\2", t)
+        return int(datetime.fromisoformat(t).timestamp())
+    except Exception:
+        return None
+
+
+def cnbc_quotes(symbols):
+    url = ("https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols="
+           + urllib.parse.quote("|".join(symbols)) + "&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json")
+    d = json.loads(get(url, headers={"Accept": "application/json"}))
+    out = {}
+    for q in d["FormattedQuoteResult"]["FormattedQuote"]:
+        price = _num(q.get("last"))
+        if price is None:
+            continue
+        out[q["symbol"]] = {"price": price, "pct": _num(q.get("change_pct")) or 0.0, "asof": _iso(q.get("last_time") or ""),
+                            "name": q.get("name") or q["symbol"]}
+    return out
+
+
+def google_quote(sym):
+    h = get("https://www.google.com/finance/quote/" + sym + "?hl=en")
+    a, b = sym.split(":")
+    m = re.search(r'\["' + re.escape(a) + r'","' + re.escape(b) + r'"\],"[^"]*",\d+,null,\[([-\d.]+),([-\d.]+),([-\d.]+)[^\]]*\],null,[-\d.]+,null,null,null,\[(\d+)\]', h)
+    if not m:
+        raise ValueError("price not found")
+    return {"price": float(m.group(1)), "pct": float(m.group(3)), "asof": int(m.group(4))}
+
+
 def gather_quotes():
-    def one(pair):
-        label, sym = pair
-        last = None
-        for host in ("query1", "query2"):
-            try:
-                txt = get(f"https://{host}.finance.yahoo.com/v8/finance/chart/" + urllib.parse.quote(sym) + "?range=1d&interval=15m",
-                          headers={"Accept": "application/json,text/plain,*/*", "Referer": "https://finance.yahoo.com/"})
-                r = json.loads(txt)["chart"]["result"][0]
-                break
-            except Exception as e:
-                last = e
-        else:
-            raise last
-        meta = r["meta"]
-        closes = [c for c in (r["indicators"]["quote"][0].get("close") or []) if isinstance(c, (int, float))]
-        prev = meta.get("chartPreviousClose") or meta.get("previousClose")
-        price = meta.get("regularMarketPrice")
-        step = max(1, len(closes) // 40)
-        return {"label": label, "price": price, "pct": ((price - prev) / prev * 100) if prev and price else 0,
-                "spark": [round(c, 4) for c in closes[::step]]}
+    """Markets: CNBC's public quote feed, Google Finance for Tadawul. Each tile links to its source."""
     prev_q = {q["label"]: q for q in prev_data.get("quotes", []) if q.get("price") is not None}
-    out, errors = [], []
-    with ThreadPoolExecutor(max_workers=3) as ex:
-        for pair, fu in [(p, ex.submit(one, p)) for p in cfg["quotes"]]:
-            try:
-                out.append(fu.result())
-            except Exception as e:
-                errors.append(f"{pair[0]}: {e}")
-                out.append(prev_q.get(pair[0], {"label": pair[0], "price": None}))
-    if errors:
-        log("quotes errors:", "; ".join(errors[:4]))
-    # currencies: fall back to a free daily exchange-rate source when live quotes are unavailable
-    if any(q.get("price") is None for q in out if q["label"] in ("USD/CAD", "CAD/EGP", "USD/EGP")):
+    today = datetime.now(TZ).strftime("%Y-%m-%d")
+    cn_syms = sorted({x for _, src in cfg["quotes"] for x in re.findall(r"(?:cnbc:|ratio:|/)([^/]+)", src) if not src.startswith("google:")})
+    try:
+        cn = cnbc_quotes(cn_syms)
+    except Exception as e:
+        log("cnbc failed:", e); cn = {}
+    out = []
+    for label, src in cfg["quotes"]:
+        q = None
         try:
-            rates = json.loads(get("https://open.er-api.com/v6/latest/USD"))["rates"]
-            fx = {"USD/CAD": rates["CAD"], "USD/EGP": rates["EGP"], "CAD/EGP": rates["EGP"] / rates["CAD"]}
-            for q in out:
-                if q.get("price") is None and q["label"] in fx:
-                    q.update({"price": round(fx[q["label"]], 4), "pct": 0, "spark": [], "note": "daily rate"})
+            if src.startswith("cnbc:"):
+                sym = src[5:]; x = cn.get(sym)
+                if x:
+                    q = dict(x, source="CNBC", url="https://www.cnbc.com/quotes/" + urllib.parse.quote(sym))
+            elif src.startswith("ratio:"):
+                a, b = src[6:].split("/"); xa, xb = cn.get(a), cn.get(b)
+                if xa and xb:
+                    pct = ((1 + xa["pct"] / 100) / (1 + xb["pct"] / 100) - 1) * 100
+                    q = {"price": round(xa["price"] / xb["price"], 4), "pct": pct, "asof": min(xa["asof"] or 0, xb["asof"] or 0) or None,
+                         "source": "CNBC (USD/EGP ÷ USD/CAD)", "url": "https://www.google.com/finance/quote/CAD-EGP"}
+            elif src.startswith("google:"):
+                sym = src[7:]
+                q = dict(google_quote(sym), source="Google Finance", url="https://www.google.com/finance/quote/" + sym)
         except Exception as e:
-            log("fx fallback failed:", e)
+            log("quote", label, e)
+        old = prev_q.get(label)
+        if not q:
+            q = dict(old, stale=True) if old else {"price": None}
+        else:
+            spark = list(old.get("spark") or []) if old and old.get("day") == today else []
+            if not spark or spark[-1] != q["price"]:
+                spark.append(q["price"])
+            q.update(spark=spark[-60:], day=today)
+        q["label"] = label
+        out.append(q)
+    log("quotes:", sum(1 for q in out if q.get("price") is not None and not q.get("stale")), "fresh of", len(out))
     return out
 
 # ---------------------------------------------------------------- weather

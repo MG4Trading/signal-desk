@@ -130,7 +130,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
   </main>
 
   <footer>
-    <span>Updates about every 10 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, rentals from Kijiji, events from Meetup, markets from Yahoo Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
+    <span>Updates about every 10 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, rentals from Kijiji, events from Meetup, markets from CNBC and Google Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
   </footer>
 </div>
 
@@ -348,19 +348,37 @@ function spark(points){
   line.setAttribute("fill", "none"); line.setAttribute("stroke", up ? "var(--up)" : "var(--down)"); line.setAttribute("stroke-width", "1.5"); line.setAttribute("vector-effect", "non-scaling-stroke"); svg.appendChild(line);
   return svg;
 }
+function fmtPx(q){ const dec = q.price < 10 ? 4 : 2; return q.price.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+function fmtAsOf(sec){ if (!sec) return ""; const d = new Date(sec * 1000), same = d.toDateString() === new Date().toDateString();
+  return (same ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + " ") + d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }); }
+function chgEl(q){ const p = q.pct || 0; return el("span", "chg " + (p > 0.005 ? "up" : p < -0.005 ? "down" : "flat"), (p > 0.005 ? "▲ " : p < -0.005 ? "▼ " : "") + Math.abs(p).toFixed(2) + "%"); }
 function marketsStrip(){
   const box = el("div", "markets");
   (D.quotes || []).forEach(q => {
-    const t = el("div", "tick" + (q.price == null ? " off" : "")); t.appendChild(el("span", "label", q.label));
+    const t = el(q.url ? "a" : "div", "tick" + (q.price == null ? " off" : "")); if (q.url){ t.href = q.url; t.target = "_blank"; t.rel = "noopener"; t.style.cssText = "text-decoration:none;color:inherit"; }
+    t.appendChild(el("span", "label", q.label));
     if (q.price == null){ t.appendChild(el("span", "px", "Unavailable")); box.appendChild(t); return; }
-    const dec = q.price < 10 ? 4 : 2;
-    t.appendChild(el("span", "px", q.price.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec })));
-    const p = q.pct || 0;
-    if (q.note) t.appendChild(el("span", "chg flat", q.note));
-    else t.appendChild(el("span", "chg " + (p > 0.005 ? "up" : p < -0.005 ? "down" : "flat"), (p > 0.005 ? "▲ " : p < -0.005 ? "▼ " : "") + Math.abs(p).toFixed(2) + "%"));
-    t.appendChild(spark(q.spark)); box.appendChild(t);
+    t.appendChild(el("span", "px", fmtPx(q))); t.appendChild(chgEl(q));
+    t.appendChild(spark(q.spark));
+    t.appendChild(el("span", "chg flat", (q.stale ? "last seen " : "") + fmtAsOf(q.asof) + " · " + (q.source || "").split(" ")[0] + " ↗"));
+    box.appendChild(t);
   });
   return box;
+}
+function marketsTable(){
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Markets")); head.appendChild(el("span", "stamp", "tap a row for the source")); g.appendChild(head);
+  (D.quotes || []).forEach(q => {
+    const a = el(q.url ? "a" : "div", "hl"); if (q.url){ a.href = q.url; a.target = "_blank"; a.rel = "noopener"; }
+    const top = el("div", "hl-meta"); top.style.cssText = "justify-content:space-between;font-size:15px;color:var(--ink)";
+    top.appendChild(el("strong", "", q.label));
+    const r = el("span", ""); r.style.cssText = "display:flex;gap:10px;align-items:baseline;font-family:var(--mono);font-variant-numeric:tabular-nums";
+    if (q.price == null) r.appendChild(el("span", "", "Unavailable")); else { r.appendChild(el("span", "", fmtPx(q))); r.appendChild(chgEl(q)); }
+    top.appendChild(r); a.appendChild(top);
+    if (q.price != null) a.appendChild(el("span", "hl-snip", (q.stale ? "Source didn't answer; last seen " : "As of ") + fmtAsOf(q.asof) + " · " + (q.source || "") + (q.url ? " ↗" : "")));
+    g.appendChild(a);
+  });
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Prices can be delayed 15 minutes or more. Currency rates are mid-market.")); g.appendChild(n);
+  return g;
 }
 
 /* ---------- homes ---------- */
@@ -476,7 +494,7 @@ function render(){
       else add(topicGroup(t, 5));
     });
   } else if (view === "weather") add(weatherCard(true));
-  else if (view === "markets") add(marketsStrip());
+  else if (view === "markets"){ add(marketsStrip()); add(marketsTable()); }
   else {
     const t = topic(view);
     let angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];

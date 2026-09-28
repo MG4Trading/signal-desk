@@ -26,39 +26,39 @@
  "quotes": [
   [
    "S&P/TSX",
-   "^GSPTSE"
+   "cnbc:.GSPTSE"
   ],
   [
    "S&P 500",
-   "^GSPC"
+   "cnbc:.SPX"
   ],
   [
    "Nasdaq",
-   "^IXIC"
+   "cnbc:.IXIC"
   ],
   [
    "Tadawul",
-   "^TASI.SR"
+   "google:TASI:TADAWUL"
   ],
   [
    "Brent",
-   "BZ=F"
+   "cnbc:@LCO.1"
   ],
   [
    "Gold",
-   "GC=F"
+   "cnbc:@GC.1"
   ],
   [
    "USD/CAD",
-   "CAD=X"
+   "cnbc:CAD="
   ],
   [
    "CAD/EGP",
-   "CADEGP=X"
+   "ratio:EGP=/CAD="
   ],
   [
    "USD/EGP",
-   "EGP=X"
+   "cnbc:EGP="
   ]
  ],
  "topics": [
