@@ -400,6 +400,114 @@ def gather_housing():
         return prev or out
     return out
 
+# ---------------------------------------------------------------- faith, kitchen, watch & listen (daily)
+QURAN = "https://api.alquran.cloud/v1"
+TAFSIR = "https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@main/tafsir/"
+HADITH = "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/"
+
+
+def gather_prayer():
+    loc = cfg["location"]; out = []
+    for off in (0, 1):
+        d = datetime.now(TZ) + timedelta(days=off)
+        j = json.loads(get(f"https://api.aladhan.com/v1/timings/{d.strftime('%d-%m-%Y')}?latitude={loc['lat']}&longitude={loc['lon']}&method=2&school=0"))["data"]
+        t = j["timings"]; h = j["date"]["hijri"]
+        out.append({"date": d.strftime("%Y-%m-%d"), "times": {k: t[k][:5] for k in ("Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha")},
+                    "hijri_ar": f"{h['day']} {h['month']['ar']} {h['year']}", "hijri_en": f"{h['day']} {h['month']['en']} {h['year']} AH"})
+    return {"days": out, "method": "ISNA, standard Asr", "source": "Aladhan", "url": "https://aladhan.com/prayer-times-api"}
+
+
+def gather_faith(day_no, content):
+    faith = {}
+    ref = content["ayahs"][day_no % len(content["ayahs"])]
+    a = json.loads(get(f"{QURAN}/ayah/{ref}/editions/quran-uthmani,en.sahih,ar.muyassar"))["data"]
+    faith["ayah"] = {"ref": ref, "ar": a[0]["text"], "en": a[1]["text"], "tafsir_ar": a[2]["text"],
+                     "surah_ar": a[0]["surah"]["name"], "surah_en": a[0]["surah"]["englishName"],
+                     "url": "https://quran.com/" + ref.replace(":", "/")}
+    # surah of the day: Al-Kahf on Fridays, otherwise a daily cycle through all 114
+    n = 18 if datetime.now(TZ).weekday() == 4 else 114 - (day_no % 114)
+    su = json.loads(get(f"{QURAN}/surah/{n}/editions/quran-uthmani,en.sahih"))["data"]
+    ar_t = json.loads(get(f"{TAFSIR}ar-tafsir-muyassar/{n}.json", timeout=40))
+    en_t = json.loads(get(f"{TAFSIR}en-tafsir-al-mukhtasar/{n}.json", timeout=40))
+    ar_map = {x["ayah"]: x["text"] for x in ar_t}; en_map = {x["ayah"]: x["text"] for x in en_t}
+    intro = ""
+    first = ar_map.get(1, "")
+    if "من مقاصد السورة" in first or "تسمية السورة" in first:
+        parts = first.split("\n\n")
+        keep = [p_ for p_ in parts if p_.strip()]
+        # the intro ends where the tafsir of verse 1 begins (the last paragraph)
+        intro = "\n\n".join(keep[:-1]).strip(); ar_map[1] = keep[-1] if keep else first
+    faith["surah"] = {"n": n, "name_ar": su[0]["name"], "name_en": su[0]["englishName"], "meaning": su[0]["englishNameTranslation"],
+                      "type": su[0]["revelationType"], "count": su[0]["numberOfAyahs"], "intro_ar": intro,
+                      "ayahs": [{"n": x["numberInSurah"], "ar": x["text"], "en": su[1]["ayahs"][i]["text"],
+                                 "t_ar": ar_map.get(x["numberInSurah"], ""), "t_en": en_map.get(x["numberInSurah"], "")} for i, x in enumerate(su[0]["ayahs"])],
+                      "info_url": f"https://quran.com/surah/{n}/info", "read_url": f"https://quran.com/{n}",
+                      "listen_url": f"https://quran.com/{n}?reciter=7"}
+    # hadith: rotate the 42 of an-Nawawi and the 40 Hadith Qudsi, Arabic and English
+    pool = [("nawawi", i) for i in range(1, 43)] + [("qudsi", i) for i in range(1, 41)]
+    book, num = pool[day_no % len(pool)]
+    ar = json.loads(get(f"{HADITH}ara-{book}/{num}.json"))["hadiths"][0]["text"]
+    en = json.loads(get(f"{HADITH}eng-{book}/{num}.json"))["hadiths"][0]["text"]
+    faith["hadith"] = {"book": {"nawawi": "الأربعون النووية · Forty Hadith of an-Nawawi", "qudsi": "الأحاديث القدسية · Forty Hadith Qudsi"}[book],
+                       "num": num, "ar": ar.strip(), "en": en.strip(),
+                       "url": f"https://sunnah.com/{'nawawi40' if book == 'nawawi' else 'qudsi40'}:{num}"}
+    return faith
+
+
+def gather_podcasts(country, n=40, max_min=30):
+    feed = json.loads(get(f"https://rss.applemarketingtools.com/api/v2/{country}/podcasts/top/{n}/podcasts.json"))["feed"]["results"]
+    ids = ",".join(r["id"] for r in feed)
+    look = json.loads(get(f"https://itunes.apple.com/lookup?id={ids}&entity=podcastEpisode&limit=1&country={country}"))["results"]
+    ep = {}
+    for r in look:
+        if r.get("wrapperType") == "podcastEpisode" and r.get("collectionId") and r.get("trackTimeMillis"):
+            ep.setdefault(str(r["collectionId"]), r)
+    out = []
+    for i, r in enumerate(feed):
+        e = ep.get(r["id"])
+        if not e:
+            continue
+        mins = round(e["trackTimeMillis"] / 60000)
+        if mins > max_min:
+            continue
+        out.append({"rank": i + 1, "name": r["name"], "by": r.get("artistName", ""), "genre": (r.get("genres") or [{}])[0].get("name", ""),
+                    "url": r["url"], "img": r.get("artworkUrl100", ""), "ep": e.get("trackName", ""), "mins": mins,
+                    "ep_url": e.get("trackViewUrl") or r["url"]})
+    return out
+
+
+def gather_movies(genre, n=15):
+    d = json.loads(get(f"https://itunes.apple.com/ca/rss/topmovies/limit={n}/genre={genre}/json"))["feed"].get("entry", [])
+    out = []
+    for e in d:
+        link = next((l["attributes"]["href"] for l in (e.get("link") if isinstance(e.get("link"), list) else [e.get("link")]) if l and l.get("attributes", {}).get("rel") == "alternate"), "")
+        out.append({"t": e["im:name"]["label"], "year": (e.get("im:releaseDate", {}).get("label") or "")[:4], "url": link,
+                    "genre": e.get("category", {}).get("attributes", {}).get("label", ""), "sum": (e.get("summary", {}).get("label") or "")[:220],
+                    "img": (e.get("im:image") or [{}])[-1].get("label", "")})
+    return out
+
+
+def gather_extras():
+    prev = load_json(os.path.join(PREV, "extras.json"), {})
+    today = datetime.now(TZ).strftime("%Y-%m-%d")
+    if prev.get("date") == today and prev.get("faith") and prev.get("prayer"):
+        return prev
+    content = load_json(os.path.join(ROOT, "extras-content.json"), {})
+    day_no = (datetime.now(TZ).date() - datetime(2026, 1, 1).date()).days
+    out = {"date": today, "generated": int(time.time()), "day_no": day_no}
+    for key, fn in (("prayer", gather_prayer), ("faith", lambda: gather_faith(day_no, content)),
+                    ("podcasts_ca", lambda: gather_podcasts("ca")), ("podcasts_eg", lambda: gather_podcasts("eg")),
+                    ("movies_action", lambda: gather_movies(4401)), ("movies_thriller", lambda: gather_movies(4416))):
+        try:
+            out[key] = fn()
+        except Exception as e:
+            log("extras", key, e)
+            if prev.get(key):
+                out[key] = prev[key]
+    out["content"] = content
+    log("extras:", ", ".join(k for k in out if k not in ("date", "generated", "day_no")))
+    return out
+
 # ---------------------------------------------------------------- weather
 WMO = {
     0: ("Clear", "☀️"), 1: ("Mainly clear", "🌤️"), 2: ("Partly cloudy", "⛅"), 3: ("Cloudy", "☁️"),
@@ -840,6 +948,14 @@ def main():
     os.makedirs(SITE, exist_ok=True)
     with open(os.path.join(SITE, "data.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+    try:
+        extras = gather_extras()
+        with open(os.path.join(SITE, "extras.json"), "w", encoding="utf-8") as f:
+            json.dump(extras, f, ensure_ascii=False, separators=(",", ":"))
+    except Exception as e:
+        log("extras failed", e)
+        if os.path.exists(os.path.join(PREV, "extras.json")):
+            shutil.copy(os.path.join(PREV, "extras.json"), os.path.join(SITE, "extras.json"))
     with open(os.path.join(SITE, "state.json"), "w", encoding="utf-8") as f:
         json.dump(state, f, separators=(",", ":"))
     page = open(os.path.join(ROOT, "page-template.html"), encoding="utf-8").read()

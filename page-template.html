@@ -14,7 +14,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 __CSS__
 [hidden]{display:none!important}
@@ -123,6 +123,44 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .gauge{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--accent-soft) 0 45%,var(--surface-2) 45% 65%,var(--amber-soft) 65% 100%);margin:6px 16px 2px}
 .gauge i{position:absolute;top:-4px;width:4px;height:18px;border-radius:2px;background:var(--ink);transform:translateX(-2px)}
 .gauge-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 16px 12px}
+.ar{font-family:"Amiri","Noto Naskh Arabic","Geeza Pro",serif;direction:rtl;text-align:right;line-height:1.9}
+.bigcount .label{display:block}
+.ayah,.av .ar,.qn{font-family:"Amiri Quran","Amiri","Geeza Pro",serif}
+.ayah{font-size:26px;line-height:2.1;padding:14px 16px 6px}
+.ayah-en{font-size:15px;padding:0 16px 10px;color:var(--ink)}
+.pray{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 16px}
+.pray div{background:var(--bg);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:1px;align-items:center}
+.pray div.next{background:var(--accent);color:var(--accent-ink)}
+.pray div.next .label{color:var(--accent-ink)}
+.pray b{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.bigcount{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:12px 16px 0;flex-wrap:wrap}
+.bigcount strong{font-family:var(--display);font-stretch:80%;font-size:30px;line-height:1}
+.fold summary{cursor:pointer;list-style:none;color:var(--accent);font-weight:600;font-size:13px;padding:6px 16px 10px;min-height:32px}
+.fold summary::-webkit-details-marker{display:none}
+.fold .inner{padding:0 16px 12px;font-size:15px;white-space:pre-line}
+.av{border-top:1px solid var(--line);padding:10px 16px;display:flex;flex-direction:column;gap:6px}
+.av .num{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.av .ar{font-size:22px}
+.av .en{font-size:14px}
+.av .t{font-size:14px;color:var(--muted);white-space:pre-line}
+.langseg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--surface-2);border-radius:10px;padding:3px;margin:10px 16px 4px}
+.langseg button{border:0;background:transparent;border-radius:8px;padding:7px 4px;font-size:13px;font-weight:600;color:var(--muted);min-height:36px}
+.langseg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.recipe-meta{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+.ing{margin:0;padding:0 16px 10px 34px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.ing b{font-family:var(--mono);font-weight:500;font-size:13px}
+.steps{margin:0;padding:0 16px 12px 34px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+[dir="rtl"] .ing,[dir="rtl"] .steps{padding:0 34px 10px 16px}
+.menu-row{display:grid;grid-template-columns:86px 1fr;gap:10px;padding:10px 16px;border-top:1px solid var(--line);font-size:14px}
+.menu-row .label{padding-top:2px}
+.serv{display:flex;align-items:center;gap:8px;padding:0 16px 10px;font-size:13px;color:var(--muted)}
+.serv button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;line-height:1}
+.film{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line)}
+.film img{width:52px;height:78px;object-fit:cover;border-radius:6px;background:var(--surface-2)}
+.film .links{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;font-weight:600}
+.film .links a{color:var(--accent);text-decoration:none}
+.pod{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.pod img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--surface-2)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:calc(100% - 32px);text-align:center}
 </style>
 </head>
@@ -201,11 +239,12 @@ const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
 const store = { get(k, d){ try { const v = localStorage.getItem("sd:" + k); return v == null ? d : JSON.parse(v); } catch(_){ return d; } }, set(k, v){ try { localStorage.setItem("sd:" + k, JSON.stringify(v)); } catch(_){} } };
 const TRAVEL = ["GO alerts", "Accidents", "Traffic", "Road closures", "GO Transit", "Transit"];
+let X = null, faithLang = store.get("faithLang", "both"), kLang = store.get("kLang", "en"), kServ = store.get("kServ", 4), kPick = null, podTab = "ca", surahAll = false;
 let angle = "all", wxTab = store.get("wxTab", "today");
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
-function sections(){ const s = [{ id: "weather", name: "Weather" }]; (D ? D.topics : []).filter(t => !t.in_markets).forEach(t => s.push(t)); s.push({ id: "markets", name: "Markets" }); return s; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer & Quran" }]; (D ? D.topics : []).filter(t => !t.in_markets).forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
 
 function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
@@ -216,6 +255,7 @@ async function load(force){
     const r = await fetch("data.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 60000)), { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
     D = await r.json();
+    try { const r2 = await fetch("extras.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 600000)), { cache: "no-store" }); if (r2.ok) X = await r2.json(); } catch(_) {}
     render();
     if (force) toast(before && D.generated === before ? "Already the latest · updated " + ago(D.generated) : "Updated · " + ago(D.generated));
   } catch (e) {
@@ -533,6 +573,176 @@ function marketNews(){
   return wrap;
 }
 
+/* ---------- faith ---------- */
+const PR = [["Fajr","الفجر"],["Sunrise","الشروق"],["Dhuhr","الظهر"],["Asr","العصر"],["Maghrib","المغرب"],["Isha","العشاء"]];
+function hm(t){ const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+function nextPrayer(){
+  const P = X && X.prayer; if (!P) return null;
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+  const g = k => (parts.find(p => p.type === k) || {}).value; const today = g("year") + "-" + g("month") + "-" + g("day"); const mins = (Number(g("hour")) % 24) * 60 + Number(g("minute"));
+  const d0 = P.days.find(d => d.date === today) || P.days[0], d1 = P.days.find(d => d.date > today);
+  for (const [k, ar] of PR){ if (k === "Sunrise") continue; if (hm(d0.times[k]) > mins) return { k, ar, t: d0.times[k], wait: hm(d0.times[k]) - mins, day: d0 }; }
+  if (d1) return { k: "Fajr", ar: "الفجر", t: d1.times.Fajr, wait: 1440 - mins + hm(d1.times.Fajr), day: d0, tomorrow: true };
+  return null;
+}
+const waitTxt = w => w < 60 ? "in " + w + " min" : "in " + Math.floor(w / 60) + " h " + (w % 60) + " min";
+function qibla(){ const r = Math.PI / 180, la1 = 43.4675 * r, lo1 = -79.6877 * r, la2 = 21.4225 * r, lo2 = 39.8262 * r;
+  const y = Math.sin(lo2 - lo1) * Math.cos(la2), x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(lo2 - lo1); return Math.round((Math.atan2(y, x) / r + 360) % 360); }
+function prayerCard(full){
+  const P = X && X.prayer; if (!P) return el("div", "empty", "Prayer times load with the next update.");
+  const n = nextPrayer(), d0 = n ? n.day : P.days[0];
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Prayer times · Oakville"));
+  const hj = el("span", "stamp ar", d0.hijri_ar); head.appendChild(hj); g.appendChild(head);
+  if (n){ const b = el("div", "bigcount"); const l = el("div", ""); l.appendChild(el("span", "label", "Next prayer")); const st = el("strong", "", n.k + " " + fmt12(n.t)); l.appendChild(st); b.appendChild(l);
+    const r = el("div", ""); r.style.textAlign = "right"; r.appendChild(el("div", "ar", n.ar)); r.appendChild(el("span", "gowait", (n.tomorrow ? "tomorrow · " : "") + waitTxt(n.wait))); b.appendChild(r); g.appendChild(b); }
+  const grid = el("div", "pray");
+  PR.forEach(([k, ar]) => { const c = el("div", n && n.k === k && !n.tomorrow ? "next" : ""); c.appendChild(el("span", "label", k)); c.appendChild(el("span", "ar", ar)).style.cssText = "font-size:15px;line-height:1.3"; c.appendChild(el("b", "", fmt12(d0.times[k]).replace(" a.m.", "a").replace(" p.m.", "p"))); grid.appendChild(c); });
+  g.appendChild(grid);
+  if (full){ const n2 = el("div", "hl"); n2.appendChild(el("span", "hl-snip", "Method: " + P.method + " · Qibla " + qibla() + "° from north (northeast) · Friday Jumu'ah: check your masjid's time · " + d0.hijri_en)); g.appendChild(n2);
+    const a = el("a", "hl"); a.href = "https://www.google.com/maps/search/mosque+near+Oakville+ON"; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", "Mosques near Oakville ↗")); g.appendChild(a); }
+  return g;
+}
+function faithMini(){
+  if (!X || !X.prayer) return null;
+  const g = prayerCard(false);
+  const A = X.faith && X.faith.ayah;
+  if (A){ const b = el("button", "hl"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer";
+    b.appendChild(el("span", "ar", A.ar)).style.fontSize = "20px"; b.appendChild(el("span", "hl-snip", A.en + " (" + A.surah_en + " " + A.ref + ")"));
+    b.onclick = () => go("faith"); g.appendChild(b); }
+  return g;
+}
+function ayahCard(){
+  const A = X && X.faith && X.faith.ayah; if (!A) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Verse of the day")); head.appendChild(el("span", "stamp ar", A.surah_ar + " · " + A.ref)); g.appendChild(head);
+  g.appendChild(el("div", "ar ayah", A.ar)); g.appendChild(el("div", "ayah-en", A.en));
+  const f = el("details", "fold"); f.appendChild(el("summary", "", "التفسير الميسر · Tafsir")); const inn = el("div", "inner ar", A.tafsir_ar); f.appendChild(inn); g.appendChild(f);
+  const a = el("a", "hl"); a.href = A.url; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", "Read and listen on Quran.com ↗")); g.appendChild(a);
+  return g;
+}
+function hadithCard(){
+  const H = X && X.faith && X.faith.hadith; if (!H) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "حديث اليوم · Hadith of the day")); head.appendChild(el("span", "stamp", "#" + H.num)); g.appendChild(head);
+  const ar = el("div", "ar"); ar.style.cssText = "font-size:19px;padding:12px 16px"; ar.textContent = H.ar; g.appendChild(ar);
+  const f = el("details", "fold"); f.appendChild(el("summary", "", "English translation")); f.appendChild(el("div", "inner", H.en)); g.appendChild(f);
+  const a = el("a", "hl"); a.href = H.url; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", H.book + " ↗")); a.appendChild(el("span", "hl-snip", "Source and grading on Sunnah.com")); g.appendChild(a);
+  return g;
+}
+function surahCard(){
+  const S = X && X.faith && X.faith.surah; if (!S) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Surah of the day")); head.appendChild(el("span", "stamp", S.type === "Meccan" ? "Meccan · مكية" : "Medinan · مدنية")); g.appendChild(head);
+  const top = el("div", "bigcount"); const l = el("div", ""); l.appendChild(el("strong", "", S.name_en)); l.appendChild(el("div", "hl-snip", S.meaning + " · " + S.count + " verses · surah " + S.n)); top.appendChild(l);
+  const r = el("div", "ar qn"); r.style.fontSize = "26px"; r.textContent = S.name_ar; top.appendChild(r); g.appendChild(top);
+  if (new Date().getDay() === 5 && S.n === 18){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Friday: Surah Al-Kahf.")); g.appendChild(n); }
+  if (S.intro_ar){ const f = el("details", "fold"); f.open = true; f.appendChild(el("summary", "", "عن السورة ومقاصدها · About the surah")); f.appendChild(el("div", "inner ar", S.intro_ar)); g.appendChild(f); }
+  const seg = el("div", "langseg"); [["both", "Both"], ["ar", "عربي"], ["en", "English"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(faithLang === k)); b.onclick = () => { faithLang = k; store.set("faithLang", k); render(); }; seg.appendChild(b); }); g.appendChild(seg);
+  const list = surahAll ? S.ayahs : S.ayahs.slice(0, 12);
+  list.forEach(v => {
+    const box = el("div", "av"); box.appendChild(el("span", "num", S.name_en + " " + S.n + ":" + v.n));
+    if (faithLang !== "en") box.appendChild(el("div", "ar", v.ar));
+    if (faithLang !== "ar") box.appendChild(el("div", "en", v.en));
+    const f = el("details", "fold"); f.style.margin = "0 -16px"; f.appendChild(el("summary", "", faithLang === "en" ? "Tafsir (Al-Mukhtasar)" : "التفسير (المختصر)"));
+    const t = el("div", "inner" + (faithLang === "en" ? "" : " ar")); t.textContent = faithLang === "en" ? v.t_en : v.t_ar; f.appendChild(t); box.appendChild(f);
+    g.appendChild(box);
+  });
+  if (!surahAll && S.ayahs.length > 12){ const b = el("button", "hl", "Show all " + S.count + " verses"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; b.onclick = () => { surahAll = true; render(); }; g.appendChild(b); }
+  [["Background and reasons of revelation (Quran.com) ↗", S.info_url], ["Read and listen to the full surah ↗", S.read_url]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t)); g.appendChild(a); });
+  return g;
+}
+
+/* ---------- kitchen ---------- */
+function kc(){ return (X && X.content) || {}; }
+function todayRecipe(){ const R = kc().recipes || []; if (!R.length) return null; return kPick != null ? R[kPick] : R[(X.day_no || 0) % R.length]; }
+function scaleAmt(txt){
+  if (kServ === 4) return txt;
+  const f = kServ / 4, map = { "½": .5, "¼": .25, "¾": .75, "⅓": 1 / 3, "⅔": 2 / 3 };
+  const m = txt.match(/^(\d+)?\s*([½¼¾⅓⅔])?/); if (!m || (!m[1] && !m[2])) return txt;
+  const v = (m[1] ? Number(m[1]) : 0) + (m[2] ? map[m[2]] : 0), n = Math.round(v * f * 4) / 4;
+  const whole = Math.floor(n), frac = n - whole, fr = { 0.25: "¼", 0.5: "½", 0.75: "¾" }[frac] || "";
+  return ((whole || !fr ? whole : "") + fr) + txt.slice(m[0].length);
+}
+function arAmt(t){
+  const w = [[/\bcups?\b/g, "كوب"], [/\btbsp\b/g, "م.ك"], [/\btsp\b/g, "م.ص"], [/\bcloves?\b/g, "فص"], [/\bcans?\b/g, "علبة"], [/\bhandful\b/g, "حفنة"],
+    [/\blarge\b/g, "كبير"], [/\bmedium\b/g, "متوسط"], [/\blight\b/g, "خفيف"], [/\beach\b/g, "من كل نوع"], [/\bto serve\b/g, "للتقديم"], [/\babout\b/g, "حوالي"], [/(\d)\s?g\b/g, "$1 جم"], [/(\d)\s?ml\b/g, "$1 مل"]];
+  return w.reduce((a, [re, r]) => a.replace(re, r), t);
+}
+function kitchenMini(){
+  const r = todayRecipe(); if (!r) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Tonight's family dinner")); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
+  const b = el("button", "hl"); b.type = "button"; b.style.cssText = "border:0;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer";
+  b.appendChild(el("span", "hl-title", r.en)); b.appendChild(el("span", "ar", r.ar)).style.fontSize = "17px";
+  b.appendChild(el("span", "hl-snip", r.mins + " min · about " + r.kcal + " kcal and " + r.protein + " g protein per serving · tap for the recipe")); b.onclick = () => go("kitchen"); g.appendChild(b);
+  return g;
+}
+function kitchenView(){
+  const C = kc(), R = C.recipes || []; if (!R.length) return el("div", "empty", "Recipes load with the next update.");
+  const ar = kLang === "ar", r = todayRecipe(), dn = X.day_no || 0;
+  const wrap = el("div", "stack");
+  const g = el("div", "group"); if (ar) g.dir = "rtl";
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", ar ? "قائمة اليوم للعائلة" : "Today's family menu")); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
+  const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["en", "English"], ["ar", "عربي"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(kLang === k)); b.onclick = () => { kLang = k; store.set("kLang", k); render(); }; seg.appendChild(b); }); g.appendChild(seg);
+  const bf = (C.breakfast || [])[dn % (C.breakfast || [1]).length], sn = (C.snacks || [])[dn % (C.snacks || [1]).length];
+  [[ar ? "الفطار" : "Breakfast", bf && bf[ar ? 1 : 0]], [ar ? "سناك" : "Snack", sn && sn[ar ? 1 : 0]], [ar ? "الغدا / العشا" : "Dinner", ar ? r.ar : r.en]].forEach(([k, v]) => { const row = el("div", "menu-row"); row.appendChild(el("span", "label", k)); row.appendChild(el("span", ar ? "ar" : "", v || "")); g.appendChild(row); });
+  wrap.appendChild(g);
+  const c = el("div", "group"); if (ar) c.dir = "rtl";
+  const h2 = el("div", "group-head"); h2.appendChild(el("strong", ar ? "ar" : "", ar ? r.ar : r.en)); h2.appendChild(el("span", "stamp", kPick != null ? (ar ? "مفاجأة" : "surprise pick") : (ar ? "وصفة اليوم" : "recipe of the day"))); c.appendChild(h2);
+  const meta = el("div", "recipe-meta"); meta.style.paddingTop = "10px";
+  [(ar ? "⏱ " + r.mins + " دقيقة" : "⏱ " + r.mins + " min"), (ar ? "🔥 حوالي " + r.kcal + " سعر للفرد" : "🔥 about " + r.kcal + " kcal a serving"), (ar ? "💪 " + r.protein + " جم بروتين" : "💪 " + r.protein + " g protein"), (ar ? "حلال" : "Halal")].forEach(t => meta.appendChild(el("span", "pill-sig", t)));
+  c.appendChild(meta);
+  const sv = el("div", "serv"); const minus = el("button", "", "−"), plus = el("button", "", "+"); minus.type = plus.type = "button";
+  minus.onclick = () => { kServ = Math.max(2, kServ - 1); store.set("kServ", kServ); render(); }; plus.onclick = () => { kServ = Math.min(10, kServ + 1); store.set("kServ", kServ); render(); };
+  sv.appendChild(minus); sv.appendChild(el("span", "", (ar ? "عدد الأفراد: " : "Serves ") + kServ)); sv.appendChild(plus); c.appendChild(sv);
+  c.appendChild(el("div", "label", ar ? "المكونات" : "Ingredients")).style.padding = "0 16px 6px";
+  const ing = el("ul", "ing"); r.ing.forEach(([en, a, amt]) => { const li = el("li", ""); li.appendChild(el("b", "", (ar ? arAmt(scaleAmt(amt)) : scaleAmt(amt)) + " ")); li.appendChild(document.createTextNode(ar ? a : en)); ing.appendChild(li); }); c.appendChild(ing);
+  c.appendChild(el("div", "label", ar ? "الطريقة" : "Steps")).style.padding = "0 16px 6px";
+  const st = el("ol", "steps"); (ar ? r.steps_ar : r.steps_en).forEach(t => st.appendChild(el("li", "", t))); c.appendChild(st);
+  const tip = el("div", "hl"); tip.appendChild(el("span", "hl-snip", "💡 " + (ar ? r.tip_ar : r.tip_en))); c.appendChild(tip);
+  const acts = el("div", "acts"); acts.style.cssText = "padding:0 16px 14px;display:flex;flex-wrap:wrap;gap:8px";
+  const sp = el("button", "primary", ar ? "🎲 فاجئني بوصفة تانية" : "🎲 Surprise me"); sp.type = "button"; sp.onclick = () => { let i; do { i = Math.floor(Math.random() * R.length); } while (R.length > 1 && R[i] === r); kPick = i; render(); window.scrollTo({ top: 0 }); }; acts.appendChild(sp);
+  const yt = el("a", "ghostbtn", ar ? "فيديو الطريقة ↗" : "Watch how ↗"); yt.href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(r.yt); yt.target = "_blank"; yt.rel = "noopener"; yt.style.textDecoration = "none"; yt.style.color = "var(--ink)"; acts.appendChild(yt);
+  if (kPick != null){ const back = el("button", "ghostbtn", ar ? "رجوع لوصفة اليوم" : "Back to today's"); back.type = "button"; back.onclick = () => { kPick = null; render(); }; acts.appendChild(back); }
+  c.appendChild(acts); wrap.appendChild(c);
+  const w = el("div", "group"); if (ar) w.dir = "rtl"; const h3 = el("div", "group-head"); h3.appendChild(el("strong", "", ar ? "الأيام الجاية" : "Coming up this week")); w.appendChild(h3);
+  for (let i = 1; i <= 6; i++){ const rr = R[(dn + i) % R.length], d = new Date(Date.now() + i * 864e5); const row = el("button", "menu-row"); row.type = "button"; row.style.cssText = "width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:inherit;font:inherit;color:inherit;cursor:pointer";
+    row.appendChild(el("span", "label", d.toLocaleDateString(ar ? "ar-EG" : "en-CA", { weekday: "short" }))); row.appendChild(el("span", ar ? "ar" : "", ar ? rr.ar : rr.en)); row.onclick = () => { kPick = R.indexOf(rr); render(); window.scrollTo({ top: 0 }); }; w.appendChild(row); }
+  wrap.appendChild(w);
+  return wrap;
+}
+
+/* ---------- watch & listen ---------- */
+const jw = t => "https://www.justwatch.com/ca/search?q=" + encodeURIComponent(t), imdb = t => "https://www.imdb.com/find/?q=" + encodeURIComponent(t);
+function filmRow(title, sub, links, img){
+  const r = el("div", "film"); const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; if (img) im.src = img; else im.style.visibility = "hidden"; r.appendChild(im);
+  const b = el("div", ""); b.style.cssText = "display:flex;flex-direction:column;gap:3px;min-width:0"; const tt = el("span", "hl-title", title); tt.dir = "auto"; b.appendChild(tt); if (sub) b.appendChild(el("span", "hl-snip", sub));
+  const ls = el("div", "links"); links.forEach(([t, u]) => { const a = el("a", "", t + " ↗"); a.href = u; a.target = "_blank"; a.rel = "noopener"; ls.appendChild(a); }); b.appendChild(ls); r.appendChild(b); return r;
+}
+function grp(title, stamp){ const g = el("div", "group"); const h = el("div", "group-head"); h.appendChild(el("strong", "", title)); if (stamp) h.appendChild(el("span", "stamp", stamp)); g.appendChild(h); return g; }
+function funView(){
+  if (!X) return [el("div", "empty", "Loading…")];
+  const C = kc(), dn = X.day_no || 0, out = [];
+  const cl = C.classic || [], eg = C.egyptian || [];
+  if (cl.length || eg.length){ const g = grp("Tonight's picks", "changes daily");
+    const a = cl[dn % cl.length], e = eg[dn % eg.length];
+    if (a) g.appendChild(filmRow(a[0] + " (" + a[1] + ")", "American classic · " + a[2], [["Where to watch", jw(a[0])], ["IMDb", imdb(a[0] + " " + a[1])], ["Trailer", "https://www.youtube.com/results?search_query=" + encodeURIComponent(a[0] + " " + a[1] + " trailer")]]));
+    if (e) g.appendChild(filmRow(e[0] + " · " + e[1] + " (" + e[2] + ")", "Egyptian film · " + e[3], [["شاهد / Watch", "https://www.youtube.com/results?search_query=" + encodeURIComponent("فيلم " + e[0])], ["IMDb", imdb(e[1] + " " + e[2])], ["Where to watch", jw(e[1])]]));
+    out.push(g); }
+  const nw = [...(X.movies_action || []).slice(0, 8), ...(X.movies_thriller || []).slice(0, 8)];
+  if (nw.length){ const g = grp("New and trending", "Apple TV charts, Canada"); const seen = new Set();
+    nw.forEach(m => { if (seen.has(m.t)) return; seen.add(m.t); g.appendChild(filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.genre || "") + (m.sum ? " · " + m.sum.slice(0, 110) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["IMDb", imdb(m.t + " " + m.year)]], m.img)); }); out.push(g); }
+  if ((C.series || []).length){ const g = grp("Short series, highly rated", "4 to 15 episodes");
+    C.series.forEach(([t, y, n, gen]) => g.appendChild(filmRow(t + " (" + y + ")", n + " episodes · " + gen, [["Where to watch", jw(t.replace(/\s*\(.*\)/, ""))], ["IMDb", imdb(t.replace(/\s*\(.*\)/, "") + " " + y)]]))); out.push(g); }
+  if (cl.length){ const g = grp("American action, crime and thrillers", "classics and modern"); cl.forEach(([t, y, gen]) => g.appendChild(filmRow(t + " (" + y + ")", gen, [["Where to watch", jw(t)], ["IMDb", imdb(t + " " + y)]]))); out.push(g); }
+  if (eg.length){ const g = grp("أفلام مصرية · Egyptian films", "old and new"); eg.forEach(([a, en, y, gen]) => g.appendChild(filmRow(a + " · " + en + " (" + y + ")", gen, [["YouTube", "https://www.youtube.com/results?search_query=" + encodeURIComponent("فيلم " + a)], ["IMDb", imdb(en + " " + y)]]))); out.push(g); }
+  const pods = podTab === "ca" ? (X.podcasts_ca || []) : (X.podcasts_eg || []);
+  const g = grp("Short podcasts", "latest episode 30 min or less");
+  const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["ca", "Top in Canada"], ["eg", "عربي · Egypt"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(podTab === k)); b.onclick = () => { podTab = k; render(); }; seg.appendChild(b); }); g.appendChild(seg);
+  if (!pods.length) g.appendChild(el("div", "empty", "No short shows in the chart today."));
+  pods.forEach(p => { const a = el("a", "pod"); a.href = p.ep_url || p.url; a.target = "_blank"; a.rel = "noopener"; const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = p.img; a.appendChild(im);
+    const b = el("div", ""); b.style.cssText = "display:flex;flex-direction:column;gap:2px;min-width:0"; const tt = el("span", "hl-title", p.name); tt.dir = "auto"; b.appendChild(tt);
+    const ep = el("span", "hl-snip", "#" + p.rank + " · " + (p.mins || "<1") + " min · " + p.ep); ep.dir = "auto"; b.appendChild(ep); a.appendChild(b); g.appendChild(a); });
+  out.push(g);
+  return out;
+}
+
 /* ---------- homes ---------- */
 const money = n => "$" + Math.round(n).toLocaleString("en-CA");
 function linksGroup(t, title){
@@ -638,6 +848,8 @@ function render(){
   if (view === "all"){
     add(myLinksRow());
     if (visible("weather")) add(weatherCard(false));
+    if (visible("faith")) add(faithMini());
+    if (visible("kitchen")) add(kitchenMini());
     if (visible("oakville")) add(goCard());
     if (visible("markets")) add(marketsStrip());
     D.topics.filter(t => visible(t.id) && !t.in_markets).forEach(t => {
@@ -646,6 +858,9 @@ function render(){
       else add(topicGroup(t, 5));
     });
   } else if (view === "weather") add(weatherCard(true));
+  else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); add(hadithCard()); add(surahCard()); }
+  else if (view === "kitchen"){ add(kitchenView()); }
+  else if (view === "fun"){ funView().forEach(add); }
   else if (view === "markets"){ add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); }
   else {
     const t = topic(view);
