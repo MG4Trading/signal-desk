@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Signal Desk updater.
 
-Runs every 15 minutes on GitHub Actions. Gathers news, markets, weather and
+Runs about every 10 minutes on GitHub Actions (see loop.sh). Gathers news, markets, weather and
 Environment Canada warnings, writes site/data.json, and sends push alerts
 through ntfy.sh. Standard library only.
 """
@@ -127,7 +127,7 @@ def gather_news():
         items.sort(key=lambda x: -x["ts"])
         seen, keep, per = set(), [], {}
         for it in items:
-            key = re.sub(r"[^a-z0-9؀-ۿ]+", " ", it["t"].lower()).strip()[:80]
+            key = re.sub(r"[^a-z0-9\u0600-\u06ff]+", " ", it["t"].lower()).strip()[:80]
             if key in seen or it["l"] in seen:
                 continue
             seen.add(key); seen.add(it["l"])
@@ -229,7 +229,7 @@ def gather_weather():
     loc = cfg["location"]
     url = ("https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s"
            "&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m,relative_humidity_2m,precipitation"
-           "&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code"
+           "&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code,wind_speed_10m,uv_index"
            "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_min,apparent_temperature_max,"
            "precipitation_probability_max,precipitation_sum,snowfall_sum,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max,sunrise,sunset"
            "&timezone=America%%2FToronto&forecast_days=7") % (loc["lat"], loc["lon"])
@@ -257,7 +257,8 @@ def gather_weather():
     for i in range(start, min(start + 24, len(h["time"]))):
         lab, ic = wx_text(h["weather_code"][i])
         hours.append({"t": h["time"][i][-5:], "temp": round(h["temperature_2m"][i]), "pop": h["precipitation_probability"][i] or 0,
-                      "icon": ic, "label": lab})
+                      "icon": ic, "label": lab, "feels": round(h["apparent_temperature"][i]),
+                      "wind": round(h["wind_speed_10m"][i] or 0), "uv": round(h["uv_index"][i] or 0)})
     lab, ic = wx_text(c["weather_code"])
     current = {"temp": round(c["temperature_2m"]), "feels": round(c["apparent_temperature"]), "label": lab, "icon": ic,
                "wind": round(c["wind_speed_10m"]), "gust": round(c.get("wind_gusts_10m") or 0),
@@ -291,6 +292,144 @@ def gather_ec_alerts():
     order = {"warning": 0, "watch": 1, "advisory": 2, "statement": 3}
     out.sort(key=lambda a: order.get(a["type"], 4))
     return out
+
+# ---------------------------------------------------------------- homes for rent
+def next_data(h):
+    m = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', h, re.S)
+    return json.loads(m.group(1)) if m else {}
+
+
+def gather_rentals(topic):
+    """3-bed rentals around Oakville from a public Kijiji search, refreshed about once an hour."""
+    r = topic["rentals"]
+    prev = prev_data.get("rentals") or {}
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("listings"):
+        return prev
+    b, out, seen, pages_ok = r["bbox"], [], set(), 0
+    for p in range(1, r.get("pages", 3) + 1):
+        url = r["search"].format(page="" if p == 1 else f"page-{p}/")
+        try:
+            ap = next_data(get(url, timeout=25)).get("props", {}).get("pageProps", {}).get("__APOLLO_STATE__", {})
+        except Exception as e:
+            log("rentals page", p, e); break
+        if not ap:
+            break
+        pages_ok += 1
+        for k, v in ap.items():
+            if not k.startswith("RealEstateListing:"):
+                continue
+            try:
+                at = {a["canonicalName"]: a["canonicalValues"] for a in (v.get("attributes") or {}).get("all", [])}
+                beds = float((at.get("numberbedrooms") or ["0"])[0])
+                baths = float((at.get("numberbathrooms") or ["0"])[0]) / 10
+                loc = v.get("location") or {}
+                co = loc.get("coordinates") or {}
+                lat, lon = co.get("latitude"), co.get("longitude")
+                price = ((v.get("price") or {}).get("amount") or 0) / 100
+            except Exception:
+                continue
+            u = v.get("url", "")
+            if not u or u in seen or lat is None or lon is None:
+                continue
+            if not (r["beds_min"] <= beds <= r["beds_max"] and baths >= r["baths_min"]):
+                continue
+            if not (b[1] <= lat <= b[3] and b[0] <= lon <= b[2]):
+                continue
+            if r.get("not_places") and re.search(r["not_places"], (loc.get("name") or "") + " " + (loc.get("address") or ""), re.I):
+                continue
+            if not (1500 <= price <= 20000):
+                continue
+            seen.add(u)
+            name = loc.get("name") or "Oakville"
+            hood = re.sub(r"^Oakville\s*\(\w+\s*", "", name).rstrip(")") if "(" in name else ""
+            try:
+                listed = int(datetime.fromisoformat((v.get("activationDate") or v.get("sortingDate")).replace("Z", "+00:00")).timestamp())
+            except Exception:
+                listed = 0
+            kind = ((at.get("unittype") or [""])[0] or "").replace("-", " ")
+            out.append({"t": v.get("title", "").strip()[:90], "l": u, "p": round(price), "beds": beds, "baths": baths,
+                        "kind": "" if kind.lower() == "not available" else kind, "hood": hood, "ts": listed,
+                        "img": (v.get("imageUrls") or [""])[0]})
+        time.sleep(1.2)
+    if not pages_ok:
+        log("rentals: no pages loaded, keeping last results")
+        return prev or {"at": 0, "listings": [], "stats": None, "hist": []}
+    out.sort(key=lambda x: -x["ts"])
+    prices = sorted(x["p"] for x in out)
+    stats = None
+    if prices:
+        mid = len(prices) // 2
+        med = prices[mid] if len(prices) % 2 else round((prices[mid - 1] + prices[mid]) / 2)
+        stats = {"median": med, "low": prices[0], "high": prices[-1], "count": len(prices)}
+    hist = [h for h in (prev.get("hist") or []) if h[0] != datetime.now(TZ).strftime("%Y-%m-%d")]
+    if stats:
+        hist.append([datetime.now(TZ).strftime("%Y-%m-%d"), stats["median"], stats["count"]])
+    log(f"rentals: {len(out)} matching listings from {pages_ok} pages")
+    return {"at": int(NOW), "listings": out[:40], "stats": stats, "hist": hist[-180:],
+            "filter": f"{r['beds_min']:g}+ bed, {r['baths_min']:g}+ bath, within about 8 km of Oakville"}
+
+# ---------------------------------------------------------------- events
+def gather_events(topic):
+    """Upcoming Meetup events for Oakville, Mississauga and the GTA, refreshed about once an hour."""
+    prev = prev_data.get("events") or {}
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("items"):
+        prev["items"] = [e for e in prev["items"] if e["start"] > NOW - 3600]
+        return prev
+    notre = re.compile(topic.get("meetup_not") or r"^$", re.I)
+    items, seen, ok = [], set(), 0
+
+    def one(q):
+        cat, loc, kw = q
+        url = "https://www.meetup.com/find/?" + urllib.parse.urlencode({"location": loc, "source": "EVENTS", "keywords": kw})
+        h = get(url, timeout=25)
+        got = []
+        for blk in re.findall(r'<script type="application/ld\+json"[^>]*>(.*?)</script>', h, re.S):
+            try:
+                d = json.loads(blk)
+            except Exception:
+                continue
+            for e in (d if isinstance(d, list) else [d]):
+                if isinstance(e, dict) and e.get("@type") == "Event":
+                    got.append((cat, loc, e))
+        return got
+
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        results = []
+        for q, fu in [(q, ex.submit(one, q)) for q in topic["meetup"]]:
+            try:
+                results.extend(fu.result()); ok += 1
+            except Exception as e:
+                log("meetup", q, e)
+    for cat, loc, e in results:
+        u = (e.get("url") or "").split("?")[0]
+        name = (e.get("name") or "").replace("\n", " ").strip()
+        org = e.get("organizer", {}).get("name", "") if isinstance(e.get("organizer"), dict) else ""
+        if not u or not name or u in seen or notre.search(name + " " + org):
+            continue
+        try:
+            start = int(datetime.fromisoformat(e["startDate"].replace("Z", "+00:00")).timestamp())
+        except Exception:
+            continue
+        if start < NOW - 3600 or start > NOW + 60 * 86400:
+            continue
+        seen.add(u)
+        online = "Online" in (e.get("eventAttendanceMode") or "")
+        if online and topic.get("in_person_only"):
+            continue
+        where = ""
+        l = e.get("location")
+        if isinstance(l, dict):
+            where = ((l.get("address") or {}) if isinstance(l.get("address"), dict) else {}).get("addressLocality") or ""
+        items.append({"c": cat, "t": name[:110], "l": u, "start": start, "org": org[:60],
+                      "where": "Online" if online else (where.strip().title() or loc.split("--")[-1]),
+                      "area": loc.split("--")[-1]})
+    if not ok:
+        log("events: Meetup unavailable, keeping last results")
+        prev["items"] = [e for e in prev.get("items", []) if e["start"] > NOW - 3600]
+        return prev or {"at": 0, "items": []}
+    items.sort(key=lambda x: x["start"])
+    log(f"events: {len(items)} upcoming")
+    return {"at": int(NOW), "items": items[:90]}
 
 # ---------------------------------------------------------------- GO (for the morning briefing)
 def next_trains(n=3):
@@ -448,10 +587,25 @@ def main():
         ec = gather_ec_alerts()
     except Exception as e:
         log("EC alerts failed", e); ec = prev_data.get("warnings", [])
+    rentals = events = None
+    for t in cfg["topics"]:
+        if t.get("rentals"):
+            try:
+                rentals = gather_rentals(t)
+            except Exception as e:
+                log("rentals failed", e); rentals = prev_data.get("rentals")
+        if t.get("meetup"):
+            try:
+                events = gather_events(t)
+            except Exception as e:
+                log("events failed", e); events = prev_data.get("events")
     data = {
         "generated": int(time.time()),
-        "topics": [{"id": t["id"], "name": t["name"]} for t in cfg["topics"]],
+        "interval": int(os.environ.get("SD_INTERVAL", "600")),
+        "repo": os.environ.get("GITHUB_REPOSITORY", ""),
+        "topics": [{"id": t["id"], "name": t["name"], "links": t.get("links", [])} for t in cfg["topics"]],
         "headlines": headlines, "quotes": quotes, "weather": weather, "warnings": ec,
+        "rentals": rentals, "events": events,
         "failed": failed, "location": cfg["location"]["name"],
     }
     run_alerts(headlines, weather, ec)

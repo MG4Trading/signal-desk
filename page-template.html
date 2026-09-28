@@ -57,7 +57,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .range .track{flex:1;height:6px;border-radius:3px;background:var(--surface-2);position:relative;min-width:40px}
 .range .fill{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#4F9BD9,#E3A33B)}
 .day .dp{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:34px;text-align:right}
-.daywear{grid-column:1/-1;font-size:13px;color:var(--muted);padding-top:2px}
+.daywear{grid-column:1/-1;font-size:13px;color:var(--muted);padding-top:2px;display:none}
 
 /* sheet */
 .sheet{position:fixed;inset:0;z-index:20;background:rgba(10,20,30,.45);display:flex;align-items:flex-end;justify-content:center}
@@ -72,6 +72,38 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .subrail::-webkit-scrollbar{display:none}
 .subrail .chip{min-height:32px;padding:5px 12px;font-size:12px}
 .primary{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:11px 16px;font-weight:600;min-height:44px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--surface-2);border-radius:10px;padding:3px;margin:12px 16px 0}
+.seg button{border:0;background:transparent;border-radius:8px;padding:8px 6px;font-size:13px;font-weight:600;color:var(--muted);min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 14px}
+.fact{background:var(--bg);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px}
+.fact b{font-family:var(--mono);font-weight:500;font-size:14px;font-variant-numeric:tabular-nums}
+.day.open .daywear{display:block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--display);font-stretch:85%;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+.trend{padding:0 16px 12px;font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.trend svg{width:110px;height:26px;flex:0 0 auto}
+.home{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.home img{width:64px;height:48px;object-fit:cover;border-radius:8px;background:var(--surface-2)}
+.home .pr{font-family:var(--mono);font-weight:500;font-size:15px}
+.home .hl-title{font-size:14px}
+.evday{padding:8px 16px;background:var(--bg);font-size:12px;font-weight:600;color:var(--muted);border-top:1px solid var(--line)}
+.ev{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.evday + .ev{border-top:0}
+.ev .when{white-space:nowrap;font-family:var(--mono);font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
+.mylinks{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.mylinks::-webkit-scrollbar{display:none}
+.mylinks a{flex:0 0 auto;background:var(--accent-soft);color:var(--accent);border-radius:12px;padding:10px 14px;font-weight:600;font-size:14px;text-decoration:none}
+.form{display:flex;flex-direction:column;gap:8px}
+.form input,.form select,.form textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%}
+.form textarea{min-height:76px;resize:vertical}
+.form .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mylist{display:flex;flex-direction:column}
+.mylist div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mylist button{border:0;background:transparent;color:var(--danger);font-weight:600;min-height:36px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:calc(100% - 32px);text-align:center}
 </style>
 </head>
 <body>
@@ -98,7 +130,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
   </main>
 
   <footer>
-    <span>Updates about every 15 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, markets from Yahoo Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
+    <span>Updates about every 10 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, rentals from Kijiji, events from Meetup, markets from Yahoo Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
   </footer>
 </div>
 
@@ -114,6 +146,30 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
       <span>2. In ntfy, tap <b>+</b> and subscribe to this topic:</span>
       <code id="topicName">__TOPIC__</code>
       <button class="ghostbtn" id="copyTopic" type="button">Copy topic name</button>
+      <span>3. In iPhone Settings → Notifications → ntfy, turn on Allow Notifications, Lock Screen and Banners.</span>
+      <button class="ghostbtn" id="testPush" type="button">Send a test alert now</button>
+    </div>
+    <span class="label">My links · saved on this device only</span>
+    <div class="alertbox form">
+      <span>Pin your own pages to the top of the app, like a training or nutrition plan. They stay private on this phone.</span>
+      <div class="mylist" id="myList"></div>
+      <input id="myLabel" placeholder="Name, e.g. Training plan" autocomplete="off">
+      <input id="myUrl" type="url" placeholder="https://…" autocomplete="off" inputmode="url">
+      <button class="ghostbtn" id="myAdd" type="button">Add link</button>
+    </div>
+    <span class="label">Add or remove a topic</span>
+    <div class="alertbox form">
+      <span>Opens a ready-filled request on GitHub. Sign in as the site owner and tap <b>Create</b>; the change shows up here in about 10 minutes.</span>
+      <div class="row2">
+        <select id="tpAction"><option value="add">Add</option><option value="remove">Remove</option></select>
+        <input id="tpName" list="tpList" placeholder="Topic, new or existing" autocomplete="off"><datalist id="tpList"></datalist>
+      </div>
+      <textarea id="tpWords" placeholder="Search words, one per line&#10;e.g. Oakville soccer&#10;Leave empty with Remove to drop the whole topic"></textarea>
+      <div class="row2">
+        <select id="tpRegion"><option value="CA">Canada</option><option value="US">USA</option><option value="EG">Egypt</option><option value="AE">UAE</option><option value="SA">Saudi Arabia</option><option value="GB">UK</option></select>
+        <select id="tpLang"><option value="en">English</option><option value="ar">Arabic</option></select>
+      </div>
+      <button class="ghostbtn" id="tpSend" type="button">Send to GitHub</button>
     </div>
     <button class="primary" id="closeSheet" type="button">Done</button>
   </div>
@@ -125,30 +181,37 @@ const $ = s => document.querySelector(s);
 const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
 const store = { get(k, d){ try { const v = localStorage.getItem("sd:" + k); return v == null ? d : JSON.parse(v); } catch(_){ return d; } }, set(k, v){ try { localStorage.setItem("sd:" + k, JSON.stringify(v)); } catch(_){} } };
 const TRAVEL = ["GO alerts", "Accidents", "Traffic", "Road closures", "GO Transit", "Transit"];
-let angle = "all";
+let angle = "all", wxTab = store.get("wxTab", "today");
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
 function sections(){ const s = [{ id: "weather", name: "Weather" }]; (D ? D.topics : []).forEach(t => s.push(t)); s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
 
+function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 async function load(force){
   $("#refreshBtn").classList.add("spin");
+  const before = D && D.generated;
   try {
     const r = await fetch("data.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 60000)), { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
     D = await r.json();
     render();
+    if (force) toast(before && D.generated === before ? "Already the latest · updated " + ago(D.generated) : "Updated · " + ago(D.generated));
   } catch (e) {
     if (!D) $("#main").innerHTML = '<div class="empty">Could not load. Check your connection and tap Refresh.</div>';
+    else if (force) toast("No connection. Showing the last update.");
   }
   $("#refreshBtn").classList.remove("spin");
 }
 
 function renderStamp(){
   if (!D) return;
-  const age = Date.now() / 1000 - D.generated;
-  const s = $("#stamp"); s.textContent = "Updated " + ago(D.generated); s.classList.toggle("stale", age > 45 * 60);
+  const age = Date.now() / 1000 - D.generated, iv = D.interval || 600;
+  const next = Math.max(1, Math.round((D.generated + iv - Date.now() / 1000) / 60));
+  const s = $("#stamp");
+  s.textContent = "Updated " + ago(D.generated) + (age < iv ? " · next in ~" + next + " min" : age > iv * 3 ? " · updates delayed" : " · next any minute");
+  s.classList.toggle("stale", age > iv * 3);
 }
 
 function renderRail(){
@@ -164,33 +227,49 @@ function fmtHour(t){ let h = Number(t.slice(0, 2)); const ap = h >= 12 ? "p" : "
 function weatherCard(full){
   const W = D.weather; if (!W) return el("div", "empty", "Weather is unavailable right now.");
   const box = el("div", "wx");
-  const now = el("div", "wx-now"), d0 = W.days[0], c = W.current;
-  now.appendChild(el("div", "wx-icon", c.icon));
-  const t = el("div", "wx-temp", c.temp + "°"); t.appendChild(el("small", "", "feels " + c.feels + "°")); now.appendChild(t);
-  now.appendChild(el("div", "wx-sub", c.label + " · High " + d0.max + "° Low " + d0.min + "° · Wind " + c.wind + " km/h" + (d0.pop ? " · " + d0.pop + "% rain" : "")));
-  box.appendChild(now);
-  const wear = el("div", "wear"); wear.appendChild(el("span", "label", "What to wear today"));
-  const ul = el("ul"); d0.wear.forEach(w => ul.appendChild(el("li", "", w))); wear.appendChild(ul);
-  box.appendChild(wear);
-  const hrs = el("div", "hours");
-  W.hours.slice(0, full ? 24 : 12).forEach(h => { const x = el("div", "hr"); x.appendChild(el("span", "t", fmtHour(h.t))); x.appendChild(el("span", "i", h.icon)); x.appendChild(el("span", "d", h.temp + "°")); x.appendChild(el("span", "p", h.pop ? h.pop + "%" : "")); hrs.appendChild(x); });
-  box.appendChild(hrs);
-  const days = el("div", "days");
+  const seg = el("div", "seg");
+  [["today", "Today"], ["week", "7 days"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(wxTab === k)); b.onclick = () => { wxTab = k; store.set("wxTab", k); render(); }; seg.appendChild(b); });
+  box.appendChild(seg);
+  const d0 = W.days[0], c = W.current;
+  if (wxTab === "today"){
+    const now = el("div", "wx-now");
+    now.appendChild(el("div", "wx-icon", c.icon));
+    const t = el("div", "wx-temp", c.temp + "°"); t.appendChild(el("small", "", "feels " + c.feels + "°")); now.appendChild(t);
+    now.appendChild(el("div", "wx-sub", c.label + " · High " + d0.max + "° Low " + d0.min + "°" + (d0.pop ? " · " + d0.pop + "% rain" : "")));
+    box.appendChild(now);
+    const wear = el("div", "wear"); wear.appendChild(el("span", "label", "What to wear today"));
+    const ul = el("ul"); d0.wear.forEach(w => ul.appendChild(el("li", "", w))); wear.appendChild(ul);
+    box.appendChild(wear);
+    const hrs = el("div", "hours");
+    W.hours.slice(0, full ? 24 : 12).forEach(h => { const x = el("div", "hr"); x.appendChild(el("span", "t", fmtHour(h.t))); x.appendChild(el("span", "i", h.icon)); x.appendChild(el("span", "d", h.temp + "°")); x.appendChild(el("span", "p", h.pop ? h.pop + "%" : "")); hrs.appendChild(x); });
+    box.appendChild(hrs);
+    if (full){
+      const f = el("div", "facts");
+      const fact = (lab, val) => { const x = el("div", "fact"); x.appendChild(el("span", "label", lab)); x.appendChild(el("b", "", val)); f.appendChild(x); };
+      fact("Wind", c.wind + " km/h"); fact("Gusts", (c.gust || d0.gust) + " km/h"); fact("Humidity", (c.humidity ?? "—") + "%");
+      fact("Rain", d0.precip + " mm"); fact("UV max", String(d0.uv)); fact(d0.snow ? "Snow" : "Feels low", d0.snow ? d0.snow + " cm" : d0.feels_min + "°");
+      fact("Sunrise", fmt12(d0.sunrise)); fact("Sunset", fmt12(d0.sunset)); fact("Tomorrow", W.days[1] ? W.days[1].icon + " " + W.days[1].max + "°/" + W.days[1].min + "°" : "—");
+      box.appendChild(f);
+    }
+    return box;
+  }
+  const days = el("div", "days"); days.style.marginTop = "12px";
   const lo = Math.min(...W.days.map(d => d.min)), hi = Math.max(...W.days.map(d => d.max)), span = (hi - lo) || 1;
   W.days.forEach((d, i) => {
-    const row = el("button", "day"); row.type = "button";
+    const row = el("button", "day" + (full ? " open" : "")); row.type = "button";
     row.appendChild(el("span", "dn", dayName(d.date, i)));
     row.appendChild(el("span", "di", d.icon));
     const r = el("span", "range"); r.appendChild(el("span", "", d.min + "°"));
     const tr = el("span", "track"), f = el("span", "fill"); f.style.left = ((d.min - lo) / span * 100) + "%"; f.style.right = ((hi - d.max) / span * 100) + "%"; tr.appendChild(f); r.appendChild(tr);
     r.appendChild(el("span", "", d.max + "°")); row.appendChild(r);
     row.appendChild(el("span", "dp", d.pop ? d.pop + "%" : ""));
-    const wearLine = el("span", "daywear", d.label + ". Wear: " + d.wear.join("; ") + "."); wearLine.hidden = !(full && i < 2);
-    row.appendChild(wearLine);
-    row.onclick = () => { wearLine.hidden = !wearLine.hidden; };
+    const extra = [d.label + (d.precip ? ", " + d.precip + " mm" : "") + (d.snow ? ", " + d.snow + " cm snow" : ""), "wind to " + d.wind + " km/h", "UV " + d.uv];
+    row.appendChild(el("span", "daywear", extra.join(" · ") + ". Wear: " + d.wear.join("; ") + "."));
+    row.onclick = () => row.classList.toggle("open");
     days.appendChild(row);
   });
   box.appendChild(days);
+  if (!full){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Tap a day for what to wear.")); box.appendChild(n); }
   return box;
 }
 function warningsBlock(){
@@ -284,11 +363,91 @@ function marketsStrip(){
   return box;
 }
 
+/* ---------- homes ---------- */
+const money = n => "$" + Math.round(n).toLocaleString("en-CA");
+function linksGroup(t, title){
+  if (!t || !t.links || !t.links.length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", title)); g.appendChild(head);
+  t.links.forEach(([lab, sub, href]) => { const a = el("a", "hl"); a.href = href; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", lab + " ↗")); a.appendChild(el("span", "hl-snip", sub)); g.appendChild(a); });
+  return g;
+}
+function homesCard(compact){
+  const R = D.rentals || {}; const L = R.listings || [];
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Homes for rent · Oakville")); head.appendChild(el("span", "stamp", R.at ? "checked " + ago(R.at) : "")); g.appendChild(head);
+  if (R.stats){
+    const st = el("div", "stats");
+    const one = (v, lab) => { const x = el("div", "stat"); x.appendChild(el("b", "", v)); x.appendChild(el("small", "", lab)); st.appendChild(x); };
+    one(money(R.stats.median), "median / month"); one("$" + (R.stats.low / 1000).toFixed(1) + "–" + (R.stats.high / 1000).toFixed(1) + "k", "range"); one(String(R.stats.count), "listings now");
+    g.appendChild(st);
+    const H = R.hist || [];
+    const tr = el("div", "trend");
+    if (H.length >= 2){
+      const pts = H.map(h => h[1]); tr.appendChild(spark(pts.length >= 5 ? pts : [pts[0], ...pts, pts[pts.length - 1], pts[pts.length - 1], pts[pts.length - 1]].slice(0, 6)));
+      const ref = H.find(h => (Date.now() - new Date(h[0] + "T12:00:00")) / 864e5 <= 8) || H[0];
+      const ch = ref[1] ? (R.stats.median - ref[1]) / ref[1] * 100 : 0;
+      tr.appendChild(el("span", "", (Math.abs(ch) < 0.5 ? "Flat" : (ch > 0 ? "▲ " : "▼ ") + Math.abs(ch).toFixed(1) + "%") + " vs " + new Date(ref[0] + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + " · tracked daily"));
+    } else tr.appendChild(el("span", "", "Price tracking started. The trend line fills in day by day."));
+    g.appendChild(tr);
+  }
+  const lab = el("div", "hl"); lab.appendChild(el("span", "label", R.filter || "3 bed, 3 bath near Oakville")); g.appendChild(lab);
+  if (!L.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", R.at ? "No matching listings right now. Try the searches below." : "First check runs within the hour.")); g.appendChild(e); }
+  L.slice(0, compact ? 3 : 40).forEach(x => {
+    const a = el("a", "home"); a.href = x.l; a.target = "_blank"; a.rel = "noopener";
+    const img = document.createElement("img"); img.loading = "lazy"; img.alt = ""; if (x.img) img.src = x.img; a.appendChild(img);
+    const t = el("div", "hl"); t.style.cssText = "padding:0;border:0;gap:2px";
+    const m = el("div", "hl-meta"); m.appendChild(el("span", "pr", money(x.p) + "/mo"));
+    if (x.ts && Date.now() / 1000 - x.ts < 36 * 3600) m.appendChild(el("span", "new", "New"));
+    t.appendChild(m); t.appendChild(el("span", "hl-title", x.t));
+    t.appendChild(el("span", "hl-snip", [x.beds + " bed", x.baths + " bath", x.kind, x.hood, x.ts ? ago(x.ts) : ""].filter(Boolean).join(" · ")));
+    a.appendChild(t); g.appendChild(a);
+  });
+  if (compact && L.length > 3){ const more = el("button", "hl", "See all " + L.length + " homes and price trend"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => go("homes"); g.appendChild(more); }
+  return g;
+}
+
+/* ---------- events ---------- */
+const EV_CATS = ["Business", "Jobs", "Gatherings", "Music"];
+function evTime(sec){ return new Date(sec * 1000).toLocaleTimeString("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" }).replace(":00", ""); }
+function evDay(sec){
+  const f = s => new Date(s * 1000).toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+  const d = f(sec), today = f(Date.now() / 1000), tmrw = f(Date.now() / 1000 + 86400);
+  return d === today ? "Today" : d === tmrw ? "Tomorrow" : new Date(sec * 1000).toLocaleDateString("en-CA", { timeZone: "America/Toronto", weekday: "long", month: "short", day: "numeric" });
+}
+function eventsCard(limit){
+  const E = D.events || {}; let L = (E.items || []).filter(e => e.start > Date.now() / 1000 - 3600);
+  if (!limit && angle !== "all") L = L.filter(e => e.c === angle);
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Upcoming · Oakville, Mississauga, GTA")); head.appendChild(el("span", "stamp", L.length + " events")); g.appendChild(head);
+  if (!L.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", E.at ? "Nothing listed for this category yet. Try the calendars below." : "First check runs within the hour.")); g.appendChild(e); }
+  let last = "";
+  L.slice(0, limit || 60).forEach(x => {
+    const day = evDay(x.start); if (day !== last){ g.appendChild(el("div", "evday", day)); last = day; }
+    const a = el("a", "ev"); a.href = x.l; a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(el("span", "when", evTime(x.start)));
+    const t = el("div", "hl"); t.style.cssText = "padding:0;border:0;gap:2px";
+    const m = el("div", "hl-meta"); m.appendChild(el("span", "tag", x.c)); m.appendChild(el("span", "", x.where)); t.appendChild(m);
+    const tt = el("span", "hl-title", x.t); tt.dir = "auto"; t.appendChild(tt);
+    if (x.org) t.appendChild(el("span", "hl-snip", x.org));
+    a.appendChild(t); g.appendChild(a);
+  });
+  if (limit && L.length > limit){ const more = el("button", "hl", "See all " + L.length + " events"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => go("events"); g.appendChild(more); }
+  return g;
+}
+
+/* ---------- my links (this device only) ---------- */
+let myLinks = store.get("myLinks", []);
+function myLinksRow(){
+  if (!myLinks.length) return null;
+  const r = el("div", "mylinks"); myLinks.forEach(([lab, href]) => { const a = el("a", "", lab + " ↗"); a.href = href; a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); return r;
+}
+function go(id){ view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }
+
 /* ---------- headlines ---------- */
 function topicGroup(t, limit){
   const items = (D.headlines || {})[t.id] || [];
   const g = el("div", "group");
-  const head = el("div", "group-head"); head.appendChild(el("strong", "", t.name)); head.appendChild(el("span", "stamp", items.length + " stories")); g.appendChild(head);
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", t.id === "homes" ? "Rent and new-build news" : t.id === "events" ? "Event news" : t.name)); head.appendChild(el("span", "stamp", items.length + " stories")); g.appendChild(head);
   if (!items.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "Nothing new in the last few days.")); g.appendChild(e); }
   let list = items;
   if (t.id === "oakville" && limit) list = items.filter(it => !TRAVEL.includes(it.a));
@@ -305,16 +464,24 @@ function render(){
   const main = $("#main"); main.textContent = "";
   const add = n => n && main.appendChild(n);
   add(warningsBlock());
+  const topic = id => D.topics.find(x => x.id === id);
   if (view === "all"){
+    add(myLinksRow());
     if (visible("weather")) add(weatherCard(false));
     if (visible("oakville")) add(goCard());
     if (visible("markets")) add(marketsStrip());
-    D.topics.filter(t => visible(t.id)).forEach(t => add(topicGroup(t, 5)));
+    D.topics.filter(t => visible(t.id)).forEach(t => {
+      if (t.id === "homes" && D.rentals) add(homesCard(true));
+      else if (t.id === "events" && D.events) add(eventsCard(5));
+      else add(topicGroup(t, 5));
+    });
   } else if (view === "weather") add(weatherCard(true));
   else if (view === "markets") add(marketsStrip());
   else {
-    const t = D.topics.find(x => x.id === view);
-    const angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];
+    const t = topic(view);
+    let angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];
+    if (t.id === "events") angles = [...new Set([...EV_CATS, ...angles])];
+    if (t.id === "homes"){ add(homesCard(false)); add(linksGroup(t, "Search listings")); }
     if (angles.length > 1){
       const sub = el("div", "subrail");
       ["all", ...angles].forEach(a => { const b = el("button", "chip", a === "all" ? "Everything" : a); b.type = "button"; b.setAttribute("aria-pressed", String(angle === a)); b.onclick = () => { angle = a; render(); }; sub.appendChild(b); });
@@ -322,7 +489,10 @@ function render(){
       add(sub);
     }
     if (t.id === "oakville" && angle === "all") add(goCard());
+    if (t.id === "events") add(eventsCard(0));
     add(topicGroup(t, 0));
+    if (t.id === "events") add(linksGroup(t, "Event calendars"));
+    else if (t.id !== "homes") add(linksGroup(t, "Links"));
   }
 }
 
@@ -335,8 +505,34 @@ function openSheet(){
     cb.onchange = () => { if (cb.checked) hidden.delete(s.id); else hidden.add(s.id); store.set("hidden", [...hidden]); render(); };
     lab.appendChild(cb); box.appendChild(lab);
   });
+  const dl = $("#tpList"); dl.textContent = ""; (D ? D.topics : []).forEach(t => { const o = document.createElement("option"); o.value = t.name; dl.appendChild(o); });
+  renderMyList();
   $("#sheet").hidden = false;
 }
+function renderMyList(){
+  const box = $("#myList"); box.textContent = "";
+  myLinks.forEach(([lab], i) => { const r = el("div"); r.appendChild(el("span", "", lab)); const b = el("button", "", "Remove"); b.type = "button"; b.onclick = () => { myLinks.splice(i, 1); store.set("myLinks", myLinks); renderMyList(); render(); }; r.appendChild(b); box.appendChild(r); });
+}
+$("#myAdd").onclick = () => {
+  const lab = $("#myLabel").value.trim(); let u = $("#myUrl").value.trim();
+  if (!lab || !u) return toast("Add a name and a link");
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  myLinks.push([lab.slice(0, 30), u]); store.set("myLinks", myLinks); $("#myLabel").value = ""; $("#myUrl").value = ""; renderMyList(); render(); toast("Pinned to the top");
+};
+$("#testPush").onclick = async () => {
+  const b = $("#testPush"); b.textContent = "Sending…";
+  try { const r = await fetch("https://ntfy.sh/" + encodeURIComponent($("#topicName").textContent.trim()), { method: "POST", body: "Alerts are working. You will get breaking Oakville news, GO and traffic alerts, weather warnings and the 6:30 a.m. briefing.", headers: { Title: "Signal Desk test", Tags: "white_check_mark" } }); b.textContent = r.ok ? "Sent. Check your phone" : "Could not send"; }
+  catch(_){ b.textContent = "Could not send"; }
+  setTimeout(() => b.textContent = "Send a test alert now", 4000);
+};
+$("#tpSend").onclick = () => {
+  const act = $("#tpAction").value, name = $("#tpName").value.trim(), words = $("#tpWords").value.split("\n").map(w => w.trim()).filter(Boolean);
+  if (!name) return toast("Type a topic name");
+  if (act === "add" && !words.length) return toast("Add at least one search word");
+  const body = "Topic: " + name + "\nRegion: " + $("#tpRegion").value + "\nLanguage: " + $("#tpLang").value + "\nKeywords:\n" + words.map(w => "- " + w).join("\n");
+  const repo = (D && D.repo) || "MG4Trading/signal-desk";
+  window.open("https://github.com/" + repo + "/issues/new?title=" + encodeURIComponent("Signal Desk: " + act + " " + name) + "&body=" + encodeURIComponent(body), "_blank", "noopener");
+};
 $("#custBtn").onclick = openSheet;
 $("#closeSheet").onclick = () => { $("#sheet").hidden = true; };
 $("#sheet").onclick = e => { if (e.target.id === "sheet") $("#sheet").hidden = true; };

@@ -1,0 +1,33 @@
+name: Add or remove a topic
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: write
+  issues: write
+concurrency:
+  group: topic-editor
+jobs:
+  edit:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, 'Signal Desk:')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update config.json
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: python edit_topics.py > result.md
+      - name: Save and reply
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUM: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet config.json; then
+            git commit -qam "Topics: $(head -1 result.md)"
+            git push -q origin HEAD:main
+          fi
+          gh issue comment "$NUM" -F result.md -R "$GITHUB_REPOSITORY"
+          gh issue close "$NUM" -R "$GITHUB_REPOSITORY"

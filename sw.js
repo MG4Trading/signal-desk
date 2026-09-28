@@ -1,4 +1,4 @@
-const C = "sd-v1";
+const C = "sd-v2";
 self.addEventListener("install", e => { e.waitUntil(caches.open(C).then(c => c.addAll(["./", "index.html"])).catch(() => {})); self.skipWaiting(); });
 self.addEventListener("activate", e => e.waitUntil(self.clients.claim()));
 self.addEventListener("fetch", e => {
