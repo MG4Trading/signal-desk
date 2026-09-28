@@ -741,6 +741,105 @@
      "2d"
     ]
    ]
+  },
+  {
+   "id": "marketnews",
+   "name": "Market news",
+   "gl": "CA",
+   "hl": "en",
+   "in_markets": true,
+   "feeds": [
+    [
+     "Market wrap",
+     "TSX close OR \"Canadian stocks\" today",
+     "",
+     "",
+     "2d",
+     "TSX|Canad|stock"
+    ],
+    [
+     "Market wrap",
+     "Wall Street close S&P 500 Nasdaq",
+     "US",
+     "",
+     "2d"
+    ],
+    [
+     "Analyst outlook",
+     "stock market outlook strategists analysts",
+     "US",
+     "",
+     "7d"
+    ],
+    [
+     "Analyst outlook",
+     "TSX outlook analysts OR strategist Canada stocks",
+     "",
+     "",
+     "14d"
+    ],
+    [
+     "Rates",
+     "\"Bank of Canada\" interest rate decision OR \"rate cut\" OR \"rate hike\"",
+     "",
+     "",
+     "7d"
+    ],
+    [
+     "Rates",
+     "\"Federal Reserve\" interest rates FOMC OR Powell",
+     "US",
+     "",
+     "7d"
+    ],
+    [
+     "Rates",
+     "mortgage rates Canada",
+     "",
+     "",
+     "7d"
+    ],
+    [
+     "Housing",
+     "CREA home sales OR \"housing market\" Canada",
+     "",
+     "",
+     "14d"
+    ],
+    [
+     "Housing",
+     "Oakville OR Halton OR GTA housing market prices",
+     "",
+     "",
+     "30d",
+     "Oakville|Halton|GTA|Toronto"
+    ],
+    [
+     "Commodities",
+     "oil prices OR gold prices",
+     "US",
+     "",
+     "3d"
+    ],
+    [
+     "Egypt & Gulf",
+     "EGX30 OR Tadawul OR \"Egyptian pound\"",
+     "",
+     "",
+     "7d"
+    ]
+   ]
   }
- ]
+ ],
+ "deep": {
+  "S&P/TSX": "cnbc:.GSPTSE",
+  "S&P 500": "cnbc:.SPX",
+  "Nasdaq": "cnbc:.IXIC",
+  "Tadawul": "google:TASI:TADAWUL",
+  "Brent": "cnbc:@LCO.1",
+  "Gold": "cnbc:@GC.1",
+  "USD/CAD": "cnbc:CAD=",
+  "CAD/EGP": "ratio:EGP=/CAD=",
+  "USD/EGP": "cnbc:EGP="
+ }
 }

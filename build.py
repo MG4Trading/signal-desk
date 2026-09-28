@@ -220,6 +220,186 @@ def gather_quotes():
     log("quotes:", sum(1 for q in out if q.get("price") is not None and not q.get("stale")), "fresh of", len(out))
     return out
 
+# ---------------------------------------------------------------- market deep dive
+def cnbc_chart(sym, rng):
+    d = json.loads(get("https://ts-api.cnbc.com/harmony/app/charts/%s.json?symbol=%s" % (rng, urllib.parse.quote(sym)),
+                       headers={"Accept": "application/json"}, timeout=25))
+    out = []
+    for b in (d.get("barData") or {}).get("priceBars") or []:
+        try:
+            out.append((int(b["tradeTimeinMills"]) // 1000, float(b["close"])))
+        except Exception:
+            pass
+    return out
+
+
+def google_hist(sym):
+    h = get("https://www.google.com/finance/quote/" + sym + "?hl=en")
+    i = h.find("key: 'ds:12'")
+    blk = h[i:i + 20000] if i >= 0 else ""
+    out = []
+    for m in re.finditer(r'\[([-\d.]+),([-\d.]+),([-\d.]+),([-\d.]+),"(\d{4}-\d\d-\d\d)T', blk):
+        out.append((int(datetime.strptime(m.group(5), "%Y-%m-%d").replace(tzinfo=timezone.utc).timestamp()), float(m.group(2))))
+    return out
+
+
+def _at(series, ts):
+    v = None
+    for t, c in series:
+        if t <= ts:
+            v = c
+        else:
+            break
+    return v
+
+
+def _rsi(closes, n=14):
+    if len(closes) <= n:
+        return None
+    gains = losses = 0.0
+    for a, b in zip(closes[:n], closes[1:n + 1]):
+        d = b - a; gains += max(d, 0); losses += max(-d, 0)
+    ag, al = gains / n, losses / n
+    for a, b in zip(closes[n:-1], closes[n + 1:]):
+        d = b - a
+        ag = (ag * (n - 1) + max(d, 0)) / n; al = (al * (n - 1) + max(-d, 0)) / n
+    return 100.0 if al == 0 else 100 - 100 / (1 + ag / al)
+
+
+def analyse(daily, weekly, live):
+    daily = sorted(daily); weekly = sorted(weekly)
+    if not daily:
+        return None
+    now = int(time.time())
+    last = live if live is not None else daily[-1][1]
+    pct = lambda old: None if not old else round((last / old - 1) * 100, 2)
+    year_start = int(datetime(datetime.now(TZ).year, 1, 1, tzinfo=TZ).timestamp())
+    longer = weekly if weekly else daily
+    rets = {"1W": pct(_at(daily, now - 7 * 86400)), "1M": pct(_at(daily, now - 30 * 86400)), "3M": pct(_at(daily, now - 91 * 86400)),
+            "YTD": pct(_at(daily, year_start - 1)), "1Y": pct(_at(daily, now - 365 * 86400)),
+            "3Y": pct(_at(longer, now - 3 * 365 * 86400)) if longer and longer[0][0] <= now - 3 * 365 * 86400 else None,
+            "5Y": pct(_at(longer, now - 5 * 365 * 86400)) if longer and longer[0][0] <= now - 5 * 365 * 86400 + 14 * 86400 else None}
+    closes = [c for _, c in daily]
+    yr = [c for t, c in daily if t >= now - 365 * 86400] + [last]
+    ma = lambda n: round(sum(closes[-n:]) / n, 4) if len(closes) >= n else None
+    ma50, ma200, rsi = ma(50), ma(200), _rsi(closes + [last])
+    hi, lo = max(yr), min(yr)
+    if ma50 and ma200:
+        trend = "Uptrend" if last > ma50 > ma200 else "Downtrend" if last < ma50 < ma200 else "Mixed"
+    elif ma50:
+        trend = "Above 50-day" if last > ma50 else "Below 50-day"
+    else:
+        trend = None
+    rnd = lambda v: float("%.6g" % v)
+    return {"rets": rets, "ma50": ma50, "ma200": ma200, "rsi": None if rsi is None else round(rsi, 1),
+            "hi52": rnd(hi), "lo52": rnd(lo), "from_hi": round((last / hi - 1) * 100, 2), "trend": trend,
+            "daily": [[t // 86400, rnd(c)] for t, c in daily if t >= now - 400 * 86400],
+            "weekly": [[t // 86400, rnd(c)] for t, c in weekly if t >= now - 5 * 366 * 86400]}
+
+
+def gather_deep(quotes):
+    """History, returns and trend signals per instrument; refreshed about once an hour."""
+    prev = prev_data.get("deep") or {}
+    live = {q["label"]: q.get("price") for q in quotes}
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("items"):
+        return prev
+    items = {}
+    def one(label, src):
+        if src.startswith("cnbc:"):
+            sym = src[5:]
+            return analyse(cnbc_chart(sym, "1Y"), cnbc_chart(sym, "5Y"), live.get(label))
+        if src.startswith("ratio:"):
+            a, b = src[6:].split("/")
+            def ratio(rng):
+                sa, sb = dict((t // 86400, c) for t, c in cnbc_chart(a, rng)), dict((t // 86400, c) for t, c in cnbc_chart(b, rng))
+                return [(d * 86400, sa[d] / sb[d]) for d in sorted(set(sa) & set(sb)) if sb[d]]
+            return analyse(ratio("1Y"), ratio("5Y"), live.get(label))
+        if src.startswith("google:"):
+            r = analyse(google_hist(src[7:]), [], live.get(label))
+            if r:
+                r["limited"] = True
+            return r
+    with ThreadPoolExecutor(max_workers=3) as ex:
+        futs = {label: ex.submit(one, label, src) for label, src in cfg.get("deep", {}).items()}
+        for label, fu in futs.items():
+            try:
+                r = fu.result()
+                if r:
+                    items[label] = r
+            except Exception as e:
+                log("deep", label, e)
+                if (prev.get("items") or {}).get(label):
+                    items[label] = prev["items"][label]
+    log(f"deep: {len(items)} instruments")
+    return {"at": int(NOW), "items": items} if items else prev
+
+
+def gather_rates():
+    prev = prev_data.get("rates") or {}
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("items"):
+        return prev
+    items = []
+    try:
+        start = (datetime.now(TZ) - timedelta(days=730)).strftime("%Y-%m-%d")
+        d = json.loads(get("https://www.bankofcanada.ca/valet/observations/V39079,V80691311,V80691335,BD.CDN.5YR.DQ.YLD/json?start_date=" + start))
+        obs = d.get("observations", [])
+        def series(k):
+            return [(o["d"], float(o[k]["v"])) for o in obs if k in o and o[k].get("v") not in (None, "")]
+        pol = series("V39079")
+        if pol:
+            last_d, last_v = pol[-1]
+            chg = next(((d_, v) for d_, v in reversed(pol) if v != last_v), None)
+            moved = None
+            if chg:
+                first_new = next(d_ for d_, v in pol if d_ > chg[0])
+                moved = {"date": first_new, "by": round(last_v - chg[1], 2)}
+            items.append({"k": "boc", "label": "Bank of Canada policy rate", "value": last_v, "asof": last_d, "moved": moved,
+                          "source": "Bank of Canada", "url": "https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/"})
+        for k, label, url in (("V80691311", "Prime rate (banks)", "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/posted-interest-rates-offered-by-chartered-banks/"),
+                              ("V80691335", "5-year fixed mortgage, posted", "https://www.bankofcanada.ca/rates/banking-and-financial-statistics/posted-interest-rates-offered-by-chartered-banks/"),
+                              ("BD.CDN.5YR.DQ.YLD", "Government of Canada 5-year yield", "https://www.bankofcanada.ca/rates/interest-rates/canadian-bonds/")):
+            sr = series(k)
+            if sr:
+                yr_ago = next((v for d_, v in sr if d_ >= (datetime.now(TZ) - timedelta(days=365)).strftime("%Y-%m-%d")), None)
+                items.append({"k": k, "label": label, "value": sr[-1][1], "asof": sr[-1][0], "yoy": None if yr_ago is None else round(sr[-1][1] - yr_ago, 2),
+                              "source": "Bank of Canada", "url": url})
+    except Exception as e:
+        log("boc rates failed:", e)
+    try:
+        cn = cnbc_quotes(["CA2Y", "CA10Y", "US2Y", "US10Y"])
+        for sym, label in (("CA10Y", "Canada 10-year yield"), ("US2Y", "U.S. 2-year yield"), ("US10Y", "U.S. 10-year yield")):
+            if sym in cn:
+                items.append({"k": sym, "label": label, "value": cn[sym]["price"], "asof": cn[sym]["asof"], "source": "CNBC",
+                              "url": "https://www.cnbc.com/quotes/" + sym})
+    except Exception as e:
+        log("bond yields failed:", e)
+    if not items:
+        return prev
+    return {"at": int(NOW), "items": items}
+
+
+def gather_housing():
+    prev = prev_data.get("housing") or {}
+    if prev.get("at") and NOW - prev["at"] < 6 * 3600 and prev.get("snlr"):
+        return prev
+    h = get("https://stats.crea.ca/en-CA/", timeout=25)
+    t = html.unescape(re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", h)))
+    out = {"at": int(NOW), "source": "CREA", "url": "https://stats.crea.ca/en-CA/"}
+    m = re.search(r"sales-to-new listings ratio.{0,80}?([\d.]+)%", t, re.I)
+    out["snlr"] = float(m.group(1)) if m else None
+    m = re.search(r"([\d.]+) months of inventory", t, re.I); out["moi"] = float(m.group(1)) if m else None
+    m = re.search(r"Home Price Index \(HPI\)[^.]*?(up|down) ([\d.]+)% year-over-year", t, re.I)
+    out["hpi_yoy"] = (1 if m.group(1).lower() == "up" else -1) * float(m.group(2)) if m else None
+    m = re.search(r"average sale price was (up|down) ([\d.]+)%", t, re.I)
+    out["avg_yoy"] = (1 if m.group(1).lower() == "up" else -1) * float(m.group(2)) if m else None
+    m = re.search(r"National Statistics (.{10,110}?) Monthly Housing Market Report", t); out["title"] = m.group(1).strip() if m else "CREA monthly housing report"
+    m = re.search(r"Ottawa, ON (\w+ \d{1,2}, \d{4})", t); out["date"] = m.group(1) if m else None
+    v = out["snlr"]
+    out["verdict"] = None if v is None else ("Buyer's market" if v < 45 else "Seller's market" if v > 65 else "Balanced market")
+    if not out["snlr"]:
+        return prev or out
+    return out
+
 # ---------------------------------------------------------------- weather
 WMO = {
     0: ("Clear", "☀️"), 1: ("Mainly clear", "🌤️"), 2: ("Partly cloudy", "⛅"), 3: ("Cloudy", "☁️"),
@@ -614,6 +794,19 @@ def main():
         quotes = gather_quotes()
     except Exception as e:
         log("quotes failed", e); quotes = prev_data.get("quotes", [])
+    deep = rates = housing = None
+    try:
+        deep = gather_deep(quotes)
+    except Exception as e:
+        log("deep failed", e); deep = prev_data.get("deep")
+    try:
+        rates = gather_rates()
+    except Exception as e:
+        log("rates failed", e); rates = prev_data.get("rates")
+    try:
+        housing = gather_housing()
+    except Exception as e:
+        log("housing failed", e); housing = prev_data.get("housing")
     try:
         weather = gather_weather()
     except Exception as e:
@@ -638,9 +831,9 @@ def main():
         "generated": int(time.time()),
         "interval": int(os.environ.get("SD_INTERVAL", "600")),
         "repo": os.environ.get("GITHUB_REPOSITORY", ""),
-        "topics": [{"id": t["id"], "name": t["name"], "links": t.get("links", [])} for t in cfg["topics"]],
+        "topics": [{"id": t["id"], "name": t["name"], "links": t.get("links", []), "in_markets": bool(t.get("in_markets"))} for t in cfg["topics"]],
         "headlines": headlines, "quotes": quotes, "weather": weather, "warnings": ec,
-        "rentals": rentals, "events": events,
+        "rentals": rentals, "events": events, "deep": deep, "rates": rates, "housing": housing,
         "failed": failed, "location": cfg["location"]["name"],
     }
     run_alerts(headlines, weather, ec)

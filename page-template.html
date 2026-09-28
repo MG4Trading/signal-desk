@@ -103,6 +103,26 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .mylist{display:flex;flex-direction:column}
 .mylist div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
 .mylist button{border:0;background:transparent;color:var(--danger);font-weight:600;min-height:36px}
+.mk-rets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 16px 12px}
+.mk-ret{background:var(--bg);border-radius:10px;padding:7px 8px;display:flex;flex-direction:column;gap:1px}
+.mk-ret b{font-family:var(--mono);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+.mk-ret b.up{color:var(--up)} .mk-ret b.down{color:var(--down)}
+.mk-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:12px 16px 8px}
+.mk-price strong{font-family:var(--display);font-stretch:80%;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.mk-chart{padding:0 16px 6px}
+.mk-chart svg{width:100%;height:170px;display:block;touch-action:pan-y}
+.mk-read{font-family:var(--mono);font-size:12px;color:var(--muted);padding:0 16px 8px;min-height:18px;font-variant-numeric:tabular-nums}
+.mk-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;padding:4px 16px 14px;font-size:13px}
+.mk-stats span{color:var(--muted)} .mk-stats b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.pill-sig{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;background:var(--surface-2);color:var(--ink)}
+.pill-sig.good{background:color-mix(in srgb, var(--up) 16%, var(--surface));color:var(--up)}
+.pill-sig.bad{background:color-mix(in srgb, var(--down) 14%, var(--surface));color:var(--down)}
+.pill-sig.warn{background:var(--amber-soft);color:var(--amber)}
+.readrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-bottom:0;text-align:left;font:inherit;color:inherit}
+.readrow .sigs{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}
+.gauge{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--accent-soft) 0 45%,var(--surface-2) 45% 65%,var(--amber-soft) 65% 100%);margin:6px 16px 2px}
+.gauge i{position:absolute;top:-4px;width:4px;height:18px;border-radius:2px;background:var(--ink);transform:translateX(-2px)}
+.gauge-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 16px 12px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:calc(100% - 32px);text-align:center}
 </style>
 </head>
@@ -185,7 +205,7 @@ let angle = "all", wxTab = store.get("wxTab", "today");
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
-function sections(){ const s = [{ id: "weather", name: "Weather" }]; (D ? D.topics : []).forEach(t => s.push(t)); s.push({ id: "markets", name: "Markets" }); return s; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }]; (D ? D.topics : []).filter(t => !t.in_markets).forEach(t => s.push(t)); s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
 
 function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
@@ -381,6 +401,138 @@ function marketsTable(){
   return g;
 }
 
+/* ---------- market deep dive ---------- */
+let mkSel = store.get("mkSel", "S&P/TSX"), mkRange = store.get("mkRange", "1Y"), mkAngle = "all";
+const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(v != null && Math.abs(v) >= 100 ? 0 : 1) + "%";
+const cls = v => v == null ? "" : v > 0.005 ? "up" : v < -0.005 ? "down" : "";
+function signals(label){
+  const x = ((D.deep || {}).items || {})[label], q = (D.quotes || []).find(z => z.label === label) || {}; if (!x) return [];
+  const out = [];
+  if (x.trend) out.push([x.trend, x.trend === "Uptrend" || x.trend === "Above 50-day" ? "good" : x.trend === "Downtrend" || x.trend === "Below 50-day" ? "bad" : ""]);
+  if (x.rsi != null) out.push(["RSI " + Math.round(x.rsi) + (x.rsi >= 70 ? " · overbought" : x.rsi <= 30 ? " · oversold" : ""), x.rsi >= 70 || x.rsi <= 30 ? "warn" : ""]);
+  if (x.from_hi != null) out.push([x.from_hi > -1 ? "At 52-week high" : pctTxt(x.from_hi) + " from 52-week high", x.from_hi > -1 ? "good" : x.from_hi < -10 ? "bad" : ""]);
+  if (x.ma200 && q.price) out.push([(q.price >= x.ma200 ? "Above" : "Below") + " 200-day avg", q.price >= x.ma200 ? "good" : "bad"]);
+  return out;
+}
+function sigEl(sig){ const box = el("span", "sigs"); sig.forEach(([t, c]) => box.appendChild(el("span", "pill-sig " + c, t))); return box; }
+function marketRead(){
+  const items = (D.deep || {}).items || {}; if (!Object.keys(items).length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Today's read")); head.appendChild(el("span", "stamp", "signals, not advice")); g.appendChild(head);
+  (D.quotes || []).forEach(q => {
+    const x = items[q.label]; if (!x) return;
+    const r = el("button", "readrow"); r.type = "button";
+    const left = el("div", ""); left.appendChild(el("strong", "", q.label)); r.appendChild(left);
+    const right = el("span", ""); right.style.cssText = "font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;display:flex;gap:10px";
+    right.appendChild(el("span", cls(q.pct) === "up" ? "" : "", "Day " + pctTxt(q.pct)));
+    right.appendChild(el("span", "", "YTD " + pctTxt(x.rets.YTD))); r.appendChild(right);
+    r.appendChild(sigEl(signals(q.label)));
+    r.onclick = () => { mkSel = q.label; store.set("mkSel", mkSel); render(); document.getElementById("mk-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    g.appendChild(r);
+  });
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Trend compares the price with its 50- and 200-day averages. RSI above 70 often means stretched; below 30, washed out. These are general market signals, not personal financial advice.")); g.appendChild(n);
+  return g;
+}
+function chartSvg(pts, onRead){
+  const ns = "http://www.w3.org/2000/svg", W = 340, H = 170, L = 50, R = 8, T = 10, B = 22;
+  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("role", "img");
+  if (pts.length < 2) return svg;
+  const vs = pts.map(p => p[1]); let lo = Math.min(...vs), hi = Math.max(...vs); const pad = (hi - lo) * 0.08 || hi * 0.01; lo -= pad; hi += pad;
+  const x0 = pts[0][0], x1 = pts[pts.length - 1][0];
+  const X = d => L + (d - x0) / ((x1 - x0) || 1) * (W - L - R), Y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  const mk = (tag, attrs) => { const e = document.createElementNS(ns, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); svg.appendChild(e); return e; };
+  const dec = hi < 10 ? 3 : hi < 1000 ? 1 : 0, fmt = v => v.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  [0, 0.5, 1].forEach(f => { const v = lo + (hi - lo) * (1 - f), y = Y(v); mk("line", { x1: L, x2: W - R, y1: y, y2: y, stroke: "var(--line)", "stroke-width": 1 }); const t = mk("text", { x: L - 6, y: y + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }); t.textContent = fmt(v); });
+  const dstr = d => new Date(d * 864e5).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: (x1 - x0) > 200 ? "2-digit" : undefined, timeZone: "UTC" });
+  [[x0, "start"], [x1, "end"]].forEach(([d, a]) => { const t = mk("text", { x: X(d), y: H - 6, "text-anchor": a, "font-size": 10, fill: "var(--muted)" }); t.textContent = dstr(d); });
+  const up = vs[vs.length - 1] >= vs[0], col = up ? "var(--up)" : "var(--down)";
+  const line = pts.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join(" ");
+  mk("path", { d: line + ` L${X(x1).toFixed(1)} ${H - B} L${X(x0).toFixed(1)} ${H - B} Z`, fill: col, "fill-opacity": 0.08, stroke: "none" });
+  mk("path", { d: line, fill: "none", stroke: col, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" });
+  const cross = mk("line", { y1: T, y2: H - B, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3", visibility: "hidden" });
+  const dot = mk("circle", { r: 4.5, fill: col, stroke: "var(--surface)", "stroke-width": 2, cx: X(x1), cy: Y(vs[vs.length - 1]) });
+  const read = i => { const p = pts[i]; dot.setAttribute("cx", X(p[0])); dot.setAttribute("cy", Y(p[1])); onRead(dstr(p[0]) + " · " + fmt(p[1]) + " · " + pctTxt((p[1] / pts[0][1] - 1) * 100) + " from start"); };
+  const move = e => { const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W; let best = 0, bd = 1e9; pts.forEach((p, i) => { const d = Math.abs(X(p[0]) - x); if (d < bd){ bd = d; best = i; } }); cross.setAttribute("x1", X(pts[best][0])); cross.setAttribute("x2", X(pts[best][0])); cross.setAttribute("visibility", "visible"); read(best); };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); read(pts.length - 1); });
+  read(pts.length - 1);
+  return svg;
+}
+function marketDetail(){
+  const items = (D.deep || {}).items || {}, labels = (D.quotes || []).map(q => q.label).filter(l => items[l]); if (!labels.length) return null;
+  if (!items[mkSel]) mkSel = labels[0];
+  const x = items[mkSel], q = (D.quotes || []).find(z => z.label === mkSel) || {};
+  const g = el("div", "group"); g.id = "mk-detail";
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Deep dive")); head.appendChild(el("span", "stamp", "history updated " + ago(D.deep.at))); g.appendChild(head);
+  const pills = el("div", "subrail"); pills.style.cssText = "margin:10px 0 0;padding:0 16px";
+  labels.forEach(l => { const b = el("button", "chip", l); b.type = "button"; b.setAttribute("aria-pressed", String(l === mkSel)); b.onclick = () => { mkSel = l; store.set("mkSel", l); render(); }; pills.appendChild(b); });
+  g.appendChild(pills);
+  const pr = el("div", "mk-price"); pr.appendChild(el("strong", "", q.price != null ? fmtPx(q) : "—")); if (q.price != null) pr.appendChild(chgEl(q));
+  if (q.url){ const a = el("a", "", (q.source || "Source") + " ↗"); a.href = q.url; a.target = "_blank"; a.rel = "noopener"; a.style.cssText = "margin-left:auto;font-size:12px;color:var(--accent);font-weight:600"; pr.appendChild(a); }
+  g.appendChild(pr);
+  const sg = sigEl(signals(mkSel)); sg.style.cssText = "display:flex;flex-wrap:wrap;gap:5px;padding:0 16px 10px"; g.appendChild(sg);
+  const rets = el("div", "mk-rets");
+  [["Day", q.pct], ["1W", x.rets["1W"]], ["1M", x.rets["1M"]], ["3M", x.rets["3M"]], ["YTD", x.rets.YTD], ["1Y", x.rets["1Y"]], ["3Y", x.rets["3Y"]], ["5Y", x.rets["5Y"]]].forEach(([k, v]) => { const c = el("div", "mk-ret"); c.appendChild(el("span", "label", k)); c.appendChild(el("b", cls(v), pctTxt(v))); rets.appendChild(c); });
+  g.appendChild(rets);
+  const now = Math.floor(Date.now() / 864e5), ytd = Math.floor(Date.UTC(new Date().getFullYear(), 0, 1) / 864e5);
+  const ranges = { "1M": [x.daily, now - 31], "3M": [x.daily, now - 92], "YTD": [x.daily, ytd], "1Y": [x.daily, now - 366], "5Y": [x.weekly && x.weekly.length ? x.weekly : x.daily, now - 5 * 366] };
+  const rp = el("div", "gotabs"); rp.style.cssText = "grid-template-columns:repeat(5,1fr);margin:0 16px 8px";
+  Object.keys(ranges).forEach(k => { const b = el("button", "", k); b.type = "button"; b.setAttribute("aria-pressed", String(k === mkRange)); b.onclick = () => { mkRange = k; store.set("mkRange", k); render(); }; rp.appendChild(b); });
+  g.appendChild(rp);
+  const [src, from] = ranges[mkRange] || ranges["1Y"]; let pts = (src || []).filter(p => p[0] >= from);
+  if (q.price != null && pts.length && pts[pts.length - 1][0] < now) pts = pts.concat([[now, q.price]]);
+  const readout = el("div", "mk-read"); const ch = el("div", "mk-chart");
+  ch.appendChild(pts.length > 1 ? chartSvg(pts, t => readout.textContent = t) : el("div", "hl-snip", "Not enough history for this range yet."));
+  g.appendChild(ch); g.appendChild(readout);
+  const st = el("div", "mk-stats"); const f = v => v == null ? "—" : fmtPx({ price: v });
+  [["52-week high", f(x.hi52)], ["52-week low", f(x.lo52)], ["50-day average", f(x.ma50)], ["200-day average", f(x.ma200)], ["RSI (14-day)", x.rsi == null ? "—" : String(x.rsi)], ["From 52-week high", pctTxt(x.from_hi)]].forEach(([k, v]) => { const d = el("div", ""); d.appendChild(el("span", "", k + " ")); d.appendChild(el("b", "", v)); st.appendChild(d); });
+  g.appendChild(st);
+  if (x.limited){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Only about a month of history is available for this market, so long-term returns and averages are blank.")); g.appendChild(n); }
+  return g;
+}
+function ratesCard(){
+  const R = (D.rates || {}).items || []; if (!R.length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Interest rates")); head.appendChild(el("span", "stamp", "tap for source")); g.appendChild(head);
+  R.forEach(r => {
+    const a = el("a", "hl"); a.href = r.url; a.target = "_blank"; a.rel = "noopener";
+    const top = el("div", "hl-meta"); top.style.cssText = "justify-content:space-between;font-size:15px;color:var(--ink)";
+    top.appendChild(el("strong", "", r.label)); top.appendChild(el("span", "", "")).style.cssText = "flex:1";
+    const v = el("span", "", r.value.toFixed(2) + "%"); v.style.cssText = "font-family:var(--mono);font-weight:500"; top.appendChild(v); a.appendChild(top);
+    const bits = [];
+    if (r.moved) bits.push("last move " + (r.moved.by > 0 ? "+" : "") + r.moved.by.toFixed(2) + " pts on " + new Date(r.moved.date + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }));
+    if (r.yoy != null) bits.push((r.yoy > 0 ? "+" : "") + r.yoy.toFixed(2) + " pts over 12 months");
+    bits.push("as of " + (typeof r.asof === "number" ? fmtAsOf(r.asof) : new Date(r.asof + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric" })) + " · " + r.source + " ↗");
+    a.appendChild(el("span", "hl-snip", bits.join(" · "))); g.appendChild(a);
+  });
+  return g;
+}
+function housingCard(){
+  const H = D.housing; if (!H || H.snlr == null) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Housing: buyer's or seller's market?")); head.appendChild(el("span", "stamp", "Canada")); g.appendChild(head);
+  const top = el("div", "mk-price"); top.appendChild(el("strong", "", H.verdict)); top.appendChild(el("span", "chg flat", "sales-to-new-listings " + H.snlr + "%")); g.appendChild(top);
+  const gg = el("div", "gauge"); const i = el("i"); i.style.left = Math.max(0, Math.min(100, (H.snlr - 30) / 50 * 100)) + "%"; gg.appendChild(i);
+  gg.style.background = `linear-gradient(90deg,var(--accent-soft) 0 ${(45 - 30) / 50 * 100}%,var(--surface-2) ${(45 - 30) / 50 * 100}% ${(65 - 30) / 50 * 100}%,var(--amber-soft) ${(65 - 30) / 50 * 100}% 100%)`; g.appendChild(gg);
+  const gl = el("div", "gauge-l"); ["Buyer's · under 45%", "Balanced", "Seller's · over 65%"].forEach(t => gl.appendChild(el("span", "", t))); g.appendChild(gl);
+  const st = el("div", "mk-stats");
+  [["Months of inventory", H.moi == null ? "—" : String(H.moi)], ["Benchmark price, year over year", pctTxt(H.hpi_yoy)], ["Average price, year over year", pctTxt(H.avg_yoy)], ["Report", H.date || "—"]].forEach(([k, v]) => { const d = el("div", ""); d.appendChild(el("span", "", k + " ")); d.appendChild(el("b", "", v)); st.appendChild(d); });
+  g.appendChild(st);
+  const src = el("a", "hl"); src.href = H.url; src.target = "_blank"; src.rel = "noopener"; src.appendChild(el("span", "hl-title", (H.title || "CREA monthly report") + " ↗")); src.appendChild(el("span", "hl-snip", "CREA national statistics. Local Oakville numbers come from the regional board; see the links below.")); g.appendChild(src);
+  if (D.rentals && D.rentals.stats){ const a = el("button", "hl"); a.type = "button"; a.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer"; a.appendChild(el("span", "hl-title", "Oakville 3-bed rent: " + money(D.rentals.stats.median) + " median →")); a.appendChild(el("span", "hl-snip", D.rentals.stats.count + " listings tracked · see Homes")); a.onclick = () => go("homes"); g.appendChild(a); }
+  [["TRREB Market Watch (includes Oakville)", "https://trreb.ca/market-data/market-watch/"], ["CREA MLS® Home Price Index", "https://www.crea.ca/housing-market-stats/mls-home-price-index/"]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t + " ↗")); g.appendChild(a); });
+  return g;
+}
+function marketNews(){
+  const t = (D.topics || []).find(z => z.in_markets); if (!t) return null;
+  const items = (D.headlines || {})[t.id] || [];
+  const wrap = el("div", "stack");
+  const angles = [...new Set(items.map(it => it.a))];
+  const sub = el("div", "subrail"); ["all", ...angles].forEach(a => { const b = el("button", "chip", a === "all" ? "All market news" : a); b.type = "button"; b.setAttribute("aria-pressed", String(mkAngle === a)); b.onclick = () => { mkAngle = a; render(); }; sub.appendChild(b); });
+  wrap.appendChild(sub);
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Analysts, rates and market news")); head.appendChild(el("span", "stamp", items.length + " stories")); g.appendChild(head);
+  (mkAngle === "all" ? items : items.filter(it => it.a === mkAngle)).slice(0, 25).forEach(it => g.appendChild(item(it)));
+  wrap.appendChild(g);
+  return wrap;
+}
+
 /* ---------- homes ---------- */
 const money = n => "$" + Math.round(n).toLocaleString("en-CA");
 function linksGroup(t, title){
@@ -488,13 +640,13 @@ function render(){
     if (visible("weather")) add(weatherCard(false));
     if (visible("oakville")) add(goCard());
     if (visible("markets")) add(marketsStrip());
-    D.topics.filter(t => visible(t.id)).forEach(t => {
+    D.topics.filter(t => visible(t.id) && !t.in_markets).forEach(t => {
       if (t.id === "homes" && D.rentals) add(homesCard(true));
       else if (t.id === "events" && D.events) add(eventsCard(5));
       else add(topicGroup(t, 5));
     });
   } else if (view === "weather") add(weatherCard(true));
-  else if (view === "markets"){ add(marketsStrip()); add(marketsTable()); }
+  else if (view === "markets"){ add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); }
   else {
     const t = topic(view);
     let angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];
