@@ -511,9 +511,9 @@ def pick_foryou(out, prev):
     shown = list((prev.get("foryou") or {}).get("shown") or [])
     today_ids = (prev.get("foryou") or {}).get("today_ids") if (prev.get("foryou") or {}).get("date") == out["date"] else None
     ranked = sorted(pool.values(), key=lambda e: -e["score"])
-    picks = [e for e in ranked if e["id"] in (today_ids or [])] if today_ids else [e for e in ranked if e["id"] not in shown][:3]
-    if len(picks) < 3:
-        picks += [e for e in ranked if e not in picks][:3 - len(picks)]
+    picks = [e for e in ranked if e["id"] in (today_ids or [])] if today_ids else [e for e in ranked if e["id"] not in shown][:5]
+    if len(picks) < 5:
+        picks += ([e for e in ranked if e not in picks and e["id"] not in shown] + [e for e in ranked if e not in picks and e["id"] in shown])[:5 - len(picks)]
     ids = [e["id"] for e in picks]
     return {"date": out["date"], "today_ids": ids, "shown": (shown + [i for i in ids if i not in shown])[-300:],
             "picks": [{k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k != "score"} for e in picks]}
@@ -533,7 +533,7 @@ def json_movies(country, genre, n=25):
 def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
-    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and "foryou" in prev:
+    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5:
         return prev
     content = load_json(os.path.join(ROOT, "extras-content.json"), {})
     day_no = (datetime.now(TZ).date() - datetime(2026, 1, 1).date()).days
@@ -1051,6 +1051,24 @@ def run_alerts(headlines, weather, ec):
                         push(f"{w['label']} is {side} {lvl:g}", f"{w['label']} ({w.get('name','')}) is at {px:g}, {'above' if side == 'above' else 'below'} your alert of {lvl:g}.",
                              tags=["chart_with_upwards_trend" if side == "above" else "chart_with_downwards_trend"], priority=4, click=w.get("url"))
     state["watch_seen"] = ws[-200:]
+
+    # gas: push when the next-day forecast moves 2 cents or more (daytime only, once per forecast day)
+    try:
+        gd = (EXTRA.get("gas") or {}).get("days") or []
+        hr = datetime.now(TZ).hour
+        if len(gd) >= 2 and gd[0].get("price") and gd[1].get("price") and 7 <= hr < 22:
+            diff = round(gd[0]["price"] - gd[1]["price"], 1)
+            key = "gas:" + gd[0].get("date", "")
+            if abs(diff) >= 2 and key not in ws:
+                ws.append(key); state["watch_seen"] = ws[-200:]
+                if not first_run:
+                    up = diff > 0
+                    push(f"Gas {'up' if up else 'down'} {abs(diff):g}\u00a2 {gd[0].get('day','')}",
+                         f"Oakville regular: {gd[0]['price']:g}\u00a2/L on {gd[0].get('day','')} ({'+' if up else '-'}{abs(diff):g}\u00a2). "
+                         + ("Fill up before it rises." if up else "Wait to fill up if you can."),
+                         tags=["fuelpump"], priority=4, click="https://www.gasbuddy.com/gasprices/ontario/oakville")
+    except Exception as e:
+        log("gas alert", e)
 
     # morning briefing
     now = datetime.now(TZ)
