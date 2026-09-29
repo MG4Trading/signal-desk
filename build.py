@@ -533,7 +533,7 @@ def json_movies(country, genre, n=25):
 def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
-    if prev.get("date") == today and prev.get("faith") and prev.get("prayer"):
+    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and "foryou" in prev:
         return prev
     content = load_json(os.path.join(ROOT, "extras-content.json"), {})
     day_no = (datetime.now(TZ).date() - datetime(2026, 1, 1).date()).days
