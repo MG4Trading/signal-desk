@@ -508,6 +508,8 @@ def pick_foryou(out, prev):
             e["score"] += 3; e["tags"].add("New release")
         if re.search(r"crime|heist|detective|murder|cartel|gang|mafia|cop|police|killer|agent|spy", e.get("sum", ""), re.I):
             e["score"] += 2; e["tags"].add("Crime")
+        if re.search(r"disney|pixar|dreamworks|illumination|animated|animation|family film|kids|princess|musical|moana|pokemon|paw patrol", e.get("t", "") + " " + e.get("sum", ""), re.I):
+            e["score"] -= 20
     shown = list((prev.get("foryou") or {}).get("shown") or [])
     today_ids = (prev.get("foryou") or {}).get("today_ids") if (prev.get("foryou") or {}).get("date") == out["date"] else None
     ranked = sorted(pool.values(), key=lambda e: -e["score"])
