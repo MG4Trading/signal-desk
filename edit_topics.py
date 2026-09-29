@@ -27,7 +27,7 @@ for line in body.replace("\r", "").split("\n"):
         if w:
             words.append(w[:120])
         continue
-    m = re.match(r"^([A-Za-z]+)\s*:\s*(.*)$", s)
+    m = re.match(r"^([A-Za-z]+(?: [A-Za-z]+)?)\s*:\s*(.*)$", s)
     if m:
         key, val = m.group(1).lower(), m.group(2).strip()
         in_words = key == "keywords"
@@ -55,6 +55,40 @@ def done(summary, detail=""):
     print("\nChanges show up in the app within about 10 minutes.")
     sys.exit(0)
 
+
+if title.startswith("signal desk: watch"):
+    import urllib.request, urllib.parse
+    sym = re.sub(r"[^A-Za-z0-9.\-=@]", "", fields.get("symbol", "")).upper()
+    wl = cfg.setdefault("watchlist", [])
+    cur = next((w for w in wl if w["sym"] == sym), None)
+    num = lambda v: float(v.replace(",", "").replace("$", "")) if re.fullmatch(r"\$?[\d,]+(\.\d+)?", (v or "").strip()) else None
+    if not sym:
+        done("Nothing changed: the symbol was missing.")
+    if "remove" in title:
+        if not cur:
+            done(f"Nothing changed: {sym} is not on the watchlist.")
+        wl.remove(cur); json.dump(cfg, open(cfg_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        done(f"Removed {sym} from the watchlist")
+    name = ""
+    try:
+        u = ("https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=" + urllib.parse.quote(sym)
+             + "&requestMethod=itv&noform=1&partnerId=2&fund=1&exthrs=1&output=json")
+        q = json.loads(urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"}), timeout=20).read())["FormattedQuoteResult"]["FormattedQuote"][0]
+        if not q.get("last"):
+            done(f"Nothing changed: {sym} was not found. Use the ticker as it trades, for example AAPL, or add -T for Toronto shares, for example RY-T.")
+        name = q.get("name") or ""
+    except SystemExit:
+        raise
+    except Exception:
+        pass
+    entry = cur or {"sym": sym}
+    entry.update({"name": fields.get("name") or entry.get("name") or name, "note": fields.get("note", entry.get("note", "")),
+                  "above": num(fields.get("alert above", fields.get("above", ""))), "below": num(fields.get("alert below", fields.get("below", "")))})
+    if not cur:
+        wl.append(entry)
+    json.dump(cfg, open(cfg_path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    done(("Updated " if cur else "Added ") + sym + (" · " + entry["name"] if entry["name"] else ""),
+         "\n".join(x for x in [f"- Alert above: {entry['above']}" if entry["above"] else "", f"- Alert below: {entry['below']}" if entry["below"] else ""] if x))
 
 if not name:
     done("Nothing changed: the topic name was missing.")

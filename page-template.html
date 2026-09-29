@@ -441,6 +441,93 @@ function marketsTable(){
   return g;
 }
 
+/* ---------- gas ---------- */
+function gasCard(compact){
+  const G = D.gas; if (!G || !(G.days || []).length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "⛽ Gas in Oakville")); head.appendChild(el("span", "stamp", "regular, ¢/L")); g.appendChild(head);
+  const t0 = G.days[0], t1 = G.days[1];
+  const top = el("div", "stats");
+  const one = (v, lab, c) => { const x = el("div", "stat"); const b = el("b", "", v); if (c) b.style.color = c; x.appendChild(b); x.appendChild(el("small", "", lab)); top.appendChild(x); };
+  one(G.avg ? G.avg.toFixed(1) : (t1 ? t1.price.toFixed(1) : "—"), "average now");
+  one(t0.price.toFixed(1), t0.day + (t0.chg ? " · " + t0.chg : " · no change"), t0.dir === "up" ? "var(--down)" : t0.dir === "down" ? "var(--up)" : "");
+  const O = G.outlook; one(O === "up" ? "▲ Rising" : O === "down" ? "▼ Falling" : "Steady", "rest of week", O === "up" ? "var(--down)" : O === "down" ? "var(--up)" : "");
+  g.appendChild(top);
+  if (!compact){
+    const wk = el("div", "days");
+    const base = t0.price, start = new Date();
+    for (let i = 0; i < 7; i++){
+      const d = new Date(start.getTime() + i * 864e5), row = el("div", "day"); row.style.cursor = "default";
+      row.appendChild(el("span", "dn", i === 0 ? "Today" : d.toLocaleDateString("en-CA", { weekday: "short" })));
+      let txt, sub;
+      if (i === 0){ txt = (t1 ? t1.price : base).toFixed(1); sub = "posted"; }
+      else if (i === 1){ txt = base.toFixed(1); sub = "Gas Wizard forecast" + (t0.chg ? " (" + t0.chg + ")" : ""); }
+      else { txt = O === "up" ? "↗ higher" : O === "down" ? "↘ lower" : "≈ " + base.toFixed(1); sub = "outlook from wholesale prices"; }
+      row.appendChild(el("span", "di", ""));
+      const r = el("span", "range"); r.appendChild(el("span", "", txt)); row.appendChild(r); row.appendChild(el("span", "dp", ""));
+      const w = el("span", "daywear", sub); w.style.display = "block"; row.appendChild(w);
+      wk.appendChild(row);
+    }
+    g.appendChild(wk);
+    if (G.wholesale){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Wholesale gasoline is " + (G.wholesale.chg3 >= 0 ? "up " : "down ") + Math.abs(G.wholesale.chg3).toFixed(1) + "¢/L over the last 3 trading days. Pump prices usually follow within a few days. Tomorrow's number is Gas Wizard's forecast; later days are a direction, not a price.")); g.appendChild(n); }
+    if ((G.hist || []).length >= 3){ const pts = G.hist.map(h => [Math.floor(new Date(h[0] + "T12:00:00Z") / 864e5), h[1]]); const readout = el("div", "mk-read"); const ch = el("div", "mk-chart"); ch.appendChild(chartSvg(pts, t => readout.textContent = t)); g.appendChild(ch); g.appendChild(readout); }
+  }
+  [["Cheapest stations near you (GasBuddy map) ↗", "https://www.gasbuddy.com/gasprices/ontario/oakville"], ["Gas Wizard forecast for Oakville ↗", G.url]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t)); g.appendChild(a); });
+  if (compact){ const b = el("button", "hl", "7-day gas outlook →"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; b.onclick = () => go("oakville"); g.appendChild(b); }
+  return g;
+}
+
+/* ---------- watchlist ---------- */
+function allQuotes(){ return [...(D.quotes || []), ...(((D.watch || {}).items) || []).map(w => ({ label: w.label, price: w.price, pct: w.pct, asof: w.asof, url: w.url, source: w.source, stale: w.stale }))]; }
+function allDeep(){ const o = Object.assign({}, (D.deep || {}).items || {}); (((D.watch || {}).items) || []).forEach(w => { if (w.deep) o[w.label] = w.deep; }); return o; }
+let wEdit = false;
+function watchIssue(action, fields){
+  const repo = (D && D.repo) || "MG4Trading/signal-desk";
+  const body = Object.entries(fields).filter(([, v]) => v !== "" && v != null).map(([k, v]) => k + ": " + v).join("\n");
+  window.open("https://github.com/" + repo + "/issues/new?title=" + encodeURIComponent("Signal Desk: watch " + action + " " + (fields.Symbol || "")) + "&body=" + encodeURIComponent(body), "_blank", "noopener");
+}
+function watchCard(){
+  const W = ((D.watch || {}).items) || [];
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "My watchlist"));
+  const eb = el("button", "ghostbtn", wEdit ? "Done" : "Edit"); eb.type = "button"; eb.style.cssText = "min-height:32px;padding:5px 12px"; eb.onclick = () => { wEdit = !wEdit; render(); }; head.appendChild(eb); g.appendChild(head);
+  if (!W.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "No stocks yet. Tap Edit to add one.")); g.appendChild(e); }
+  const deep = allDeep();
+  W.forEach(w => {
+    const r = el("div", "readrow"); r.style.cursor = "pointer";
+    const left = el("div", ""); left.appendChild(el("strong", "", w.label)); left.appendChild(el("div", "hl-snip", (w.name || "") + (w.tsx ? " · TSX" : ""))); r.appendChild(left);
+    const right = el("div", ""); right.style.cssText = "text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums";
+    right.appendChild(el("div", "", w.price != null ? fmtPx(w) : "—")); const ch = chgEl(w); right.appendChild(ch); r.appendChild(right);
+    const x = deep[w.label]; const bits = [];
+    if (x && x.rets) bits.push(["YTD " + pctTxt(x.rets.YTD), ""]);
+    signals(w.label).slice(0, 2).forEach(s2 => bits.push(s2));
+    if (w.above) bits.push(["Alert above " + w.above, "warn"]); if (w.below) bits.push(["Alert below " + w.below, "warn"]);
+    if (w.note) bits.push([w.note, ""]);
+    r.appendChild(sigEl(bits));
+    if (wEdit){ const acts = el("div", "acts"); acts.style.cssText = "grid-column:1/-1;display:flex;gap:8px";
+      const ed = el("button", "ghostbtn", "✎ Change alerts or note"); ed.type = "button"; ed.onclick = e => { e.stopPropagation(); wForm = { sym: w.sym, name: w.name, above: w.above || "", below: w.below || "", note: w.note || "" }; render(); };
+      const rm = el("button", "ghostbtn", "✕ Remove"); rm.type = "button"; rm.style.color = "var(--danger)"; rm.onclick = e => { e.stopPropagation(); watchIssue("remove", { Symbol: w.sym }); };
+      acts.appendChild(ed); acts.appendChild(rm); r.appendChild(acts); }
+    r.onclick = () => { if (wEdit) return; mkSel = w.label; store.set("mkSel", mkSel); render(); document.getElementById("mk-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    g.appendChild(r);
+  });
+  if (wEdit){
+    const f = el("div", "alertbox form"); f.style.margin = "10px 16px 14px";
+    f.appendChild(el("span", "", wForm.sym ? "Change " + wForm.sym : "Add a stock. Use the ticker, and add -T for Toronto shares (RY-T, SHOP-T)."));
+    const inp = (id, ph, v, mode) => { const i = document.createElement("input"); i.id = id; i.placeholder = ph; i.value = v || ""; i.autocomplete = "off"; if (mode) i.inputMode = mode; f.appendChild(i); return i; };
+    const si = inp("wSym", "Ticker, e.g. AAPL or RY-T", wForm.sym); if (wForm.sym) si.readOnly = true;
+    const ni = inp("wName", "Name (optional)", wForm.name);
+    const row = el("div", "row2"); const ab = document.createElement("input"); ab.id = "wAbove"; ab.placeholder = "Alert above (price)"; ab.inputMode = "decimal"; ab.value = wForm.above; const be = document.createElement("input"); be.id = "wBelow"; be.placeholder = "Alert below (price)"; be.inputMode = "decimal"; be.value = wForm.below; row.appendChild(ab); row.appendChild(be); f.appendChild(row);
+    const no = inp("wNote", "Note (optional), e.g. buy under 250", wForm.note);
+    const send = el("button", "primary", wForm.sym ? "Save changes on GitHub" : "Add on GitHub"); send.type = "button";
+    send.onclick = () => { const sym = si.value.trim().toUpperCase(); if (!sym) return toast("Type a ticker"); watchIssue(wForm.sym ? "edit" : "add", { Symbol: sym, Name: ni.value.trim(), "Alert above": ab.value.trim(), "Alert below": be.value.trim(), Note: no.value.trim() }); wForm = { sym: "", name: "", above: "", below: "", note: "" }; };
+    f.appendChild(send);
+    if (wForm.sym){ const c = el("button", "ghostbtn", "Cancel"); c.type = "button"; c.onclick = () => { wForm = { sym: "", name: "", above: "", below: "", note: "" }; render(); }; f.appendChild(c); }
+    f.appendChild(el("span", "hl-snip", "Opens a ready-filled request on GitHub. Sign in and tap Create; the list updates within about 10 minutes. A phone alert goes out the first time a price crosses your alert level each day."));
+    g.appendChild(f);
+  }
+  return g;
+}
+let wForm = { sym: "", name: "", above: "", below: "", note: "" };
+
 /* ---------- businesses for sale ---------- */
 let mkTab = store.get("mkTab", "mk"), bizArea = "all", bizSort = "new";
 function mkTabs(){
@@ -492,7 +579,7 @@ let mkSel = store.get("mkSel", "S&P/TSX"), mkRange = store.get("mkRange", "1Y"),
 const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(v != null && Math.abs(v) >= 100 ? 0 : 1) + "%";
 const cls = v => v == null ? "" : v > 0.005 ? "up" : v < -0.005 ? "down" : "";
 function signals(label){
-  const x = ((D.deep || {}).items || {})[label], q = (D.quotes || []).find(z => z.label === label) || {}; if (!x) return [];
+  const x = allDeep()[label], q = allQuotes().find(z => z.label === label) || {}; if (!x) return [];
   const out = [];
   if (x.trend) out.push([x.trend, x.trend === "Uptrend" || x.trend === "Above 50-day" ? "good" : x.trend === "Downtrend" || x.trend === "Below 50-day" ? "bad" : ""]);
   if (x.rsi != null) out.push(["RSI " + Math.round(x.rsi) + (x.rsi >= 70 ? " · overbought" : x.rsi <= 30 ? " · oversold" : ""), x.rsi >= 70 || x.rsi <= 30 ? "warn" : ""]);
@@ -544,9 +631,9 @@ function chartSvg(pts, onRead){
   return svg;
 }
 function marketDetail(){
-  const items = (D.deep || {}).items || {}, labels = (D.quotes || []).map(q => q.label).filter(l => items[l]); if (!labels.length) return null;
+  const items = allDeep(), labels = allQuotes().map(q => q.label).filter(l => items[l]); if (!labels.length) return null;
   if (!items[mkSel]) mkSel = labels[0];
-  const x = items[mkSel], q = (D.quotes || []).find(z => z.label === mkSel) || {};
+  const x = items[mkSel], q = allQuotes().find(z => z.label === mkSel) || {};
   const g = el("div", "group"); g.id = "mk-detail";
   const head = el("div", "group-head"); head.appendChild(el("strong", "", "Deep dive")); head.appendChild(el("span", "stamp", "history updated " + ago(D.deep.at))); g.appendChild(head);
   const pills = el("div", "subrail"); pills.style.cssText = "margin:10px 0 0;padding:0 16px";
@@ -765,6 +852,15 @@ function grp(title, stamp){ const g = el("div", "group"); const h = el("div", "g
 function funView(){
   if (!X) return [el("div", "empty", "Loading…")];
   const C = kc(), dn = X.day_no || 0, out = [];
+  const FY = (X.foryou || {}).picks || [], hid = new Set(store.get("hideFilms", []));
+  const fy = FY.filter(m => !hid.has(m.id));
+  if (fy.length){ const g = grp("Suggested for you today", "new picks every day");
+    fy.forEach(m => { const r = filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.tags || []).join(" · ") + (m.sum ? " · " + m.sum.slice(0, 120) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["Trailer", "https://www.youtube.com/results?search_query=" + encodeURIComponent(m.t + " " + (m.year || "") + " trailer")]], m.img);
+      const nb = el("button", "ghostbtn", "Not for me"); nb.type = "button"; nb.style.cssText = "min-height:30px;padding:4px 10px;font-size:12px;justify-self:start"; nb.onclick = () => { hid.add(m.id); store.set("hideFilms", [...hid]); render(); };
+      r.lastChild.appendChild(nb); g.appendChild(r); });
+    const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Picked from today's action, thriller and crime charts in Canada and the U.S. New releases rank higher, and a title is never suggested twice.")); g.appendChild(n);
+    out.push(g); }
+  if ((X.egypt_cinema || []).length){ const g = grp("أخبار السينما المصرية · Egyptian cinema news", ""); X.egypt_cinema.slice(0, 6).forEach(it => g.appendChild(item(it))); out.push(g); }
   const cl = C.classic || [], eg = C.egyptian || [];
   if (cl.length || eg.length){ const g = grp("Tonight's picks", "changes daily");
     const a = cl[dn % cl.length], e = eg[dn % eg.length];
@@ -897,6 +993,7 @@ function render(){
     if (visible("faith")) add(faithMini());
     if (visible("kitchen")) add(kitchenMini());
     if (visible("oakville")) add(goCard());
+    if (visible("oakville")) add(gasCard(true));
     if (visible("markets")) add(marketsStrip());
     D.topics.filter(t => visible(t.id) && !t.in_markets).forEach(t => {
       if (t.id === "homes" && D.rentals) add(homesCard(true));
@@ -907,7 +1004,7 @@ function render(){
   else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); add(hadithCard()); add(surahCard()); }
   else if (view === "kitchen"){ add(kitchenView()); }
   else if (view === "fun"){ funView().forEach(add); }
-  else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
+  else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
   else {
     const t = topic(view);
     let angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];
@@ -919,7 +1016,7 @@ function render(){
       if (!angles.includes(angle)) angle = "all";
       add(sub);
     }
-    if (t.id === "oakville" && angle === "all") add(goCard());
+    if (t.id === "oakville" && angle === "all"){ add(gasCard(false)); add(goCard()); }
     if (t.id === "events") add(eventsCard(0));
     add(topicGroup(t, 0));
     if (t.id === "events") add(linksGroup(t, "Event calendars"));

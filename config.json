@@ -841,5 +841,49 @@
   "USD/CAD": "cnbc:CAD=",
   "CAD/EGP": "ratio:EGP=/CAD=",
   "USD/EGP": "cnbc:EGP="
- }
+ },
+ "watchlist": [
+  {
+   "sym": "RY-T",
+   "name": "",
+   "note": "",
+   "above": null,
+   "below": null
+  },
+  {
+   "sym": "SHOP-T",
+   "name": "",
+   "note": "",
+   "above": null,
+   "below": null
+  },
+  {
+   "sym": "ENB-T",
+   "name": "",
+   "note": "",
+   "above": null,
+   "below": null
+  },
+  {
+   "sym": "AAPL",
+   "name": "",
+   "note": "",
+   "above": null,
+   "below": null
+  },
+  {
+   "sym": "MSFT",
+   "name": "",
+   "note": "",
+   "above": null,
+   "below": null
+  },
+  {
+   "sym": "NVDA",
+   "name": "",
+   "note": "",
+   "above": null,
+   "below": null
+  }
+ ]
 }

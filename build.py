@@ -487,6 +487,49 @@ def gather_movies(genre, n=15):
     return out
 
 
+def pick_foryou(out, prev):
+    """Three new action, crime, thriller or adventure picks a day, never repeating what was suggested before."""
+    pool = {}
+    def add(lst, tag, bonus):
+        for i, m in enumerate(lst or []):
+            mid = (re.search(r"/id(\d+)", m.get("url") or "") or [None, m["t"]])[1]
+            e = pool.setdefault(mid, dict(m, id=mid, tags=set(), score=0.0))
+            e["tags"].add(tag); e["score"] += bonus + max(0, 15 - i) / 5
+    add(out.get("movies_action"), "Action & adventure", 2)
+    add(out.get("movies_thriller"), "Thriller", 2)
+    for g, tag in ((4401, "Action & adventure"), (4416, "Thriller")):
+        try:
+            add([dict(m, t=m["t"]) for m in json_movies("us", g)], tag + " · U.S. chart", 1)
+        except Exception as e:
+            log("us chart", e)
+    year = datetime.now(TZ).year
+    for e in pool.values():
+        if e.get("year") and e["year"].isdigit() and int(e["year"]) >= year - 1:
+            e["score"] += 3; e["tags"].add("New release")
+        if re.search(r"crime|heist|detective|murder|cartel|gang|mafia|cop|police|killer|agent|spy", e.get("sum", ""), re.I):
+            e["score"] += 2; e["tags"].add("Crime")
+    shown = list((prev.get("foryou") or {}).get("shown") or [])
+    today_ids = (prev.get("foryou") or {}).get("today_ids") if (prev.get("foryou") or {}).get("date") == out["date"] else None
+    ranked = sorted(pool.values(), key=lambda e: -e["score"])
+    picks = [e for e in ranked if e["id"] in (today_ids or [])] if today_ids else [e for e in ranked if e["id"] not in shown][:3]
+    if len(picks) < 3:
+        picks += [e for e in ranked if e not in picks][:3 - len(picks)]
+    ids = [e["id"] for e in picks]
+    return {"date": out["date"], "today_ids": ids, "shown": (shown + [i for i in ids if i not in shown])[-300:],
+            "picks": [{k: (sorted(v) if isinstance(v, set) else v) for k, v in e.items() if k != "score"} for e in picks]}
+
+
+def json_movies(country, genre, n=25):
+    d = json.loads(get(f"https://itunes.apple.com/{country}/rss/topmovies/limit={n}/genre={genre}/json"))["feed"].get("entry", [])
+    out = []
+    for e in d:
+        link = next((l["attributes"]["href"] for l in (e.get("link") if isinstance(e.get("link"), list) else [e.get("link")]) if l and l.get("attributes", {}).get("rel") == "alternate"), "")
+        out.append({"t": e["im:name"]["label"], "year": (e.get("im:releaseDate", {}).get("label") or "")[:4], "url": link.replace("/us/", "/ca/"),
+                    "genre": e.get("category", {}).get("attributes", {}).get("label", ""), "sum": (e.get("summary", {}).get("label") or "")[:220],
+                    "img": (e.get("im:image") or [{}])[-1].get("label", "")})
+    return out
+
+
 def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
@@ -504,6 +547,15 @@ def gather_extras():
             log("extras", key, e)
             if prev.get(key):
                 out[key] = prev[key]
+    try:
+        out["foryou"] = pick_foryou(out, prev)
+    except Exception as e:
+        log("foryou", e); out["foryou"] = prev.get("foryou")
+    try:
+        feed = {"id": "egcinema", "gl": "EG", "hl": "ar", "feeds": []}
+        out["egypt_cinema"] = fetch_feed(feed, ["سينما", "فيلم مصري جديد OR أفلام السينما المصرية OR إيرادات السينما", "EG", "ar", "7d"])[:8]
+    except Exception as e:
+        log("egypt cinema", e); out["egypt_cinema"] = prev.get("egypt_cinema", [])
     out["content"] = content
     log("extras:", ", ".join(k for k in out if k not in ("date", "generated", "day_no")))
     return out
@@ -570,6 +622,80 @@ def gather_biz():
     items.sort(key=lambda x: -x["ts"])
     log(f"biz: {len(items)} businesses for sale")
     return {"at": int(NOW), "items": items[:60]}
+
+# ---------------------------------------------------------------- gas prices
+EXTRA = {}
+
+
+def gather_gas(quotes):
+    prev = prev_data.get("gas") or {}
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("days"):
+        return prev
+    url = "https://gaswizard.ca/gas-prices/oakville/"
+    h = get(url, timeout=25)
+    days = []
+    for m in re.finditer(r'daytext">(\w+)</span> - <span class="datetext">([^<]+)</span>.*?fuel-price-value">([\d.]+)</span>\s*<span class="price-direction ([\w-]+)">([^<]*)<', h, re.S):
+        chg = m.group(5).strip()
+        days.append({"day": m.group(1), "date": m.group(2), "price": float(m.group(3)),
+                     "dir": {"pd-up": "up", "pd-down": "down"}.get(m.group(4), "same"), "chg": "" if chg in ("---", "") else chg})
+        if len(days) >= 2:
+            break
+    m = re.search(r"Current Average Price \$([\d.]+)\s*\(Reported at:\s*([^)]+)\)", html.unescape(re.sub(r"<[^>]+>", " ", h)))
+    avg = round(float(m.group(1)) * 100, 1) if m else None
+    out = {"at": int(NOW), "days": days, "avg": avg, "reported": m.group(2).strip() if m else "", "url": url,
+           "source": "Gas Wizard (Dan McTeague)"}
+    # wholesale gasoline trend as a guide for the rest of the week
+    try:
+        rb = cnbc_chart("@RB.1", "1M")
+        usdcad = next((q["price"] for q in quotes if q.get("label") == "USD/CAD" and q.get("price")), 1.38)
+        if len(rb) >= 4:
+            d3 = (rb[-1][1] - rb[-4][1]) * 100 / 3.78541 * usdcad
+            out["wholesale"] = {"chg3": round(d3, 1), "last": rb[-1][1], "series": [[t // 86400, round(c, 4)] for t, c in rb[-22:]]}
+            out["outlook"] = "up" if d3 >= 1.5 else "down" if d3 <= -1.5 else "steady"
+    except Exception as e:
+        log("rbob", e)
+    today = datetime.now(TZ).strftime("%Y-%m-%d")
+    hist = [x for x in (prev.get("hist") or []) if x[0] != today]
+    if avg:
+        hist.append([today, avg])
+    out["hist"] = hist[-90:]
+    return out if days or avg else prev
+
+
+# ---------------------------------------------------------------- stock watchlist
+def gather_watch():
+    wl = cfg.get("watchlist") or []
+    if not wl:
+        return {"items": []}
+    prev = prev_data.get("watch") or {}
+    prev_deep = {w["sym"]: w.get("deep") for w in prev.get("items", []) if w.get("deep")}
+    fresh_deep = not (prev.get("deep_at") and NOW - prev["deep_at"] < 55 * 60)
+    try:
+        cn = cnbc_quotes([w["sym"] for w in wl])
+    except Exception as e:
+        log("watch quotes", e); cn = {}
+    prev_q = {w["sym"]: w for w in prev.get("items", [])}
+    items = []
+    def deep_for(w):
+        return analyse(cnbc_chart(w["sym"], "1Y"), cnbc_chart(w["sym"], "5Y"), (cn.get(w["sym"]) or {}).get("price"))
+    deeps = {}
+    if fresh_deep:
+        with ThreadPoolExecutor(max_workers=3) as ex:
+            for w, fu in [(w, ex.submit(deep_for, w)) for w in wl]:
+                try:
+                    deeps[w["sym"]] = fu.result()
+                except Exception as e:
+                    log("watch deep", w["sym"], e)
+    for w in wl:
+        q = cn.get(w["sym"]) or {}
+        old = prev_q.get(w["sym"]) or {}
+        label = w["sym"].replace("-T", "").replace(".TO", "")
+        items.append({"sym": w["sym"], "label": label, "name": w.get("name") or q.get("name") or old.get("name") or "",
+                      "price": q.get("price", old.get("price")), "pct": q.get("pct", old.get("pct")), "asof": q.get("asof", old.get("asof")),
+                      "stale": not q, "note": w.get("note", ""), "above": w.get("above"), "below": w.get("below"),
+                      "tsx": w["sym"].endswith("-T"), "url": "https://www.cnbc.com/quotes/" + urllib.parse.quote(w["sym"]), "source": "CNBC",
+                      "deep": deeps.get(w["sym"]) or prev_deep.get(w["sym"])})
+    return {"items": items, "deep_at": int(NOW) if fresh_deep and deeps else prev.get("deep_at")}
 
 # ---------------------------------------------------------------- weather
 WMO = {
@@ -910,6 +1036,22 @@ def run_alerts(headlines, weather, ec):
                          tags=["umbrella"], priority=4, click=site_url())
         state["wx_seen"] = list(wx_seen)[-60:]
 
+    # watchlist price alerts, once a day per stock and direction
+    ws = state.setdefault("watch_seen", [])
+    for w in (EXTRA.get("watch") or {}).get("items", []):
+        px = w.get("price")
+        if px is None or w.get("stale"):
+            continue
+        for side, lvl in (("above", w.get("above")), ("below", w.get("below"))):
+            if lvl and ((side == "above" and px >= lvl) or (side == "below" and px <= lvl)):
+                key = f"{datetime.now(TZ).strftime('%Y-%m-%d')}:{w['sym']}:{side}"
+                if key not in ws:
+                    ws.append(key)
+                    if not first_run:
+                        push(f"{w['label']} is {side} {lvl:g}", f"{w['label']} ({w.get('name','')}) is at {px:g}, {'above' if side == 'above' else 'below'} your alert of {lvl:g}.",
+                             tags=["chart_with_upwards_trend" if side == "above" else "chart_with_downwards_trend"], priority=4, click=w.get("url"))
+    state["watch_seen"] = ws[-200:]
+
     # morning briefing
     now = datetime.now(TZ)
     hh, mm = map(int, cfg["alerts"]["morning_briefing"].split(":"))
@@ -924,6 +1066,10 @@ def run_alerts(headlines, weather, ec):
             lines.append("Wear: " + "; ".join(d["wear"]) + ".")
         if ec:
             lines.append("⚠️ " + ", ".join(a["name"] for a in ec[:2]))
+        g = EXTRA.get("gas") or {}
+        if g.get("days"):
+            t0 = g["days"][0]
+            lines.append(f"⛽ Gas {t0['day']}: {t0['price']:.1f}¢/L" + (f" ({t0['chg']})" if t0.get("chg") else " (no change)"))
         trains = next_trains(3)
         if trains:
             lines.append("Next GO to Union: " + ", ".join(fmt12(t[0]) for t in trains))
@@ -965,6 +1111,16 @@ def main():
         quotes = gather_quotes()
     except Exception as e:
         log("quotes failed", e); quotes = prev_data.get("quotes", [])
+    gas = watch = None
+    try:
+        gas = gather_gas(quotes)
+    except Exception as e:
+        log("gas failed", e); gas = prev_data.get("gas")
+    try:
+        watch = gather_watch()
+    except Exception as e:
+        log("watch failed", e); watch = prev_data.get("watch")
+    EXTRA["gas"], EXTRA["watch"] = gas, watch
     deep = rates = housing = biz = None
     try:
         biz = gather_biz()
@@ -1008,7 +1164,7 @@ def main():
         "repo": os.environ.get("GITHUB_REPOSITORY", ""),
         "topics": [{"id": t["id"], "name": t["name"], "links": t.get("links", []), "in_markets": bool(t.get("in_markets"))} for t in cfg["topics"]],
         "headlines": headlines, "quotes": quotes, "weather": weather, "warnings": ec,
-        "rentals": rentals, "events": events, "deep": deep, "rates": rates, "housing": housing, "biz": biz,
+        "rentals": rentals, "events": events, "deep": deep, "rates": rates, "housing": housing, "biz": biz, "gas": gas, "watch": watch,
         "failed": failed, "location": cfg["location"]["name"],
     }
     run_alerts(headlines, weather, ec)
