@@ -631,18 +631,26 @@ EXTRA = {}
 
 def gather_gas(quotes):
     prev = prev_data.get("gas") or {}
-    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("days"):
+    if prev.get("at") and NOW - prev["at"] < 55 * 60 and prev.get("days") and prev.get("avg"):
         return prev
     url = "https://gaswizard.ca/gas-prices/oakville/"
     h = get(url, timeout=25)
     days = []
-    for m in re.finditer(r'daytext">(\w+)</span> - <span class="datetext">([^<]+)</span>.*?fuel-price-value">([\d.]+)</span>\s*<span class="price-direction ([\w-]+)">([^<]*)<', h, re.S):
-        chg = m.group(5).strip()
-        days.append({"day": m.group(1), "date": m.group(2), "price": float(m.group(3)),
-                     "dir": {"pd-up": "up", "pd-down": "down"}.get(m.group(4), "same"), "chg": "" if chg in ("---", "") else chg})
+    for blk in re.split(r"<li>", h)[1:]:
+        m = re.search(r'daytext">(\w+)</span>\s*-\s*<span class="datetext">([^<]+)</span>', blk)
+        pv = re.search(r'fuel-price-value">([\d.]+)</span>', blk)
+        if not (m and pv):
+            continue
+        body = re.sub(r"<!--.*?-->", "", blk, flags=re.S)
+        dm = re.search(r'price-direction (pd-[\w-]+)"', body)
+        cm = re.search(r'price-text">([^<]*)<', body) or re.search(r'price-direction [\w-]+">([^<]*)<', body)
+        chg = (cm.group(1).strip() if cm else "")
+        days.append({"day": m.group(1), "date": m.group(2).strip(), "price": float(pv.group(1)),
+                     "dir": {"pd-up": "up", "pd-down": "down"}.get(dm.group(1) if dm else "", "same"),
+                     "chg": "" if chg in ("---", "") else chg})
         if len(days) >= 2:
             break
-    m = re.search(r"Current Average Price \$([\d.]+)\s*\(Reported at:\s*([^)]+)\)", html.unescape(re.sub(r"<[^>]+>", " ", h)))
+    m = re.search(r"Current Average Price\s*\$\s*([\d.]+)\s*\(Reported at:\s*([^)]+)\)", html.unescape(re.sub(r"<[^>]+>", " ", h)))
     avg = round(float(m.group(1)) * 100, 1) if m else None
     out = {"at": int(NOW), "days": days, "avg": avg, "reported": m.group(2).strip() if m else "", "url": url,
            "source": "Gas Wizard (Dan McTeague)"}
