@@ -784,7 +784,15 @@ function surahCard(){
 
 /* ---------- kitchen ---------- */
 function kc(){ return (X && X.content) || {}; }
-function todayRecipe(){ const R = kc().recipes || []; if (!R.length) return null; return kPick != null ? R[kPick] : R[(X.day_no || 0) % R.length]; }
+function egR(){ return (kc().recipes || []).filter(r => r.cuisine === "Egyptian"); }
+function dayInfo(off){ const d = new Date(Date.now() + off * 864e5), dow = d.getDay(), ed = Math.floor((d.getTime() - d.getTimezoneOffset() * 6e4) / 864e5); return { dow, k: Math.floor((ed + 3) / 7), wknd: dow === 6 || dow === 0 }; }
+function recipeFor(off){
+  const R = egR(); if (!R.length) return null; const { dow, k, wknd } = dayInfo(off);
+  const CL = R.filter(r => r.style === "classic"), LT = R.filter(r => r.style !== "classic");
+  if (wknd && CL.length) return CL[(2 * k + (dow === 0 ? 1 : 0)) % CL.length];
+  const L = LT.length ? LT : R; return L[(5 * k + Math.max(0, dow - 1)) % L.length];
+}
+function todayRecipe(){ const R = egR(); if (!R.length) return null; return kPick != null ? R[kPick] : recipeFor(0); }
 function scaleAmt(txt){
   if (kServ === 4) return txt;
   const f = kServ / 4, map = { "½": .5, "¼": .25, "¾": .75, "⅓": 1 / 3, "⅔": 2 / 3 };
@@ -800,26 +808,27 @@ function arAmt(t){
 }
 function kitchenMini(){
   const r = todayRecipe(); if (!r) return null;
-  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Tonight's family dinner")); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Tonight's family dinner · for " + kServ)); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
   const b = el("button", "hl"); b.type = "button"; b.style.cssText = "border:0;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer";
   b.appendChild(el("span", "hl-title", r.en)); b.appendChild(el("span", "ar", r.ar)).style.fontSize = "17px";
-  b.appendChild(el("span", "hl-snip", r.mins + " min · about " + r.kcal + " kcal and " + r.protein + " g protein per serving · tap for the recipe")); b.onclick = () => go("kitchen"); g.appendChild(b);
+  b.appendChild(el("span", "hl-snip", (r.youth ? "Youth favourite · " : "") + (r.style === "classic" ? "Weekend treat · " : "") + r.mins + " min · about " + r.kcal + " kcal and " + r.protein + " g protein per serving · tap for the recipe")); b.onclick = () => go("kitchen"); g.appendChild(b);
   return g;
 }
 function kitchenView(){
-  const C = kc(), R = C.recipes || []; if (!R.length) return el("div", "empty", "Recipes load with the next update.");
+  const C = kc(), R = egR(); if (!R.length) return el("div", "empty", "Recipes load with the next update.");
   const ar = kLang === "ar", r = todayRecipe(), dn = X.day_no || 0;
   const wrap = el("div", "stack");
   const g = el("div", "group"); if (ar) g.dir = "rtl";
   const head = el("div", "group-head"); head.appendChild(el("strong", "", ar ? "قائمة اليوم للعائلة" : "Today's family menu")); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
   const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["en", "English"], ["ar", "عربي"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(kLang === k)); b.onclick = () => { kLang = k; store.set("kLang", k); render(); }; seg.appendChild(b); }); g.appendChild(seg);
   const bf = (C.breakfast || [])[dn % (C.breakfast || [1]).length], sn = (C.snacks || [])[dn % (C.snacks || [1]).length];
-  [[ar ? "الفطار" : "Breakfast", bf && bf[ar ? 1 : 0]], [ar ? "سناك" : "Snack", sn && sn[ar ? 1 : 0]], [ar ? "الغدا / العشا" : "Dinner", ar ? r.ar : r.en]].forEach(([k, v]) => { const row = el("div", "menu-row"); row.appendChild(el("span", "label", k)); row.appendChild(el("span", ar ? "ar" : "", v || "")); g.appendChild(row); });
+  const DI = dayInfo(0), ds = (C.desserts || []), dz = DI.wknd && ds.length ? ds[(2 * DI.k + (DI.dow === 0 ? 1 : 0)) % ds.length] : null;
+  [[ar ? "الفطار" : "Breakfast", bf && bf[ar ? 1 : 0]], [ar ? "سناك" : "Snack", sn && sn[ar ? 1 : 0]], [ar ? "الغدا / العشا" : "Dinner", (ar ? r.ar : r.en) + (ar ? " · لـ " + kServ + " أفراد" : " · for " + kServ)]].concat(dz ? [[ar ? "حلو الويك إند" : "Weekend dessert", dz[ar ? 1 : 0]]] : []).forEach(([k, v]) => { const row = el("div", "menu-row"); row.appendChild(el("span", "label", k)); row.appendChild(el("span", ar ? "ar" : "", v || "")); g.appendChild(row); });
   wrap.appendChild(g);
   const c = el("div", "group"); if (ar) c.dir = "rtl";
   const h2 = el("div", "group-head"); h2.appendChild(el("strong", ar ? "ar" : "", ar ? r.ar : r.en)); h2.appendChild(el("span", "stamp", kPick != null ? (ar ? "مفاجأة" : "surprise pick") : (ar ? "وصفة اليوم" : "recipe of the day"))); c.appendChild(h2);
   const meta = el("div", "recipe-meta"); meta.style.paddingTop = "10px";
-  [(ar ? "⏱ " + r.mins + " دقيقة" : "⏱ " + r.mins + " min"), (ar ? "🔥 حوالي " + r.kcal + " سعر للفرد" : "🔥 about " + r.kcal + " kcal a serving"), (ar ? "💪 " + r.protein + " جم بروتين" : "💪 " + r.protein + " g protein"), (ar ? "حلال" : "Halal")].forEach(t => meta.appendChild(el("span", "pill-sig", t)));
+  [(ar ? "⏱ " + r.mins + " دقيقة" : "⏱ " + r.mins + " min"), (ar ? "🔥 حوالي " + r.kcal + " سعر للفرد" : "🔥 about " + r.kcal + " kcal a serving"), (ar ? "💪 " + r.protein + " جم بروتين" : "💪 " + r.protein + " g protein"), (ar ? "حلال" : "Halal"), (r.style === "classic" ? (ar ? "أكلة الويك إند" : "Weekend treat") : (ar ? "أخف لأيام الأسبوع" : "Lighter weeknight"))].concat(r.youth ? [ar ? "مفضلة الشباب" : "Youth favourite"] : []).forEach(t => meta.appendChild(el("span", "pill-sig", t)));
   c.appendChild(meta);
   const sv = el("div", "serv"); const minus = el("button", "", "−"), plus = el("button", "", "+"); minus.type = plus.type = "button";
   minus.onclick = () => { kServ = Math.max(2, kServ - 1); store.set("kServ", kServ); render(); }; plus.onclick = () => { kServ = Math.min(10, kServ + 1); store.set("kServ", kServ); render(); };
@@ -835,7 +844,7 @@ function kitchenView(){
   if (kPick != null){ const back = el("button", "ghostbtn", ar ? "رجوع لوصفة اليوم" : "Back to today's"); back.type = "button"; back.onclick = () => { kPick = null; render(); }; acts.appendChild(back); }
   c.appendChild(acts); wrap.appendChild(c);
   const w = el("div", "group"); if (ar) w.dir = "rtl"; const h3 = el("div", "group-head"); h3.appendChild(el("strong", "", ar ? "الأيام الجاية" : "Coming up this week")); w.appendChild(h3);
-  for (let i = 1; i <= 6; i++){ const rr = R[(dn + i) % R.length], d = new Date(Date.now() + i * 864e5); const row = el("button", "menu-row"); row.type = "button"; row.style.cssText = "width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:inherit;font:inherit;color:inherit;cursor:pointer";
+  for (let i = 1; i <= 6; i++){ const rr = recipeFor(i), d = new Date(Date.now() + i * 864e5); const row = el("button", "menu-row"); row.type = "button"; row.style.cssText = "width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:inherit;font:inherit;color:inherit;cursor:pointer";
     row.appendChild(el("span", "label", d.toLocaleDateString(ar ? "ar-EG" : "en-CA", { weekday: "short" }))); row.appendChild(el("span", ar ? "ar" : "", ar ? rr.ar : rr.en)); row.onclick = () => { kPick = R.indexOf(rr); render(); window.scrollTo({ top: 0 }); }; w.appendChild(row); }
   wrap.appendChild(w);
   return wrap;

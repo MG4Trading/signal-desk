@@ -1,1421 +1,2211 @@
 {
-"recipes": [
-{
-"id": "koshari",
-"cuisine": "Egyptian",
-"en": "Lighter koshari",
-"ar": "كشري خفيف",
-"mins": 50,
-"kcal": 520,
-"protein": 22,
-"ing": [
-[
-"Brown lentils",
-"عدس بجبة",
-"1 cup"
-],
-[
-"Rice",
-"أرز",
-"1 cup"
-],
-[
-"Whole-wheat macaroni",
-"مكرونة قمح كامل",
-"1½ cups"
-],
-[
-"Cooked chickpeas",
-"حمص مسلوق",
-"1 can (540 ml)"
-],
-[
-"Onions, thinly sliced",
-"بصل شرائح رفيعة",
-"2 large"
-],
-[
-"Crushed tomatoes",
-"طماطم مهروسة",
-"2 cups"
-],
-[
-"Garlic",
-"ثوم",
-"4 cloves"
-],
-[
-"White vinegar",
-"خل أبيض",
-"3 tbsp"
-],
-[
-"Cumin",
-"كمون",
-"1 tsp"
-],
-[
-"Chili flakes (optional)",
-"شطة (اختياري)",
-"½ tsp"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"3 tbsp"
-]
-],
-"steps_en": [
-"Bake the onion slices with 1 tbsp oil at 220°C for 20–25 min until crisp. This replaces deep-frying.",
-"Simmer the lentils in water for 15 min, add the rice with salt and cumin, cover and cook 20 min until tender.",
-"Boil the macaroni until al dente and drain.",
-"Sauce: sauté garlic in 1 tbsp oil, add tomatoes, chili, salt; simmer 10 min, then stir in 2 tbsp vinegar.",
-"Garlic dressing (dakka): 2 crushed garlic cloves, 1 tbsp vinegar, 3 tbsp water, cumin, salt.",
-"Layer rice-lentils, macaroni and chickpeas; top with sauce, dakka and crispy onions."
-],
-"steps_ar": [
-"اخبز شرائح البصل مع ملعقة زيت على ٢٢٠ درجة لمدة ٢٠–٢٥ دقيقة حتى تتحمص بدلاً من القلي.",
-"اسلق العدس ١٥ دقيقة، ثم أضف الأرز والملح والكمون، وغطّه واتركه ٢٠ دقيقة حتى ينضج.",
-"اسلق المكرونة حتى تنضج وصفّها.",
-"الصلصة: شوّح الثوم في ملعقة زيت، أضف الطماطم والشطة والملح واتركها ١٠ دقائق، ثم أضف ملعقتين خل.",
-"الدقة: فصّان ثوم مهروس مع ملعقة خل و٣ ملاعق ماء وكمون وملح.",
-"رص الأرز بالعدس ثم المكرونة والحمص، وأضف الصلصة والدقة والبصل المحمص."
-],
-"tip_en": "Baked onions save about 150 kcal per plate compared with fried.",
-"tip_ar": "البصل المخبوز يوفر حوالي ١٥٠ سعر حراري في الطبق مقارنة بالمقلي.",
-"yt": "طريقة عمل الكشري المصري"
-},
-{
-"id": "molokhia",
-"cuisine": "Egyptian",
-"en": "Molokhia with grilled chicken",
-"ar": "ملوخية بالفراخ المشوية",
-"mins": 45,
-"kcal": 430,
-"protein": 42,
-"ing": [
-[
-"Frozen minced molokhia",
-"ملوخية مفرومة مجمدة",
-"400 g"
-],
-[
-"Chicken breasts",
-"صدور فراخ",
-"4 (about 700 g)"
-],
-[
-"Low-sodium chicken broth",
-"شوربة فراخ قليلة الملح",
-"4 cups"
-],
-[
-"Garlic",
-"ثوم",
-"8 cloves"
-],
-[
-"Ground coriander",
-"كزبرة ناشفة",
-"2 tsp"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"2 tbsp"
-],
-[
-"Lemon",
-"ليمون",
-"1"
-],
-[
-"Brown rice or ½ baladi bread each",
-"أرز بني أو نص رغيف بلدي للفرد",
-"to serve"
-]
-],
-"steps_en": [
-"Season the chicken with salt, pepper, lemon and a little oil; grill or pan-sear 6–7 min a side.",
-"Bring the broth to a simmer, add the molokhia and stir until just combined. Do not boil hard.",
-"Taqlia: fry the crushed garlic and coriander in 1 tbsp oil until golden, then add to the pot.",
-"Serve molokhia with sliced chicken and a small portion of rice or bread."
-],
-"steps_ar": [
-"تبّل الفراخ بالملح والفلفل والليمون وقليل من الزيت واشويها ٦–٧ دقائق لكل جانب.",
-"سخّن الشوربة حتى الغليان الهادئ، أضف الملوخية وقلّب حتى تتجانس ولا تتركها تغلي بشدة.",
-"التقلية: حمّر الثوم المهروس والكزبرة في ملعقة زيت ثم أضفها للملوخية.",
-"قدّم الملوخية مع شرائح الفراخ وكمية صغيرة من الأرز أو العيش."
-],
-"tip_en": "Molokhia is rich in iron and fibre; grilling the chicken keeps it lean.",
-"tip_ar": "الملوخية غنية بالحديد والألياف، وشوي الفراخ يجعلها قليلة الدهون.",
-"yt": "طريقة عمل الملوخية بالفراخ"
-},
-{
-"id": "singari",
-"cuisine": "Egyptian",
-"en": "Baked fish singari",
-"ar": "سمك صيادية سنجاري في الفرن",
-"mins": 40,
-"kcal": 330,
-"protein": 38,
-"ing": [
-[
-"White fish fillets (tilapia or basa)",
-"فيليه سمك بلطي أو باسا",
-"800 g"
-],
-[
-"Tomatoes, sliced",
-"طماطم شرائح",
-"3"
-],
-[
-"Green and red peppers",
-"فلفل ألوان",
-"2"
-],
-[
-"Onion",
-"بصل",
-"1"
-],
-[
-"Garlic",
-"ثوم",
-"5 cloves"
-],
-[
-"Cumin",
-"كمون",
-"1 tsp"
-],
-[
-"Lemon juice",
-"عصير ليمون",
-"3 tbsp"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"2 tbsp"
-],
-[
-"Parsley or coriander",
-"بقدونس أو كزبرة",
-"½ cup"
-]
-],
-"steps_en": [
-"Blend garlic, cumin, lemon, oil, salt, pepper and herbs into a marinade; coat the fish for 15 min.",
-"Layer onion, peppers and tomatoes in a baking dish; lay the fish on top and add the rest of the marinade.",
-"Cover with foil and bake at 200°C for 20 min; uncover and bake 10 more.",
-"Serve with a big salad and a little brown rice."
-],
-"steps_ar": [
-"اخلط الثوم والكمون والليمون والزيت والملح والفلفل والخضرة، وتبّل السمك ١٥ دقيقة.",
-"رص البصل والفلفل والطماطم في صينية، وضع السمك فوقها مع باقي التتبيلة.",
-"غطّها بورق ألومنيوم واخبزها على ٢٠٠ درجة ٢٠ دقيقة، ثم اكشفها ١٠ دقائق.",
-"قدّمها مع سلطة كبيرة وقليل من الأرز البني."
-],
-"tip_en": "High protein, low fat, and ready in 40 minutes.",
-"tip_ar": "بروتين عالي ودهون قليلة وجاهزة في ٤٠ دقيقة.",
-"yt": "طريقة عمل سمك سنجاري"
-},
-{
-"id": "bamia",
-"cuisine": "Egyptian",
-"en": "Bamia with lean beef",
-"ar": "بامية باللحمة",
-"mins": 70,
-"kcal": 410,
-"protein": 34,
-"ing": [
-[
-"Lean beef cubes",
-"لحمة قطع قليلة الدهن",
-"500 g"
-],
-[
-"Okra (frozen, small)",
-"بامية زيرو مجمدة",
-"500 g"
-],
-[
-"Onion, chopped",
-"بصل مفروم",
-"1"
-],
-[
-"Tomato paste",
-"صلصة طماطم",
-"2 tbsp"
-],
-[
-"Crushed tomatoes",
-"طماطم مهروسة",
-"2 cups"
-],
-[
-"Garlic",
-"ثوم",
-"4 cloves"
-],
-[
-"Ground coriander",
-"كزبرة ناشفة",
-"1 tsp"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"1 tbsp"
-]
-],
-"steps_en": [
-"Brown the beef with the onion in oil, cover with water and simmer 40 min until tender (or 20 min in a pressure cooker).",
-"Add tomato paste and crushed tomatoes with salt and pepper; simmer 10 min.",
-"Add the okra and cook 15 min without stirring too much.",
-"Finish with garlic and coriander sautéed for a minute. Serve with a small portion of rice."
-],
-"steps_ar": [
-"شوّح اللحمة مع البصل في الزيت، غطّها بالماء واتركها ٤٠ دقيقة حتى تنضج (أو ٢٠ دقيقة في الحلة البريستو).",
-"أضف الصلصة والطماطم والملح والفلفل واتركها ١٠ دقائق.",
-"أضف البامية واتركها ١٥ دقيقة بدون تقليب كثير.",
-"أضف الثوم والكزبرة بعد تشويحهم دقيقة. قدّمها مع كمية صغيرة من الأرز."
-],
-"tip_en": "Choose round or shoulder cuts and trim the fat to keep it light.",
-"tip_ar": "اختار قطعة كتف أو فخدة وشيل الدهن لتكون أخف.",
-"yt": "طريقة عمل البامية باللحمة"
-},
-{
-"id": "freekeh",
-"cuisine": "Egyptian",
-"en": "Freekeh with chicken",
-"ar": "فريك بالفراخ",
-"mins": 55,
-"kcal": 480,
-"protein": 40,
-"ing": [
-[
-"Freekeh",
-"فريك",
-"1½ cups"
-],
-[
-"Chicken thighs, skinless",
-"أوراك فراخ بدون جلد",
-"700 g"
-],
-[
-"Onion",
-"بصل",
-"1"
-],
-[
-"Cardamom pods",
-"حبهان",
-"3"
-],
-[
-"Bay leaves",
-"ورق لورا",
-"2"
-],
-[
-"Cinnamon stick",
-"عود قرفة",
-"1"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"1 tbsp"
-],
-[
-"Toasted almonds",
-"لوز محمص",
-"¼ cup"
-]
-],
-"steps_en": [
-"Boil the chicken with half the onion, cardamom, bay leaves and cinnamon for 25 min; keep the broth.",
-"Rinse the freekeh. Sauté the rest of the onion in oil, add freekeh and stir 2 min.",
-"Add 3½ cups of the broth, salt and pepper; cover and simmer 25 min.",
-"Brown the chicken pieces in the oven for 10 min and serve on the freekeh with almonds."
-],
-"steps_ar": [
-"اسلق الفراخ مع نص بصلة والحبهان واللورا والقرفة ٢٥ دقيقة واحتفظ بالشوربة.",
-"اغسل الفريك. شوّح باقي البصل في الزيت، أضف الفريك وقلّب دقيقتين.",
-"أضف ٣ كوب ونص من الشوربة والملح والفلفل، غطّه واتركه ٢٥ دقيقة.",
-"حمّر الفراخ في الفرن ١٠ دقائق وقدّمها على الفريك مع اللوز."
-],
-"tip_en": "Freekeh has about twice the fibre of white rice.",
-"tip_ar": "الفريك فيه ضعف ألياف الأرز الأبيض تقريباً.",
-"yt": "طريقة عمل الفريك بالفراخ"
-},
-{
-"id": "mahshi",
-"cuisine": "Egyptian",
-"en": "Stuffed zucchini (kousa mahshi)",
-"ar": "كوسة محشية",
-"mins": 75,
-"kcal": 390,
-"protein": 24,
-"ing": [
-[
-"Small zucchini",
-"كوسة صغيرة",
-"10"
-],
-[
-"Lean ground beef",
-"لحمة مفرومة قليلة الدهن",
-"300 g"
-],
-[
-"Rice",
-"أرز مصري",
-"¾ cup"
-],
-[
-"Chopped dill, parsley, coriander",
-"شبت وبقدونس وكزبرة مفرومين",
-"1 cup"
-],
-[
-"Onion, grated",
-"بصل مبشور",
-"1"
-],
-[
-"Crushed tomatoes",
-"طماطم مهروسة",
-"2 cups"
-],
-[
-"Low-sodium broth",
-"شوربة قليلة الملح",
-"2 cups"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"1 tbsp"
-]
-],
-"steps_en": [
-"Core the zucchini. Mix beef, rice, herbs, onion, half the tomatoes, salt, pepper and oil.",
-"Fill each zucchini three-quarters full to leave room for the rice to swell.",
-"Stand them in a pot, pour over the broth and remaining tomatoes.",
-"Bring to a boil, then cover and simmer 40 min."
-],
-"steps_ar": [
-"قوّر الكوسة. اخلط اللحمة والأرز والخضرة والبصل ونص الطماطم والملح والفلفل والزيت.",
-"احشي الكوسة لتلات أرباعها عشان الأرز يكبر.",
-"رصّها في حلة وأضف الشوربة وباقي الطماطم.",
-"سيبها تغلي ثم غطّها على نار هادية ٤٠ دقيقة."
-],
-"tip_en": "Lean beef and extra herbs keep it lighter than the classic.",
-"tip_ar": "اللحمة قليلة الدهن والخضرة الكتير بيخلوها أخف من الطريقة التقليدية.",
-"yt": "طريقة عمل الكوسة المحشية"
-},
-{
-"id": "kofta",
-"cuisine": "Egyptian",
-"en": "Baked kofta with tahini",
-"ar": "كفتة بالطحينة في الفرن",
-"mins": 45,
-"kcal": 460,
-"protein": 32,
-"ing": [
-[
-"Lean ground beef",
-"لحمة مفرومة قليلة الدهن",
-"600 g"
-],
-[
-"Onion, grated",
-"بصل مبشور",
-"1"
-],
-[
-"Parsley",
-"بقدونس",
-"½ cup"
-],
-[
-"Baharat or seven spice",
-"بهارات مشكلة",
-"1 tsp"
-],
-[
-"Tahini",
-"طحينة",
-"⅓ cup"
-],
-[
-"Lemon juice",
-"عصير ليمون",
-"3 tbsp"
-],
-[
-"Potatoes, thinly sliced",
-"بطاطس شرائح رفيعة",
-"2 medium"
-],
-[
-"Tomatoes, sliced",
-"طماطم شرائح",
-"2"
-]
-],
-"steps_en": [
-"Mix beef, onion, parsley, spices and salt; shape into small fingers.",
-"Line a dish with potato and tomato slices, add the kofta and bake at 200°C for 20 min.",
-"Whisk tahini, lemon, water and a pinch of salt into a pourable sauce.",
-"Pour the sauce over and bake 10 more min. Serve with salad."
-],
-"steps_ar": [
-"اخلط اللحمة والبصل والبقدونس والبهارات والملح، وشكّلها أصابع صغيرة.",
-"افرش الصينية بالبطاطس والطماطم، ضع الكفتة واخبزها على ٢٠٠ درجة ٢٠ دقيقة.",
-"اخفق الطحينة مع الليمون والماء والملح حتى تبقى صوص سايل.",
-"صب الصوص واخبزها ١٠ دقائق كمان. قدّمها مع سلطة."
-],
-"tip_en": "Tahini adds healthy fats and calcium.",
-"tip_ar": "الطحينة بتضيف دهون صحية وكالسيوم.",
-"yt": "طريقة عمل كفتة بالطحينة في الفرن"
-},
-{
-"id": "cacciatore",
-"cuisine": "Italian (halal)",
-"en": "Chicken cacciatore (no wine)",
-"ar": "دجاج كاتشياتوري بدون نبيذ",
-"mins": 50,
-"kcal": 380,
-"protein": 40,
-"ing": [
-[
-"Chicken thighs, skinless",
-"أوراك دجاج بدون جلد",
-"8 (about 900 g)"
-],
-[
-"Mushrooms",
-"مشروم",
-"250 g"
-],
-[
-"Red pepper",
-"فلفل أحمر",
-"1"
-],
-[
-"Onion",
-"بصل",
-"1"
-],
-[
-"Garlic",
-"ثوم",
-"4 cloves"
-],
-[
-"Crushed tomatoes",
-"طماطم مهروسة",
-"1 can (796 ml)"
-],
-[
-"Chicken broth",
-"شوربة دجاج",
-"½ cup"
-],
-[
-"Dried oregano and rosemary",
-"زعتر بري وروزماري",
-"1 tsp each"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"1 tbsp"
-]
-],
-"steps_en": [
-"Brown the chicken in oil, 4 min a side; set aside.",
-"Sauté onion, pepper, mushrooms and garlic 5 min.",
-"Add tomatoes, broth (in place of wine), herbs, salt and pepper; return the chicken.",
-"Cover and simmer 25–30 min. Serve with whole-wheat pasta or greens."
-],
-"steps_ar": [
-"حمّر الدجاج في الزيت ٤ دقائق لكل جانب وارفعه.",
-"شوّح البصل والفلفل والمشروم والثوم ٥ دقائق.",
-"أضف الطماطم والشوربة (بدل النبيذ) والأعشاب والملح والفلفل، ورجّع الدجاج.",
-"غطّه واتركه ٢٥–٣٠ دقيقة. قدّمه مع مكرونة قمح كامل أو خضار."
-],
-"tip_en": "Broth with a splash of apple cider vinegar gives depth without alcohol.",
-"tip_ar": "الشوربة مع رشة خل تدي طعم عميق من غير كحول.",
-"yt": "طريقة عمل دجاج كاتشياتوري"
-},
-{
-"id": "bolognese",
-"cuisine": "Italian (halal)",
-"en": "Whole-wheat spaghetti with turkey bolognese",
-"ar": "سباجيتي قمح كامل بصوص بولونيز الديك الرومي",
-"mins": 45,
-"kcal": 540,
-"protein": 38,
-"ing": [
-[
-"Whole-wheat spaghetti",
-"سباجيتي قمح كامل",
-"350 g"
-],
-[
-"Lean ground turkey (halal)",
-"لحم ديك رومي مفروم حلال",
-"500 g"
-],
-[
-"Onion, carrot, celery, finely chopped",
-"بصل وجزر وكرفس مفرومين ناعم",
-"1 each"
-],
-[
-"Garlic",
-"ثوم",
-"3 cloves"
-],
-[
-"Crushed tomatoes",
-"طماطم مهروسة",
-"1 can (796 ml)"
-],
-[
-"Tomato paste",
-"صلصة طماطم",
-"1 tbsp"
-],
-[
-"Basil",
-"ريحان",
-"handful"
-],
-[
-"Parmesan (halal-certified rennet)",
-"بارميزان بمنفحة حلال",
-"¼ cup"
-]
-],
-"steps_en": [
-"Sauté onion, carrot and celery in a little oil for 6 min; add garlic.",
-"Add turkey and brown, breaking it up.",
-"Add paste, tomatoes, salt, pepper; simmer 20 min. Stir in basil.",
-"Cook pasta al dente and toss with the sauce; top with a little parmesan."
-],
-"steps_ar": [
-"شوّح البصل والجزر والكرفس في قليل من الزيت ٦ دقائق وأضف الثوم.",
-"أضف الديك الرومي وقلّبه حتى يتحمر ويتفكك.",
-"أضف الصلصة والطماطم والملح والفلفل واتركه ٢٠ دقيقة، ثم أضف الريحان.",
-"اسلق المكرونة وقلّبها مع الصوص ورش القليل من البارميزان."
-],
-"tip_en": "Check the parmesan label for microbial or halal rennet.",
-"tip_ar": "اتأكد إن البارميزان منفحته نباتية أو حلال.",
-"yt": "طريقة عمل سباجيتي بولونيز"
-},
-{
-"id": "shrimp_linguine",
-"cuisine": "Italian (halal)",
-"en": "Shrimp and zucchini linguine",
-"ar": "لينغويني بالجمبري والكوسة",
-"mins": 25,
-"kcal": 470,
-"protein": 33,
-"ing": [
-[
-"Linguine (whole-wheat if you like)",
-"لينغويني (قمح كامل اختياري)",
-"320 g"
-],
-[
-"Shrimp, peeled",
-"جمبري مقشر",
-"500 g"
-],
-[
-"Zucchini, sliced",
-"كوسة شرائح",
-"2"
-],
-[
-"Garlic, sliced",
-"ثوم شرائح",
-"5 cloves"
-],
-[
-"Chili flakes",
-"شطة",
-"½ tsp"
-],
-[
-"Lemon zest and juice",
-"قشر وعصير ليمونة",
-"1"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"3 tbsp"
-],
-[
-"Parsley",
-"بقدونس",
-"½ cup"
-]
-],
-"steps_en": [
-"Boil the pasta; save 1 cup of pasta water.",
-"Warm the garlic and chili in oil over low heat until fragrant.",
-"Add zucchini 3 min, then shrimp 3–4 min until pink.",
-"Toss in pasta, lemon, parsley and a splash of pasta water."
-],
-"steps_ar": [
-"اسلق المكرونة واحتفظ بكوب من مية السلق.",
-"سخّن الثوم والشطة في الزيت على نار هادية حتى تطلع ريحتهم.",
-"أضف الكوسة ٣ دقائق، ثم الجمبري ٣–٤ دقائق حتى يحمر.",
-"أضف المكرونة والليمون والبقدونس ورشة من مية المكرونة."
-],
-"tip_en": "Ready in 25 minutes, a good weeknight dinner.",
-"tip_ar": "جاهزة في ٢٥ دقيقة، عشا مثالي في أيام الشغل.",
-"yt": "طريقة عمل مكرونة بالجمبري والثوم"
-},
-{
-"id": "minestrone",
-"cuisine": "Italian (halal)",
-"en": "Minestrone with beans",
-"ar": "شوربة مينسترون بالفاصوليا",
-"mins": 45,
-"kcal": 320,
-"protein": 15,
-"ing": [
-[
-"Onion, carrot, celery",
-"بصل وجزر وكرفس",
-"1 each"
-],
-[
-"Zucchini",
-"كوسة",
-"1"
-],
-[
-"Potato",
-"بطاطس",
-"1"
-],
-[
-"Crushed tomatoes",
-"طماطم مهروسة",
-"1 can"
-],
-[
-"Vegetable broth",
-"شوربة خضار",
-"6 cups"
-],
-[
-"White kidney beans",
-"فاصوليا بيضاء",
-"1 can"
-],
-[
-"Small pasta (ditalini)",
-"مكرونة صغيرة",
-"½ cup"
-],
-[
-"Spinach",
-"سبانخ",
-"2 cups"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"1 tbsp"
-]
-],
-"steps_en": [
-"Sauté onion, carrot and celery in oil 6 min.",
-"Add zucchini, potato, tomatoes and broth; simmer 15 min.",
-"Add beans and pasta; cook 10 min.",
-"Stir in spinach, season, and serve with lemon."
-],
-"steps_ar": [
-"شوّح البصل والجزر والكرفس في الزيت ٦ دقائق.",
-"أضف الكوسة والبطاطس والطماطم والشوربة واتركها ١٥ دقيقة.",
-"أضف الفاصوليا والمكرونة واتركها ١٠ دقائق.",
-"أضف السبانخ والتوابل وقدّمها مع ليمون."
-],
-"tip_en": "A full meal in a bowl with lots of fibre.",
-"tip_ar": "وجبة كاملة في طبق واحد وغنية بالألياف.",
-"yt": "طريقة عمل شوربة المينسترون"
-},
-{
-"id": "salmon",
-"cuisine": "Italian (halal)",
-"en": "Baked salmon with lemon and herbs",
-"ar": "سلمون بالفرن بالليمون والأعشاب",
-"mins": 30,
-"kcal": 450,
-"protein": 36,
-"ing": [
-[
-"Salmon fillets",
-"فيليه سلمون",
-"4 (about 700 g)"
-],
-[
-"Cherry tomatoes",
-"طماطم شيري",
-"2 cups"
-],
-[
-"Zucchini and red onion",
-"كوسة وبصل أحمر",
-"1 each"
-],
-[
-"Garlic",
-"ثوم",
-"3 cloves"
-],
-[
-"Lemon",
-"ليمون",
-"1"
-],
-[
-"Dried oregano or Italian herbs",
-"أعشاب إيطالية",
-"2 tsp"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"2 tbsp"
-],
-[
-"Black olives (optional)",
-"زيتون أسود (اختياري)",
-"¼ cup"
-]
-],
-"steps_en": [
-"Toss the vegetables with oil, garlic, herbs and salt; roast at 210°C for 10 min.",
-"Add the salmon, season, top with lemon slices.",
-"Roast 12–14 min until the fish flakes.",
-"Serve with a green salad."
-],
-"steps_ar": [
-"قلّب الخضار مع الزيت والثوم والأعشاب والملح واشويها على ٢١٠ درجة ١٠ دقائق.",
-"أضف السلمون وتبّله وحط عليه شرائح ليمون.",
-"اشويه ١٢–١٤ دقيقة حتى يتفتت بسهولة.",
-"قدّمه مع سلطة خضرا."
-],
-"tip_en": "Salmon gives omega-3 fats that support heart health.",
-"tip_ar": "السلمون فيه أوميغا ٣ المفيدة لصحة القلب.",
-"yt": "طريقة عمل السلمون في الفرن"
-},
-{
-"id": "piccata",
-"cuisine": "Italian (halal)",
-"en": "Chicken piccata (no wine)",
-"ar": "دجاج بيكاتا بالليمون بدون نبيذ",
-"mins": 30,
-"kcal": 360,
-"protein": 42,
-"ing": [
-[
-"Chicken breasts, halved and flattened",
-"صدور دجاج مفرودة",
-"4"
-],
-[
-"Whole-wheat flour",
-"دقيق قمح كامل",
-"¼ cup"
-],
-[
-"Chicken broth",
-"شوربة دجاج",
-"1 cup"
-],
-[
-"Lemon juice",
-"عصير ليمون",
-"¼ cup"
-],
-[
-"Capers",
-"كبر",
-"2 tbsp"
-],
-[
-"Garlic",
-"ثوم",
-"2 cloves"
-],
-[
-"Olive oil",
-"زيت زيتون",
-"1½ tbsp"
-],
-[
-"Butter",
-"زبدة",
-"1 tbsp"
-],
-[
-"Parsley",
-"بقدونس",
-"¼ cup"
-]
-],
-"steps_en": [
-"Season the chicken and dust lightly with flour.",
-"Pan-sear in oil 3–4 min a side; set aside.",
-"Add garlic, then broth and lemon; simmer 5 min. Stir in capers and butter.",
-"Return the chicken, spoon over the sauce and add parsley. Serve with greens or a small portion of pasta."
-],
-"steps_ar": [
-"تبّل الدجاج ورش عليه طبقة خفيفة من الدقيق.",
-"حمّره في الزيت ٣–٤ دقائق لكل جانب وارفعه.",
-"أضف الثوم ثم الشوربة والليمون واتركه ٥ دقائق، وأضف الكبر والزبدة.",
-"رجّع الدجاج وغطّه بالصوص وأضف البقدونس. قدّمه مع خضار أو قليل من المكرونة."
-],
-"tip_en": "Lemon and broth replace wine and keep the sauce light.",
-"tip_ar": "الليمون والشوربة بدل النبيذ وبيخلوا الصوص خفيف.",
-"yt": "طريقة عمل دجاج بيكاتا"
-},
-{
-"id": "parmigiana",
-"cuisine": "Italian (halal)",
-"en": "Light baked eggplant parmigiana",
-"ar": "باذنجان بارميجانا خفيف في الفرن",
-"mins": 60,
-"kcal": 340,
-"protein": 18,
-"ing": [
-[
-"Eggplants, sliced",
-"باذنجان شرائح",
-"2 large"
-],
-[
-"Tomato sauce (passata)",
-"صلصة طماطم باساتا",
-"3 cups"
-],
-[
-"Garlic",
-"ثوم",
-"2 cloves"
-],
-[
-"Basil",
-"ريحان",
-"handful"
-],
-[
-"Part-skim mozzarella",
-"موتزاريلا قليلة الدسم",
-"200 g"
-],
-[
-"Parmesan (halal rennet)",
-"بارميزان بمنفحة حلال",
-"¼ cup"
-],
-[
-"Olive oil spray",
-"رشاش زيت زيتون",
-"light"
-]
-],
-"steps_en": [
-"Spray the eggplant slices lightly with oil and bake at 220°C for 20 min, turning once. No frying.",
-"Warm the passata with garlic, basil and salt.",
-"Layer sauce, eggplant and mozzarella; repeat, finishing with sauce and parmesan.",
-"Bake at 190°C for 25 min; rest 10 min before cutting."
-],
-"steps_ar": [
-"رش شرائح الباذنجان بقليل من الزيت واخبزها على ٢٢٠ درجة ٢٠ دقيقة مع تقليبها مرة، من غير قلي.",
-"سخّن الصلصة مع الثوم والريحان والملح.",
-"رص طبقات من الصلصة والباذنجان والموتزاريلا، وكرّر ثم أنهِ بالصلصة والبارميزان.",
-"اخبزها على ١٩٠ درجة ٢٥ دقيقة واتركها ١٠ دقائق قبل التقطيع."
-],
-"tip_en": "Baking the eggplant instead of frying cuts the oil by about three-quarters.",
-"tip_ar": "خَبز الباذنجان بدل قليه بيقلل الزيت حوالي تلات أرباع.",
-"yt": "طريقة عمل باذنجان بارميجانا"
-}
-],
-"breakfast": [
-[
-"Ful medames with olive oil, cumin, tomato and a boiled egg",
-"فول مدمس بزيت الزيتون والكمون والطماطم وبيضة مسلوقة"
-],
-[
-"Eggs with tomatoes and peppers (shakshuka) and ½ baladi bread",
-"شكشوكة بالطماطم والفلفل ونص رغيف بلدي"
-],
-[
-"Greek yogurt with oats, honey and walnuts",
-"زبادي يوناني بالشوفان والعسل وعين الجمل"
-],
-[
-"White cheese, cucumber, tomato, olives and whole-wheat pita",
-"جبنة بيضاء وخيار وطماطم وزيتون وعيش قمح كامل"
-],
-[
-"Baked falafel (ta'ameya) with tahini salad",
-"طعمية في الفرن مع سلطة طحينة"
-],
-[
-"Whole-wheat toast with ricotta, tomato and basil",
-"توست قمح كامل بالريكوتا والطماطم والريحان"
-],
-[
-"Oatmeal with dates, cinnamon and milk",
-"شوفان بالبلح والقرفة واللبن"
-],
-[
-"Omelette with spinach and feta",
-"أومليت بالسبانخ والجبنة الفيتا"
-],
-[
-"Labneh with za'atar, olive oil and veggies",
-"لبنة بالزعتر وزيت الزيتون والخضار"
-],
-[
-"Cottage cheese with fruit and almonds",
-"جبنة قريش بالفاكهة واللوز"
-]
-],
-"snacks": [
-[
-"Apple with 2 tbsp peanut butter",
-"تفاحة مع ملعقتين زبدة فول سوداني"
-],
-[
-"Carrots and cucumbers with hummus",
-"جزر وخيار مع حمص"
-],
-[
-"Handful of almonds and 2 dates",
-"حفنة لوز وتمرتين"
-],
-[
-"Laban (buttermilk) and a banana",
-"كوب لبن رايب وموزة"
-],
-[
-"Roasted chickpeas",
-"حمص محمص"
-],
-[
-"Guava or orange slices",
-"جوافة أو شرائح برتقال"
-],
-[
-"Air-popped popcorn with cumin",
-"فشار بدون زيت بالكمون"
-],
-[
-"Greek yogurt with berries",
-"زبادي يوناني بالتوت"
-]
-],
-"ayahs": [
-"94:5",
-"94:6",
-"65:2",
-"65:3",
-"13:28",
-"3:139",
-"39:53",
-"2:153",
-"2:186",
-"29:69",
-"2:286",
-"12:87",
-"93:3",
-"93:5",
-"40:60",
-"3:159",
-"14:7",
-"2:152",
-"3:173",
-"9:40",
-"2:201",
-"64:11",
-"2:216",
-"16:97",
-"41:30",
-"47:7",
-"99:7",
-"2:155",
-"3:200",
-"39:10",
-"7:56",
-"31:17",
-"20:25",
-"18:10",
-"21:87",
-"33:3",
-"57:23",
-"11:115",
-"16:128",
-"8:46",
-"2:45",
-"17:80",
-"3:26",
-"6:162",
-"49:13",
-"25:63",
-"28:24",
-"12:86",
-"4:28",
-"62:10"
-],
-"classic": [
-[
-"The Godfather",
-1972,
-"Crime"
-],
-[
-"Heat",
-1995,
-"Crime / Action"
-],
-[
-"Se7en",
-1995,
-"Thriller"
-],
-[
-"The Silence of the Lambs",
-1991,
-"Thriller"
-],
-[
-"Die Hard",
-1988,
-"Action"
-],
-[
-"Raiders of the Lost Ark",
-1981,
-"Adventure"
-],
-[
-"The Dark Knight",
-2008,
-"Action / Crime"
-],
-[
-"Inception",
-2010,
-"Thriller / Action"
-],
-[
-"Mad Max: Fury Road",
-2015,
-"Action / Adventure"
-],
-[
-"No Country for Old Men",
-2007,
-"Crime / Thriller"
-],
-[
-"The Departed",
-2006,
-"Crime / Thriller"
-],
-[
-"Goodfellas",
-1990,
-"Crime"
-],
-[
-"The Fugitive",
-1993,
-"Action / Thriller"
-],
-[
-"Jaws",
-1975,
-"Thriller / Adventure"
-],
-[
-"The Usual Suspects",
-1995,
-"Crime / Thriller"
-],
-[
-"Zodiac",
-2007,
-"Crime / Thriller"
-],
-[
-"Prisoners",
-2013,
-"Crime / Thriller"
-],
-[
-"Sicario",
-2015,
-"Crime / Action"
-],
-[
-"Gladiator",
-2000,
-"Action / Adventure"
-],
-[
-"Top Gun: Maverick",
-2022,
-"Action"
-],
-[
-"Mission: Impossible – Fallout",
-2018,
-"Action"
-],
-[
-"Casino Royale",
-2006,
-"Action / Adventure"
-],
-[
-"The Bourne Ultimatum",
-2007,
-"Action / Thriller"
-],
-[
-"Indiana Jones and the Last Crusade",
-1989,
-"Adventure"
-],
-[
-"The Town",
-2010,
-"Crime / Thriller"
-],
-[
-"Gone Girl",
-2014,
-"Thriller"
-],
-[
-"Collateral",
-2004,
-"Crime / Thriller"
-],
-[
-"The French Connection",
-1971,
-"Crime / Action"
-],
-[
-"Dune: Part Two",
-2024,
-"Adventure / Action"
-],
-[
-"Edge of Tomorrow",
-2014,
-"Action"
-]
-],
-"egyptian": [
-[
-"باب الحديد",
-"Cairo Station",
-1958,
-"Drama / Thriller"
-],
-[
-"اللص والكلاب",
-"The Thief and the Dogs",
-1962,
-"Crime"
-],
-[
-"شيء من الخوف",
-"A Taste of Fear",
-1969,
-"Drama"
-],
-[
-"الكيف",
-"Al-Keif",
-1985,
-"Drama / Crime"
-],
-[
-"الهروب",
-"The Escape",
-1991,
-"Crime / Action"
-],
-[
-"الإرهاب والكباب",
-"Terrorism and Kebab",
-1992,
-"Comedy / Drama"
-],
-[
-"عمارة يعقوبيان",
-"The Yacoubian Building",
-2006,
-"Drama"
-],
-[
-"الجزيرة",
-"The Island",
-2007,
-"Crime / Action"
-],
-[
-"إبراهيم الأبيض",
-"Ibrahim Labyad",
-2009,
-"Crime / Action"
-],
-[
-"الفيل الأزرق",
-"The Blue Elephant",
-2014,
-"Thriller"
-],
-[
-"ولاد رزق",
-"Sons of Rizk",
-2015,
-"Action / Heist"
-],
-[
-"الممر",
-"The Passage",
-2019,
-"War / Action"
-],
-[
-"كيرة والجن",
-"Kira & El Gin",
-2022,
-"Historical / Action"
-],
-[
-"تيتو",
-"Tito",
-2004,
-"Crime / Action"
-]
-],
-"series": [
-[
-"Chernobyl",
-2019,
-5,
-"Drama / Thriller",
-false
-],
-[
-"Band of Brothers",
-2001,
-10,
-"War / Action",
-false
-],
-[
-"True Detective (Season 1)",
-2014,
-8,
-"Crime / Thriller",
-false
-],
-[
-"The Night Of",
-2016,
-8,
-"Crime",
-false
-],
-[
-"Mare of Easttown",
-2021,
-7,
-"Crime",
-false
-],
-[
-"Adolescence",
-2025,
-4,
-"Crime / Drama",
-false
-],
-[
-"Black Bird",
-2022,
-6,
-"Crime / Thriller",
-false
-],
-[
-"The Day of the Jackal",
-2024,
-10,
-"Thriller / Action",
-false
-],
-[
-"Shōgun",
-2024,
-10,
-"Adventure / Drama",
-false
-],
-[
-"Slow Horses (Season 1)",
-2022,
-6,
-"Spy / Thriller",
-false
-],
-[
-"Ripley",
-2024,
-8,
-"Crime / Thriller",
-false
-],
-[
-"ما وراء الطبيعة (Paranormal)",
-2020,
-6,
-"Horror / Thriller",
-true
-],
-[
-"بطلوع الروح (Batloo' El Rouh)",
-2022,
-15,
-"Drama / Thriller",
-true
-]
-]
+ "recipes": [
+  {
+   "id": "koshari",
+   "cuisine": "Egyptian",
+   "en": "Lighter koshari",
+   "ar": "كشري خفيف",
+   "mins": 50,
+   "kcal": 520,
+   "protein": 22,
+   "ing": [
+    [
+     "Brown lentils",
+     "عدس بجبة",
+     "1 cup"
+    ],
+    [
+     "Rice",
+     "أرز",
+     "1 cup"
+    ],
+    [
+     "Whole-wheat macaroni",
+     "مكرونة قمح كامل",
+     "1½ cups"
+    ],
+    [
+     "Cooked chickpeas",
+     "حمص مسلوق",
+     "1 can (540 ml)"
+    ],
+    [
+     "Onions, thinly sliced",
+     "بصل شرائح رفيعة",
+     "2 large"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "2 cups"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "4 cloves"
+    ],
+    [
+     "White vinegar",
+     "خل أبيض",
+     "3 tbsp"
+    ],
+    [
+     "Cumin",
+     "كمون",
+     "1 tsp"
+    ],
+    [
+     "Chili flakes (optional)",
+     "شطة (اختياري)",
+     "½ tsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "3 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Bake the onion slices with 1 tbsp oil at 220°C for 20–25 min until crisp. This replaces deep-frying.",
+    "Simmer the lentils in water for 15 min, add the rice with salt and cumin, cover and cook 20 min until tender.",
+    "Boil the macaroni until al dente and drain.",
+    "Sauce: sauté garlic in 1 tbsp oil, add tomatoes, chili, salt; simmer 10 min, then stir in 2 tbsp vinegar.",
+    "Garlic dressing (dakka): 2 crushed garlic cloves, 1 tbsp vinegar, 3 tbsp water, cumin, salt.",
+    "Layer rice-lentils, macaroni and chickpeas; top with sauce, dakka and crispy onions."
+   ],
+   "steps_ar": [
+    "اخبز شرائح البصل مع ملعقة زيت على ٢٢٠ درجة لمدة ٢٠–٢٥ دقيقة حتى تتحمص بدلاً من القلي.",
+    "اسلق العدس ١٥ دقيقة، ثم أضف الأرز والملح والكمون، وغطّه واتركه ٢٠ دقيقة حتى ينضج.",
+    "اسلق المكرونة حتى تنضج وصفّها.",
+    "الصلصة: شوّح الثوم في ملعقة زيت، أضف الطماطم والشطة والملح واتركها ١٠ دقائق، ثم أضف ملعقتين خل.",
+    "الدقة: فصّان ثوم مهروس مع ملعقة خل و٣ ملاعق ماء وكمون وملح.",
+    "رص الأرز بالعدس ثم المكرونة والحمص، وأضف الصلصة والدقة والبصل المحمص."
+   ],
+   "tip_en": "Baked onions save about 150 kcal per plate compared with fried.",
+   "tip_ar": "البصل المخبوز يوفر حوالي ١٥٠ سعر حراري في الطبق مقارنة بالمقلي.",
+   "yt": "طريقة عمل الكشري المصري",
+   "style": "light",
+   "youth": true
+  },
+  {
+   "id": "molokhia",
+   "cuisine": "Egyptian",
+   "en": "Molokhia with grilled chicken",
+   "ar": "ملوخية بالفراخ المشوية",
+   "mins": 45,
+   "kcal": 430,
+   "protein": 42,
+   "ing": [
+    [
+     "Frozen minced molokhia",
+     "ملوخية مفرومة مجمدة",
+     "400 g"
+    ],
+    [
+     "Chicken breasts",
+     "صدور فراخ",
+     "4 (about 700 g)"
+    ],
+    [
+     "Low-sodium chicken broth",
+     "شوربة فراخ قليلة الملح",
+     "4 cups"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "8 cloves"
+    ],
+    [
+     "Ground coriander",
+     "كزبرة ناشفة",
+     "2 tsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "2 tbsp"
+    ],
+    [
+     "Lemon",
+     "ليمون",
+     "1"
+    ],
+    [
+     "Brown rice or ½ baladi bread each",
+     "أرز بني أو نص رغيف بلدي للفرد",
+     "to serve"
+    ]
+   ],
+   "steps_en": [
+    "Season the chicken with salt, pepper, lemon and a little oil; grill or pan-sear 6–7 min a side.",
+    "Bring the broth to a simmer, add the molokhia and stir until just combined. Do not boil hard.",
+    "Taqlia: fry the crushed garlic and coriander in 1 tbsp oil until golden, then add to the pot.",
+    "Serve molokhia with sliced chicken and a small portion of rice or bread."
+   ],
+   "steps_ar": [
+    "تبّل الفراخ بالملح والفلفل والليمون وقليل من الزيت واشويها ٦–٧ دقائق لكل جانب.",
+    "سخّن الشوربة حتى الغليان الهادئ، أضف الملوخية وقلّب حتى تتجانس ولا تتركها تغلي بشدة.",
+    "التقلية: حمّر الثوم المهروس والكزبرة في ملعقة زيت ثم أضفها للملوخية.",
+    "قدّم الملوخية مع شرائح الفراخ وكمية صغيرة من الأرز أو العيش."
+   ],
+   "tip_en": "Molokhia is rich in iron and fibre; grilling the chicken keeps it lean.",
+   "tip_ar": "الملوخية غنية بالحديد والألياف، وشوي الفراخ يجعلها قليلة الدهون.",
+   "yt": "طريقة عمل الملوخية بالفراخ",
+   "style": "light",
+   "youth": true
+  },
+  {
+   "id": "singari",
+   "cuisine": "Egyptian",
+   "en": "Baked fish singari",
+   "ar": "سمك صيادية سنجاري في الفرن",
+   "mins": 40,
+   "kcal": 330,
+   "protein": 38,
+   "ing": [
+    [
+     "White fish fillets (tilapia or basa)",
+     "فيليه سمك بلطي أو باسا",
+     "800 g"
+    ],
+    [
+     "Tomatoes, sliced",
+     "طماطم شرائح",
+     "3"
+    ],
+    [
+     "Green and red peppers",
+     "فلفل ألوان",
+     "2"
+    ],
+    [
+     "Onion",
+     "بصل",
+     "1"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "5 cloves"
+    ],
+    [
+     "Cumin",
+     "كمون",
+     "1 tsp"
+    ],
+    [
+     "Lemon juice",
+     "عصير ليمون",
+     "3 tbsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "2 tbsp"
+    ],
+    [
+     "Parsley or coriander",
+     "بقدونس أو كزبرة",
+     "½ cup"
+    ]
+   ],
+   "steps_en": [
+    "Blend garlic, cumin, lemon, oil, salt, pepper and herbs into a marinade; coat the fish for 15 min.",
+    "Layer onion, peppers and tomatoes in a baking dish; lay the fish on top and add the rest of the marinade.",
+    "Cover with foil and bake at 200°C for 20 min; uncover and bake 10 more.",
+    "Serve with a big salad and a little brown rice."
+   ],
+   "steps_ar": [
+    "اخلط الثوم والكمون والليمون والزيت والملح والفلفل والخضرة، وتبّل السمك ١٥ دقيقة.",
+    "رص البصل والفلفل والطماطم في صينية، وضع السمك فوقها مع باقي التتبيلة.",
+    "غطّها بورق ألومنيوم واخبزها على ٢٠٠ درجة ٢٠ دقيقة، ثم اكشفها ١٠ دقائق.",
+    "قدّمها مع سلطة كبيرة وقليل من الأرز البني."
+   ],
+   "tip_en": "High protein, low fat, and ready in 40 minutes.",
+   "tip_ar": "بروتين عالي ودهون قليلة وجاهزة في ٤٠ دقيقة.",
+   "yt": "طريقة عمل سمك سنجاري",
+   "style": "light"
+  },
+  {
+   "id": "bamia",
+   "cuisine": "Egyptian",
+   "en": "Bamia with lean beef",
+   "ar": "بامية باللحمة",
+   "mins": 70,
+   "kcal": 410,
+   "protein": 34,
+   "ing": [
+    [
+     "Lean beef cubes",
+     "لحمة قطع قليلة الدهن",
+     "500 g"
+    ],
+    [
+     "Okra (frozen, small)",
+     "بامية زيرو مجمدة",
+     "500 g"
+    ],
+    [
+     "Onion, chopped",
+     "بصل مفروم",
+     "1"
+    ],
+    [
+     "Tomato paste",
+     "صلصة طماطم",
+     "2 tbsp"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "2 cups"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "4 cloves"
+    ],
+    [
+     "Ground coriander",
+     "كزبرة ناشفة",
+     "1 tsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "1 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Brown the beef with the onion in oil, cover with water and simmer 40 min until tender (or 20 min in a pressure cooker).",
+    "Add tomato paste and crushed tomatoes with salt and pepper; simmer 10 min.",
+    "Add the okra and cook 15 min without stirring too much.",
+    "Finish with garlic and coriander sautéed for a minute. Serve with a small portion of rice."
+   ],
+   "steps_ar": [
+    "شوّح اللحمة مع البصل في الزيت، غطّها بالماء واتركها ٤٠ دقيقة حتى تنضج (أو ٢٠ دقيقة في الحلة البريستو).",
+    "أضف الصلصة والطماطم والملح والفلفل واتركها ١٠ دقائق.",
+    "أضف البامية واتركها ١٥ دقيقة بدون تقليب كثير.",
+    "أضف الثوم والكزبرة بعد تشويحهم دقيقة. قدّمها مع كمية صغيرة من الأرز."
+   ],
+   "tip_en": "Choose round or shoulder cuts and trim the fat to keep it light.",
+   "tip_ar": "اختار قطعة كتف أو فخدة وشيل الدهن لتكون أخف.",
+   "yt": "طريقة عمل البامية باللحمة",
+   "style": "light"
+  },
+  {
+   "id": "freekeh",
+   "cuisine": "Egyptian",
+   "en": "Freekeh with chicken",
+   "ar": "فريك بالفراخ",
+   "mins": 55,
+   "kcal": 480,
+   "protein": 40,
+   "ing": [
+    [
+     "Freekeh",
+     "فريك",
+     "1½ cups"
+    ],
+    [
+     "Chicken thighs, skinless",
+     "أوراك فراخ بدون جلد",
+     "700 g"
+    ],
+    [
+     "Onion",
+     "بصل",
+     "1"
+    ],
+    [
+     "Cardamom pods",
+     "حبهان",
+     "3"
+    ],
+    [
+     "Bay leaves",
+     "ورق لورا",
+     "2"
+    ],
+    [
+     "Cinnamon stick",
+     "عود قرفة",
+     "1"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "1 tbsp"
+    ],
+    [
+     "Toasted almonds",
+     "لوز محمص",
+     "¼ cup"
+    ]
+   ],
+   "steps_en": [
+    "Boil the chicken with half the onion, cardamom, bay leaves and cinnamon for 25 min; keep the broth.",
+    "Rinse the freekeh. Sauté the rest of the onion in oil, add freekeh and stir 2 min.",
+    "Add 3½ cups of the broth, salt and pepper; cover and simmer 25 min.",
+    "Brown the chicken pieces in the oven for 10 min and serve on the freekeh with almonds."
+   ],
+   "steps_ar": [
+    "اسلق الفراخ مع نص بصلة والحبهان واللورا والقرفة ٢٥ دقيقة واحتفظ بالشوربة.",
+    "اغسل الفريك. شوّح باقي البصل في الزيت، أضف الفريك وقلّب دقيقتين.",
+    "أضف ٣ كوب ونص من الشوربة والملح والفلفل، غطّه واتركه ٢٥ دقيقة.",
+    "حمّر الفراخ في الفرن ١٠ دقائق وقدّمها على الفريك مع اللوز."
+   ],
+   "tip_en": "Freekeh has about twice the fibre of white rice.",
+   "tip_ar": "الفريك فيه ضعف ألياف الأرز الأبيض تقريباً.",
+   "yt": "طريقة عمل الفريك بالفراخ",
+   "style": "light"
+  },
+  {
+   "id": "mahshi",
+   "cuisine": "Egyptian",
+   "en": "Stuffed zucchini (kousa mahshi)",
+   "ar": "كوسة محشية",
+   "mins": 75,
+   "kcal": 390,
+   "protein": 24,
+   "ing": [
+    [
+     "Small zucchini",
+     "كوسة صغيرة",
+     "10"
+    ],
+    [
+     "Lean ground beef",
+     "لحمة مفرومة قليلة الدهن",
+     "300 g"
+    ],
+    [
+     "Rice",
+     "أرز مصري",
+     "¾ cup"
+    ],
+    [
+     "Chopped dill, parsley, coriander",
+     "شبت وبقدونس وكزبرة مفرومين",
+     "1 cup"
+    ],
+    [
+     "Onion, grated",
+     "بصل مبشور",
+     "1"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "2 cups"
+    ],
+    [
+     "Low-sodium broth",
+     "شوربة قليلة الملح",
+     "2 cups"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "1 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Core the zucchini. Mix beef, rice, herbs, onion, half the tomatoes, salt, pepper and oil.",
+    "Fill each zucchini three-quarters full to leave room for the rice to swell.",
+    "Stand them in a pot, pour over the broth and remaining tomatoes.",
+    "Bring to a boil, then cover and simmer 40 min."
+   ],
+   "steps_ar": [
+    "قوّر الكوسة. اخلط اللحمة والأرز والخضرة والبصل ونص الطماطم والملح والفلفل والزيت.",
+    "احشي الكوسة لتلات أرباعها عشان الأرز يكبر.",
+    "رصّها في حلة وأضف الشوربة وباقي الطماطم.",
+    "سيبها تغلي ثم غطّها على نار هادية ٤٠ دقيقة."
+   ],
+   "tip_en": "Lean beef and extra herbs keep it lighter than the classic.",
+   "tip_ar": "اللحمة قليلة الدهن والخضرة الكتير بيخلوها أخف من الطريقة التقليدية.",
+   "yt": "طريقة عمل الكوسة المحشية",
+   "style": "light",
+   "youth": true
+  },
+  {
+   "id": "kofta",
+   "cuisine": "Egyptian",
+   "en": "Baked kofta with tahini",
+   "ar": "كفتة بالطحينة في الفرن",
+   "mins": 45,
+   "kcal": 460,
+   "protein": 32,
+   "ing": [
+    [
+     "Lean ground beef",
+     "لحمة مفرومة قليلة الدهن",
+     "600 g"
+    ],
+    [
+     "Onion, grated",
+     "بصل مبشور",
+     "1"
+    ],
+    [
+     "Parsley",
+     "بقدونس",
+     "½ cup"
+    ],
+    [
+     "Baharat or seven spice",
+     "بهارات مشكلة",
+     "1 tsp"
+    ],
+    [
+     "Tahini",
+     "طحينة",
+     "⅓ cup"
+    ],
+    [
+     "Lemon juice",
+     "عصير ليمون",
+     "3 tbsp"
+    ],
+    [
+     "Potatoes, thinly sliced",
+     "بطاطس شرائح رفيعة",
+     "2 medium"
+    ],
+    [
+     "Tomatoes, sliced",
+     "طماطم شرائح",
+     "2"
+    ]
+   ],
+   "steps_en": [
+    "Mix beef, onion, parsley, spices and salt; shape into small fingers.",
+    "Line a dish with potato and tomato slices, add the kofta and bake at 200°C for 20 min.",
+    "Whisk tahini, lemon, water and a pinch of salt into a pourable sauce.",
+    "Pour the sauce over and bake 10 more min. Serve with salad."
+   ],
+   "steps_ar": [
+    "اخلط اللحمة والبصل والبقدونس والبهارات والملح، وشكّلها أصابع صغيرة.",
+    "افرش الصينية بالبطاطس والطماطم، ضع الكفتة واخبزها على ٢٠٠ درجة ٢٠ دقيقة.",
+    "اخفق الطحينة مع الليمون والماء والملح حتى تبقى صوص سايل.",
+    "صب الصوص واخبزها ١٠ دقائق كمان. قدّمها مع سلطة."
+   ],
+   "tip_en": "Tahini adds healthy fats and calcium.",
+   "tip_ar": "الطحينة بتضيف دهون صحية وكالسيوم.",
+   "yt": "طريقة عمل كفتة بالطحينة في الفرن",
+   "style": "light",
+   "youth": true
+  },
+  {
+   "id": "cacciatore",
+   "cuisine": "Italian (halal)",
+   "en": "Chicken cacciatore (no wine)",
+   "ar": "دجاج كاتشياتوري بدون نبيذ",
+   "mins": 50,
+   "kcal": 380,
+   "protein": 40,
+   "ing": [
+    [
+     "Chicken thighs, skinless",
+     "أوراك دجاج بدون جلد",
+     "8 (about 900 g)"
+    ],
+    [
+     "Mushrooms",
+     "مشروم",
+     "250 g"
+    ],
+    [
+     "Red pepper",
+     "فلفل أحمر",
+     "1"
+    ],
+    [
+     "Onion",
+     "بصل",
+     "1"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "4 cloves"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "1 can (796 ml)"
+    ],
+    [
+     "Chicken broth",
+     "شوربة دجاج",
+     "½ cup"
+    ],
+    [
+     "Dried oregano and rosemary",
+     "زعتر بري وروزماري",
+     "1 tsp each"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "1 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Brown the chicken in oil, 4 min a side; set aside.",
+    "Sauté onion, pepper, mushrooms and garlic 5 min.",
+    "Add tomatoes, broth (in place of wine), herbs, salt and pepper; return the chicken.",
+    "Cover and simmer 25–30 min. Serve with whole-wheat pasta or greens."
+   ],
+   "steps_ar": [
+    "حمّر الدجاج في الزيت ٤ دقائق لكل جانب وارفعه.",
+    "شوّح البصل والفلفل والمشروم والثوم ٥ دقائق.",
+    "أضف الطماطم والشوربة (بدل النبيذ) والأعشاب والملح والفلفل، ورجّع الدجاج.",
+    "غطّه واتركه ٢٥–٣٠ دقيقة. قدّمه مع مكرونة قمح كامل أو خضار."
+   ],
+   "tip_en": "Broth with a splash of apple cider vinegar gives depth without alcohol.",
+   "tip_ar": "الشوربة مع رشة خل تدي طعم عميق من غير كحول.",
+   "yt": "طريقة عمل دجاج كاتشياتوري"
+  },
+  {
+   "id": "bolognese",
+   "cuisine": "Italian (halal)",
+   "en": "Whole-wheat spaghetti with turkey bolognese",
+   "ar": "سباجيتي قمح كامل بصوص بولونيز الديك الرومي",
+   "mins": 45,
+   "kcal": 540,
+   "protein": 38,
+   "ing": [
+    [
+     "Whole-wheat spaghetti",
+     "سباجيتي قمح كامل",
+     "350 g"
+    ],
+    [
+     "Lean ground turkey (halal)",
+     "لحم ديك رومي مفروم حلال",
+     "500 g"
+    ],
+    [
+     "Onion, carrot, celery, finely chopped",
+     "بصل وجزر وكرفس مفرومين ناعم",
+     "1 each"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "3 cloves"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "1 can (796 ml)"
+    ],
+    [
+     "Tomato paste",
+     "صلصة طماطم",
+     "1 tbsp"
+    ],
+    [
+     "Basil",
+     "ريحان",
+     "handful"
+    ],
+    [
+     "Parmesan (halal-certified rennet)",
+     "بارميزان بمنفحة حلال",
+     "¼ cup"
+    ]
+   ],
+   "steps_en": [
+    "Sauté onion, carrot and celery in a little oil for 6 min; add garlic.",
+    "Add turkey and brown, breaking it up.",
+    "Add paste, tomatoes, salt, pepper; simmer 20 min. Stir in basil.",
+    "Cook pasta al dente and toss with the sauce; top with a little parmesan."
+   ],
+   "steps_ar": [
+    "شوّح البصل والجزر والكرفس في قليل من الزيت ٦ دقائق وأضف الثوم.",
+    "أضف الديك الرومي وقلّبه حتى يتحمر ويتفكك.",
+    "أضف الصلصة والطماطم والملح والفلفل واتركه ٢٠ دقيقة، ثم أضف الريحان.",
+    "اسلق المكرونة وقلّبها مع الصوص ورش القليل من البارميزان."
+   ],
+   "tip_en": "Check the parmesan label for microbial or halal rennet.",
+   "tip_ar": "اتأكد إن البارميزان منفحته نباتية أو حلال.",
+   "yt": "طريقة عمل سباجيتي بولونيز"
+  },
+  {
+   "id": "shrimp_linguine",
+   "cuisine": "Italian (halal)",
+   "en": "Shrimp and zucchini linguine",
+   "ar": "لينغويني بالجمبري والكوسة",
+   "mins": 25,
+   "kcal": 470,
+   "protein": 33,
+   "ing": [
+    [
+     "Linguine (whole-wheat if you like)",
+     "لينغويني (قمح كامل اختياري)",
+     "320 g"
+    ],
+    [
+     "Shrimp, peeled",
+     "جمبري مقشر",
+     "500 g"
+    ],
+    [
+     "Zucchini, sliced",
+     "كوسة شرائح",
+     "2"
+    ],
+    [
+     "Garlic, sliced",
+     "ثوم شرائح",
+     "5 cloves"
+    ],
+    [
+     "Chili flakes",
+     "شطة",
+     "½ tsp"
+    ],
+    [
+     "Lemon zest and juice",
+     "قشر وعصير ليمونة",
+     "1"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "3 tbsp"
+    ],
+    [
+     "Parsley",
+     "بقدونس",
+     "½ cup"
+    ]
+   ],
+   "steps_en": [
+    "Boil the pasta; save 1 cup of pasta water.",
+    "Warm the garlic and chili in oil over low heat until fragrant.",
+    "Add zucchini 3 min, then shrimp 3–4 min until pink.",
+    "Toss in pasta, lemon, parsley and a splash of pasta water."
+   ],
+   "steps_ar": [
+    "اسلق المكرونة واحتفظ بكوب من مية السلق.",
+    "سخّن الثوم والشطة في الزيت على نار هادية حتى تطلع ريحتهم.",
+    "أضف الكوسة ٣ دقائق، ثم الجمبري ٣–٤ دقائق حتى يحمر.",
+    "أضف المكرونة والليمون والبقدونس ورشة من مية المكرونة."
+   ],
+   "tip_en": "Ready in 25 minutes, a good weeknight dinner.",
+   "tip_ar": "جاهزة في ٢٥ دقيقة، عشا مثالي في أيام الشغل.",
+   "yt": "طريقة عمل مكرونة بالجمبري والثوم"
+  },
+  {
+   "id": "minestrone",
+   "cuisine": "Italian (halal)",
+   "en": "Minestrone with beans",
+   "ar": "شوربة مينسترون بالفاصوليا",
+   "mins": 45,
+   "kcal": 320,
+   "protein": 15,
+   "ing": [
+    [
+     "Onion, carrot, celery",
+     "بصل وجزر وكرفس",
+     "1 each"
+    ],
+    [
+     "Zucchini",
+     "كوسة",
+     "1"
+    ],
+    [
+     "Potato",
+     "بطاطس",
+     "1"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "1 can"
+    ],
+    [
+     "Vegetable broth",
+     "شوربة خضار",
+     "6 cups"
+    ],
+    [
+     "White kidney beans",
+     "فاصوليا بيضاء",
+     "1 can"
+    ],
+    [
+     "Small pasta (ditalini)",
+     "مكرونة صغيرة",
+     "½ cup"
+    ],
+    [
+     "Spinach",
+     "سبانخ",
+     "2 cups"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "1 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Sauté onion, carrot and celery in oil 6 min.",
+    "Add zucchini, potato, tomatoes and broth; simmer 15 min.",
+    "Add beans and pasta; cook 10 min.",
+    "Stir in spinach, season, and serve with lemon."
+   ],
+   "steps_ar": [
+    "شوّح البصل والجزر والكرفس في الزيت ٦ دقائق.",
+    "أضف الكوسة والبطاطس والطماطم والشوربة واتركها ١٥ دقيقة.",
+    "أضف الفاصوليا والمكرونة واتركها ١٠ دقائق.",
+    "أضف السبانخ والتوابل وقدّمها مع ليمون."
+   ],
+   "tip_en": "A full meal in a bowl with lots of fibre.",
+   "tip_ar": "وجبة كاملة في طبق واحد وغنية بالألياف.",
+   "yt": "طريقة عمل شوربة المينسترون"
+  },
+  {
+   "id": "salmon",
+   "cuisine": "Italian (halal)",
+   "en": "Baked salmon with lemon and herbs",
+   "ar": "سلمون بالفرن بالليمون والأعشاب",
+   "mins": 30,
+   "kcal": 450,
+   "protein": 36,
+   "ing": [
+    [
+     "Salmon fillets",
+     "فيليه سلمون",
+     "4 (about 700 g)"
+    ],
+    [
+     "Cherry tomatoes",
+     "طماطم شيري",
+     "2 cups"
+    ],
+    [
+     "Zucchini and red onion",
+     "كوسة وبصل أحمر",
+     "1 each"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "3 cloves"
+    ],
+    [
+     "Lemon",
+     "ليمون",
+     "1"
+    ],
+    [
+     "Dried oregano or Italian herbs",
+     "أعشاب إيطالية",
+     "2 tsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "2 tbsp"
+    ],
+    [
+     "Black olives (optional)",
+     "زيتون أسود (اختياري)",
+     "¼ cup"
+    ]
+   ],
+   "steps_en": [
+    "Toss the vegetables with oil, garlic, herbs and salt; roast at 210°C for 10 min.",
+    "Add the salmon, season, top with lemon slices.",
+    "Roast 12–14 min until the fish flakes.",
+    "Serve with a green salad."
+   ],
+   "steps_ar": [
+    "قلّب الخضار مع الزيت والثوم والأعشاب والملح واشويها على ٢١٠ درجة ١٠ دقائق.",
+    "أضف السلمون وتبّله وحط عليه شرائح ليمون.",
+    "اشويه ١٢–١٤ دقيقة حتى يتفتت بسهولة.",
+    "قدّمه مع سلطة خضرا."
+   ],
+   "tip_en": "Salmon gives omega-3 fats that support heart health.",
+   "tip_ar": "السلمون فيه أوميغا ٣ المفيدة لصحة القلب.",
+   "yt": "طريقة عمل السلمون في الفرن"
+  },
+  {
+   "id": "piccata",
+   "cuisine": "Italian (halal)",
+   "en": "Chicken piccata (no wine)",
+   "ar": "دجاج بيكاتا بالليمون بدون نبيذ",
+   "mins": 30,
+   "kcal": 360,
+   "protein": 42,
+   "ing": [
+    [
+     "Chicken breasts, halved and flattened",
+     "صدور دجاج مفرودة",
+     "4"
+    ],
+    [
+     "Whole-wheat flour",
+     "دقيق قمح كامل",
+     "¼ cup"
+    ],
+    [
+     "Chicken broth",
+     "شوربة دجاج",
+     "1 cup"
+    ],
+    [
+     "Lemon juice",
+     "عصير ليمون",
+     "¼ cup"
+    ],
+    [
+     "Capers",
+     "كبر",
+     "2 tbsp"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "2 cloves"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "1½ tbsp"
+    ],
+    [
+     "Butter",
+     "زبدة",
+     "1 tbsp"
+    ],
+    [
+     "Parsley",
+     "بقدونس",
+     "¼ cup"
+    ]
+   ],
+   "steps_en": [
+    "Season the chicken and dust lightly with flour.",
+    "Pan-sear in oil 3–4 min a side; set aside.",
+    "Add garlic, then broth and lemon; simmer 5 min. Stir in capers and butter.",
+    "Return the chicken, spoon over the sauce and add parsley. Serve with greens or a small portion of pasta."
+   ],
+   "steps_ar": [
+    "تبّل الدجاج ورش عليه طبقة خفيفة من الدقيق.",
+    "حمّره في الزيت ٣–٤ دقائق لكل جانب وارفعه.",
+    "أضف الثوم ثم الشوربة والليمون واتركه ٥ دقائق، وأضف الكبر والزبدة.",
+    "رجّع الدجاج وغطّه بالصوص وأضف البقدونس. قدّمه مع خضار أو قليل من المكرونة."
+   ],
+   "tip_en": "Lemon and broth replace wine and keep the sauce light.",
+   "tip_ar": "الليمون والشوربة بدل النبيذ وبيخلوا الصوص خفيف.",
+   "yt": "طريقة عمل دجاج بيكاتا"
+  },
+  {
+   "id": "parmigiana",
+   "cuisine": "Italian (halal)",
+   "en": "Light baked eggplant parmigiana",
+   "ar": "باذنجان بارميجانا خفيف في الفرن",
+   "mins": 60,
+   "kcal": 340,
+   "protein": 18,
+   "ing": [
+    [
+     "Eggplants, sliced",
+     "باذنجان شرائح",
+     "2 large"
+    ],
+    [
+     "Tomato sauce (passata)",
+     "صلصة طماطم باساتا",
+     "3 cups"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "2 cloves"
+    ],
+    [
+     "Basil",
+     "ريحان",
+     "handful"
+    ],
+    [
+     "Part-skim mozzarella",
+     "موتزاريلا قليلة الدسم",
+     "200 g"
+    ],
+    [
+     "Parmesan (halal rennet)",
+     "بارميزان بمنفحة حلال",
+     "¼ cup"
+    ],
+    [
+     "Olive oil spray",
+     "رشاش زيت زيتون",
+     "light"
+    ]
+   ],
+   "steps_en": [
+    "Spray the eggplant slices lightly with oil and bake at 220°C for 20 min, turning once. No frying.",
+    "Warm the passata with garlic, basil and salt.",
+    "Layer sauce, eggplant and mozzarella; repeat, finishing with sauce and parmesan.",
+    "Bake at 190°C for 25 min; rest 10 min before cutting."
+   ],
+   "steps_ar": [
+    "رش شرائح الباذنجان بقليل من الزيت واخبزها على ٢٢٠ درجة ٢٠ دقيقة مع تقليبها مرة، من غير قلي.",
+    "سخّن الصلصة مع الثوم والريحان والملح.",
+    "رص طبقات من الصلصة والباذنجان والموتزاريلا، وكرّر ثم أنهِ بالصلصة والبارميزان.",
+    "اخبزها على ١٩٠ درجة ٢٥ دقيقة واتركها ١٠ دقائق قبل التقطيع."
+   ],
+   "tip_en": "Baking the eggplant instead of frying cuts the oil by about three-quarters.",
+   "tip_ar": "خَبز الباذنجان بدل قليه بيقلل الزيت حوالي تلات أرباع.",
+   "yt": "طريقة عمل باذنجان بارميجانا"
+  },
+  {
+   "id": "chicken_pane",
+   "cuisine": "Egyptian",
+   "style": "light",
+   "youth": true,
+   "en": "Air-fryer chicken pané with vermicelli rice",
+   "ar": "فراخ بانيه في القلاية الهوائية مع رز بالشعرية",
+   "mins": 45,
+   "kcal": 560,
+   "protein": 42,
+   "ing": [
+    [
+     "Chicken breasts, sliced thin",
+     "صدور فراخ شرائح رفيعة",
+     "700 g"
+    ],
+    [
+     "Eggs",
+     "بيض",
+     "2"
+    ],
+    [
+     "Breadcrumbs",
+     "بقسماط",
+     "1 cup"
+    ],
+    [
+     "Garlic, crushed",
+     "ثوم مهروس",
+     "3 cloves"
+    ],
+    [
+     "Lemon juice",
+     "عصير ليمون",
+     "2 tbsp"
+    ],
+    [
+     "Paprika",
+     "بابريكا",
+     "1 tsp"
+    ],
+    [
+     "Egyptian rice",
+     "أرز مصري",
+     "1½ cups"
+    ],
+    [
+     "Vermicelli (sha'reya)",
+     "شعرية",
+     "½ cup"
+    ],
+    [
+     "Butter or ghee",
+     "زبدة أو سمنة",
+     "1 tbsp"
+    ],
+    [
+     "Olive oil spray",
+     "رشة زيت زيتون",
+     "light"
+    ]
+   ],
+   "steps_en": [
+    "Marinate the chicken with garlic, lemon, paprika, salt and pepper for 15 min.",
+    "Dip each slice in beaten egg, then press into the breadcrumbs.",
+    "Spray lightly with oil and air-fry at 200°C for 10–12 min, flipping halfway, until golden.",
+    "Rice: brown the vermicelli in the butter, add the washed rice and stir 1 min.",
+    "Add 2¼ cups hot water and salt, boil, then cover on low heat for 20 min.",
+    "Serve with a green salad and a squeeze of lemon."
+   ],
+   "steps_ar": [
+    "تبّل الفراخ بالثوم والليمون والبابريكا والملح والفلفل لمدة ١٥ دقيقة.",
+    "اغمس كل شريحة في البيض المخفوق ثم في البقسماط.",
+    "رش رشة زيت واطبخها في القلاية الهوائية على ٢٠٠ درجة ١٠–١٢ دقيقة مع التقليب حتى تحمر.",
+    "الرز: حمّر الشعرية في الزبدة، أضف الرز المغسول وقلّب دقيقة.",
+    "أضف ٢¼ كوب ماء ساخن وملح، وبعد الغليان غطّه على نار هادية ٢٠ دقيقة.",
+    "قدّمها مع سلطة خضرا وعصرة ليمون."
+   ],
+   "tip_en": "Same crunch as fried pané with about a third of the oil.",
+   "tip_ar": "نفس قرمشة البانيه المقلي بثلث كمية الزيت تقريباً.",
+   "yt": "فراخ بانيه في الاير فراير"
+  },
+  {
+   "id": "shawarma_bowl",
+   "cuisine": "Egyptian",
+   "style": "light",
+   "youth": true,
+   "en": "Chicken shawarma rice bowls with tahini",
+   "ar": "بول شاورما فراخ بالرز والطحينة",
+   "mins": 40,
+   "kcal": 590,
+   "protein": 45,
+   "ing": [
+    [
+     "Boneless chicken thighs",
+     "أوراك فراخ بدون عضم",
+     "800 g"
+    ],
+    [
+     "Plain yogurt",
+     "زبادي",
+     "½ cup"
+    ],
+    [
+     "Shawarma spices (cumin, paprika, cinnamon, cardamom)",
+     "بهارات شاورما (كمون، بابريكا، قرفة، حبهان)",
+     "2 tbsp"
+    ],
+    [
+     "Garlic, crushed",
+     "ثوم مهروس",
+     "4 cloves"
+    ],
+    [
+     "Lemon",
+     "ليمون",
+     "1"
+    ],
+    [
+     "Basmati rice",
+     "أرز بسمتي",
+     "1½ cups"
+    ],
+    [
+     "Tahini",
+     "طحينة",
+     "¼ cup"
+    ],
+    [
+     "Cucumbers",
+     "خيار",
+     "2"
+    ],
+    [
+     "Tomatoes",
+     "طماطم",
+     "2"
+    ],
+    [
+     "Pickles",
+     "مخلل",
+     "½ cup"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "2 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Mix the yogurt, spices, garlic, half the lemon juice, 1 tbsp oil and salt; coat the chicken and rest 30 min (or overnight).",
+    "Roast at 220°C for 25 min, then broil 3 min until charred at the edges. Slice thin.",
+    "Cook the rice with a pinch of salt and a little oil.",
+    "Tahini sauce: tahini, remaining lemon, a crushed garlic clove, salt and water to a pourable sauce.",
+    "Dice the cucumbers and tomatoes.",
+    "Build bowls: rice, chicken, salad, pickles, and plenty of tahini."
+   ],
+   "steps_ar": [
+    "اخلط الزبادي والبهارات والثوم ونص الليمون وملعقة زيت والملح، وتبّل الفراخ ٣٠ دقيقة (أو ليلة كاملة).",
+    "اشويها في الفرن على ٢٢٠ درجة ٢٥ دقيقة ثم شغّل الشواية ٣ دقائق لحد ما الأطراف تتحمص. قطّعها شرائح.",
+    "اطبخ الرز برشة ملح وشوية زيت.",
+    "صوص الطحينة: طحينة وباقي الليمون وفص ثوم مهروس وملح وماء لحد ما يبقى سايل.",
+    "قطّع الخيار والطماطم مكعبات.",
+    "رتّب البول: رز ثم فراخ ثم سلطة ومخلل وطحينة كتير."
+   ],
+   "tip_en": "Thighs stay juicy; leftovers make next-day shawarma wraps.",
+   "tip_ar": "الأوراك بتفضل طرية، والباقي يعمل سندوتشات شاورما تاني يوم.",
+   "yt": "شاورما فراخ في الفرن"
+  },
+  {
+   "id": "kebda",
+   "cuisine": "Egyptian",
+   "style": "light",
+   "youth": true,
+   "en": "Alexandrian liver sandwiches (kebda eskandarani)",
+   "ar": "سندوتشات كبدة إسكندراني",
+   "mins": 25,
+   "kcal": 470,
+   "protein": 34,
+   "ing": [
+    [
+     "Beef liver, sliced thin",
+     "كبدة بقري شرائح رفيعة",
+     "600 g"
+    ],
+    [
+     "Green chilies, sliced",
+     "فلفل أخضر حار شرائح",
+     "2"
+    ],
+    [
+     "Bell pepper, sliced",
+     "فلفل ألوان شرائح",
+     "1"
+    ],
+    [
+     "Garlic, crushed",
+     "ثوم مهروس",
+     "5 cloves"
+    ],
+    [
+     "Cumin",
+     "كمون",
+     "1½ tsp"
+    ],
+    [
+     "Lemon juice",
+     "عصير ليمون",
+     "3 tbsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "2 tbsp"
+    ],
+    [
+     "Pitas or baladi bread",
+     "عيش بلدي أو شامي",
+     "4"
+    ],
+    [
+     "Tahini salad, to serve",
+     "سلطة طحينة للتقديم",
+     "1 cup"
+    ]
+   ],
+   "steps_en": [
+    "Season the liver with cumin, half the garlic, salt and pepper.",
+    "Heat a wide pan until very hot, add the oil and sear the liver in batches for 2–3 min; don't overcook.",
+    "Add the chilies, bell pepper and remaining garlic; toss 2 min.",
+    "Take off the heat and add the lemon juice.",
+    "Fill warm bread and serve with tahini salad and pickles."
+   ],
+   "steps_ar": [
+    "تبّل الكبدة بالكمون ونص الثوم والملح والفلفل.",
+    "سخّن طاسة واسعة جداً، أضف الزيت وشوّح الكبدة على دفعات ٢–٣ دقائق بس عشان ما تنشفش.",
+    "أضف الفلفل الحار والفلفل الألوان وباقي الثوم وقلّب دقيقتين.",
+    "ارفعها من على النار وأضف عصير الليمون.",
+    "احشي العيش السخن وقدّمها مع سلطة الطحينة والمخلل."
+   ],
+   "tip_en": "Liver is rich in iron and B12, and it cooks in minutes.",
+   "tip_ar": "الكبدة غنية بالحديد وفيتامين ب١٢ وبتستوي في دقائق.",
+   "yt": "كبدة اسكندراني"
+  },
+  {
+   "id": "tameya_baked",
+   "cuisine": "Egyptian",
+   "style": "light",
+   "youth": true,
+   "en": "Oven-baked ta'ameya with tahini",
+   "ar": "طعمية في الفرن بالطحينة",
+   "mins": 40,
+   "kcal": 450,
+   "protein": 18,
+   "ing": [
+    [
+     "Peeled split fava beans, soaked overnight",
+     "فول مدشوش منقوع من الليل",
+     "2 cups"
+    ],
+    [
+     "Fresh parsley",
+     "بقدونس",
+     "1 bunch"
+    ],
+    [
+     "Fresh coriander",
+     "كزبرة خضرا",
+     "1 bunch"
+    ],
+    [
+     "Fresh dill",
+     "شبت",
+     "½ bunch"
+    ],
+    [
+     "Green onions or leeks",
+     "بصل أخضر أو كرات",
+     "4"
+    ],
+    [
+     "Onion",
+     "بصل",
+     "1 medium"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "4 cloves"
+    ],
+    [
+     "Cumin",
+     "كمون",
+     "2 tsp"
+    ],
+    [
+     "Ground coriander",
+     "كزبرة ناشفة",
+     "1 tsp"
+    ],
+    [
+     "Baking soda",
+     "بيكنج صودا",
+     "½ tsp"
+    ],
+    [
+     "Sesame seeds",
+     "سمسم",
+     "2 tbsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "3 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Drain the beans well and blend with the herbs, onions, garlic, spices and salt to a fine, green paste.",
+    "Rest 20 min, then stir in the baking soda just before shaping.",
+    "Shape small discs, press one side into sesame, and place on an oiled tray.",
+    "Brush the tops with oil and bake at 220°C for 20 min, flipping halfway (or air-fry 12 min).",
+    "Serve in baladi bread with tahini, tomatoes, cucumbers and pickles."
+   ],
+   "steps_ar": [
+    "صفّي الفول كويس واطحنه مع الخضرة والبصل والثوم والبهارات والملح لحد ما يبقى عجينة خضرا ناعمة.",
+    "سيبها ٢٠ دقيقة، وأضف البيكنج صودا قبل التشكيل على طول.",
+    "شكّل أقراص صغيرة، واغمس وش منها في السمسم، ورصها على صينية مدهونة.",
+    "ادهن الوش بالزيت واخبزها على ٢٢٠ درجة ٢٠ دقيقة مع التقليب (أو في القلاية الهوائية ١٢ دقيقة).",
+    "قدّمها في عيش بلدي مع طحينة وطماطم وخيار ومخلل."
+   ],
+   "tip_en": "Freeze extra discs raw; bake straight from the freezer for quick school-day meals.",
+   "tip_ar": "جمّد الأقراص الزيادة نيّة واخبزها من الفريزر على طول لأيام المدرسة.",
+   "yt": "طعمية في الفرن"
+  },
+  {
+   "id": "seniya",
+   "cuisine": "Egyptian",
+   "style": "light",
+   "youth": true,
+   "en": "Beef and potato tray (seniyet batates)",
+   "ar": "صينية بطاطس باللحمة",
+   "mins": 75,
+   "kcal": 520,
+   "protein": 36,
+   "ing": [
+    [
+     "Beef cubes",
+     "لحمة مكعبات",
+     "600 g"
+    ],
+    [
+     "Potatoes, sliced",
+     "بطاطس شرائح",
+     "1 kg"
+    ],
+    [
+     "Onions, sliced",
+     "بصل شرائح",
+     "2"
+    ],
+    [
+     "Bell peppers, sliced",
+     "فلفل ألوان شرائح",
+     "2"
+    ],
+    [
+     "Tomatoes, grated",
+     "طماطم مبشورة",
+     "4"
+    ],
+    [
+     "Tomato paste",
+     "صلصة طماطم",
+     "2 tbsp"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "4 cloves"
+    ],
+    [
+     "Seven-spice",
+     "بهارات مشكلة",
+     "1 tsp"
+    ],
+    [
+     "Cumin",
+     "كمون",
+     "1 tsp"
+    ],
+    [
+     "Olive oil",
+     "زيت زيتون",
+     "2 tbsp"
+    ],
+    [
+     "Hot water",
+     "ماء ساخن",
+     "1½ cups"
+    ]
+   ],
+   "steps_en": [
+    "Brown the beef in 1 tbsp oil with half the onions, salt and spices; add 2 cups water and simmer 40 min until tender (or 15 min in a pressure cooker).",
+    "Toss the potatoes and peppers with the remaining oil, salt and cumin.",
+    "Layer potatoes, peppers, beef and the rest of the onions in a tray.",
+    "Mix the grated tomatoes, paste, garlic, beef broth and hot water; pour over the tray.",
+    "Bake at 200°C for 35–40 min until the potatoes are tender and the top is browned."
+   ],
+   "steps_ar": [
+    "حمّر اللحمة في ملعقة زيت مع نص البصل والملح والبهارات، أضف ٢ كوب ماء واتركها ٤٠ دقيقة لحد ما تستوي (أو ١٥ دقيقة في حلة البريستو).",
+    "قلّب البطاطس والفلفل مع باقي الزيت والملح والكمون.",
+    "رص البطاطس والفلفل واللحمة وباقي البصل في الصينية.",
+    "اخلط الطماطم المبشورة والصلصة والثوم مع مرقة اللحمة والماء الساخن واسكبها على الصينية.",
+    "ادخلها الفرن على ٢٠٠ درجة ٣٥–٤٠ دقيقة لحد ما البطاطس تستوي والوش يحمر."
+   ],
+   "tip_en": "A one-tray dinner: prep in 15 min, and the oven does the rest.",
+   "tip_ar": "عشا في صينية واحدة: تحضير ١٥ دقيقة والفرن يكمّل الباقي.",
+   "yt": "صينية بطاطس باللحمة"
+  },
+  {
+   "id": "hawawshi",
+   "cuisine": "Egyptian",
+   "style": "classic",
+   "youth": true,
+   "en": "Hawawshi (spiced beef baked in baladi bread)",
+   "ar": "حواوشي بلدي",
+   "mins": 45,
+   "kcal": 640,
+   "protein": 36,
+   "ing": [
+    [
+     "Ground beef (80/20)",
+     "لحمة مفرومة",
+     "750 g"
+    ],
+    [
+     "Onion, grated and squeezed",
+     "بصل مبشور ومعصور",
+     "1 large"
+    ],
+    [
+     "Green bell pepper, finely diced",
+     "فلفل أخضر رومي مفروم",
+     "1"
+    ],
+    [
+     "Hot green chilies, minced",
+     "فلفل حار مفروم",
+     "2"
+    ],
+    [
+     "Parsley, chopped",
+     "بقدونس مفروم",
+     "½ cup"
+    ],
+    [
+     "Garlic",
+     "ثوم",
+     "3 cloves"
+    ],
+    [
+     "Seven-spice",
+     "بهارات مشكلة",
+     "1½ tsp"
+    ],
+    [
+     "Cumin",
+     "كمون",
+     "1 tsp"
+    ],
+    [
+     "Paprika",
+     "بابريكا",
+     "1 tsp"
+    ],
+    [
+     "Baladi or large pita breads",
+     "عيش بلدي أو شامي كبير",
+     "4"
+    ],
+    [
+     "Ghee or oil, for brushing",
+     "سمنة أو زيت للدهن",
+     "2 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Knead the beef with the onion, peppers, parsley, garlic, spices and salt for 2 min.",
+    "Open each bread into a pocket and spread a thin, even layer of meat inside, right to the edges.",
+    "Brush the outside with ghee.",
+    "Bake on a tray at 220°C for 20–25 min, flipping halfway, until crisp and the meat is cooked through.",
+    "Cut in quarters; serve with tahini, pickles and a green salad."
+   ],
+   "steps_ar": [
+    "اعجن اللحمة مع البصل والفلفل والبقدونس والثوم والبهارات والملح دقيقتين.",
+    "افتح كل رغيف واحشيه بطبقة رفيعة ومتساوية من اللحمة لحد الأطراف.",
+    "ادهن الرغيف من برة بالسمنة.",
+    "اخبزه على ٢٢٠ درجة ٢٠–٢٥ دقيقة مع التقليب لحد ما يقرمش واللحمة تستوي.",
+    "قطّعه أرباع وقدّمه مع طحينة ومخلل وسلطة خضرا."
+   ],
+   "tip_en": "Keep the meat layer thin so the bread crisps before the inside dries out.",
+   "tip_ar": "خلّي طبقة اللحمة رفيعة عشان العيش يقرمش قبل ما اللحمة تنشف.",
+   "yt": "طريقة عمل الحواوشي في الفرن"
+  },
+  {
+   "id": "macarona_bechamel",
+   "cuisine": "Egyptian",
+   "style": "classic",
+   "youth": true,
+   "en": "Macarona béchamel",
+   "ar": "مكرونة بالبشاميل",
+   "mins": 80,
+   "kcal": 720,
+   "protein": 38,
+   "ing": [
+    [
+     "Penne",
+     "مكرونة قلم",
+     "500 g"
+    ],
+    [
+     "Ground beef",
+     "لحمة مفرومة",
+     "600 g"
+    ],
+    [
+     "Onion, diced",
+     "بصل مفروم",
+     "1 large"
+    ],
+    [
+     "Tomato paste",
+     "صلصة طماطم",
+     "2 tbsp"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "1 cup"
+    ],
+    [
+     "Seven-spice",
+     "بهارات مشكلة",
+     "1 tsp"
+    ],
+    [
+     "Butter",
+     "زبدة",
+     "6 tbsp"
+    ],
+    [
+     "Flour",
+     "دقيق",
+     "6 tbsp"
+    ],
+    [
+     "Milk",
+     "لبن",
+     "1 l"
+    ],
+    [
+     "Egg",
+     "بيضة",
+     "1"
+    ],
+    [
+     "Nutmeg",
+     "جوزة الطيب",
+     "¼ tsp"
+    ],
+    [
+     "Mozzarella, grated",
+     "موتزاريلا مبشورة",
+     "1 cup"
+    ]
+   ],
+   "steps_en": [
+    "Brown the beef with the onion, then add the paste, tomatoes, spices and salt; simmer 10 min until thick.",
+    "Boil the penne 2 min short of al dente and drain.",
+    "Béchamel: melt the butter, whisk in the flour 1 min, then pour in the milk slowly, whisking until thick. Season with salt and nutmeg; cool slightly and whisk in the egg.",
+    "Mix one cup of béchamel into the penne.",
+    "Layer half the penne, all the meat, then the rest of the penne; cover with the remaining béchamel and cheese.",
+    "Bake at 200°C for 30–35 min until golden. Rest 10 min before cutting."
+   ],
+   "steps_ar": [
+    "حمّر اللحمة مع البصل، ثم أضف الصلصة والطماطم والبهارات والملح واتركها ١٠ دقائق لحد ما تتسبك.",
+    "اسلق المكرونة أقل من نضجها بدقيقتين وصفّيها.",
+    "البشاميل: دوّب الزبدة وأضف الدقيق وقلّب دقيقة، ثم أضف اللبن بالتدريج مع التقليب لحد ما يتقل. تبّله بالملح وجوزة الطيب، وبعد ما يبرد شوية اخفق فيه البيضة.",
+    "اخلط كوب بشاميل مع المكرونة.",
+    "رص نص المكرونة ثم اللحمة كلها ثم باقي المكرونة، وغطيها بباقي البشاميل والجبنة.",
+    "ادخلها الفرن على ٢٠٠ درجة ٣٠–٣٥ دقيقة لحد ما تحمر، وسيبها ١٠ دقائق قبل التقطيع."
+   ],
+   "tip_en": "Assemble on Friday night and bake on Saturday; it tastes even better.",
+   "tip_ar": "جهّزها بالليل واخبزها تاني يوم، طعمها بيبقى أحلى.",
+   "yt": "مكرونة بالبشاميل"
+  },
+  {
+   "id": "fattah",
+   "cuisine": "Egyptian",
+   "style": "classic",
+   "youth": false,
+   "en": "Fattah with beef, rice and garlic-vinegar sauce",
+   "ar": "فتة باللحمة",
+   "mins": 120,
+   "kcal": 760,
+   "protein": 45,
+   "ing": [
+    [
+     "Beef or veal pieces on the bone",
+     "لحمة بالعضم",
+     "1 kg"
+    ],
+    [
+     "Onion, halved",
+     "بصلة مقسومة",
+     "1"
+    ],
+    [
+     "Cardamom pods",
+     "حبهان",
+     "3"
+    ],
+    [
+     "Bay leaves",
+     "ورق لورا",
+     "2"
+    ],
+    [
+     "Egyptian rice",
+     "أرز مصري",
+     "2 cups"
+    ],
+    [
+     "Baladi bread, toasted and broken",
+     "عيش بلدي محمص ومقطع",
+     "2"
+    ],
+    [
+     "Garlic, crushed",
+     "ثوم مهروس",
+     "8 cloves"
+    ],
+    [
+     "White vinegar",
+     "خل أبيض",
+     "⅓ cup"
+    ],
+    [
+     "Crushed tomatoes",
+     "طماطم مهروسة",
+     "1½ cups"
+    ],
+    [
+     "Ghee",
+     "سمنة",
+     "3 tbsp"
+    ]
+   ],
+   "steps_en": [
+    "Simmer the meat with the onion, cardamom, bay leaves and salt in water for 90 min (35 min in a pressure cooker). Keep the broth.",
+    "Cook the rice in 1 tbsp ghee with broth.",
+    "Sauce: fry half the garlic in 1 tbsp ghee until fragrant, add half the vinegar, then the tomatoes and salt; simmer 10 min.",
+    "Garlic-vinegar: fry the rest of the garlic in the remaining ghee, then add the rest of the vinegar.",
+    "Brown the meat pieces briefly in a hot pan or under the broiler.",
+    "Layer toasted bread moistened with broth and garlic-vinegar, then rice, tomato sauce and the meat on top."
+   ],
+   "steps_ar": [
+    "اسلق اللحمة مع البصل والحبهان والورق لورا والملح ٩٠ دقيقة (٣٥ دقيقة في البريستو)، واحتفظ بالشوربة.",
+    "اطبخ الرز في ملعقة سمنة بالشوربة.",
+    "الصلصة: شوّح نص الثوم في ملعقة سمنة، أضف نص الخل ثم الطماطم والملح واتركها ١٠ دقائق.",
+    "التقلية: شوّح باقي الثوم في باقي السمنة وأضف باقي الخل.",
+    "حمّر اللحمة في طاسة سخنة أو تحت الشواية.",
+    "رص العيش المحمص وبلّه بالشوربة والتقلية، ثم الرز والصلصة واللحمة على الوش."
+   ],
+   "tip_en": "A weekend family feast; the broth also makes a great soup starter.",
+   "tip_ar": "عزومة العيلة في الويك إند، والشوربة تنفع شوربة قبل الأكل.",
+   "yt": "طريقة عمل الفتة المصرية"
+  },
+  {
+   "id": "roz_meammar",
+   "cuisine": "Egyptian",
+   "style": "classic",
+   "youth": true,
+   "en": "Roz me'ammar with roast chicken",
+   "ar": "رز معمر مع فراخ محمرة",
+   "mins": 120,
+   "kcal": 780,
+   "protein": 48,
+   "ing": [
+    [
+     "Whole chicken, cut in 4",
+     "فرخة مقطعة أرباع",
+     "1 (1.5 kg)"
+    ],
+    [
+     "Egyptian rice",
+     "أرز مصري",
+     "2 cups"
+    ],
+    [
+     "Whole milk",
+     "لبن كامل الدسم",
+     "2 cups"
+    ],
+    [
+     "Cream",
+     "قشطة",
+     "½ cup"
+    ],
+    [
+     "Butter",
+     "زبدة",
+     "3 tbsp"
+    ],
+    [
+     "Onion",
+     "بصل",
+     "1"
+    ],
+    [
+     "Cardamom pods",
+     "حبهان",
+     "4"
+    ],
+    [
+     "Bay leaves",
+     "ورق لورا",
+     "2"
+    ],
+    [
+     "Cinnamon stick",
+     "عود قرفة",
+     "1"
+    ]
+   ],
+   "steps_en": [
+    "Boil the chicken with the onion, cardamom, bay leaves, cinnamon and salt for 30 min; keep 1½ cups of broth.",
+    "Mix the washed rice with the warm milk, cream, broth, 2 tbsp melted butter and salt in an oven dish or clay pot.",
+    "Cover tightly and bake at 160°C for 60 min, then uncover, dot with butter and bake at 200°C for 20 min until golden on top.",
+    "Meanwhile, roast the chicken pieces at 220°C for 20 min until browned.",
+    "Serve the creamy rice with the chicken and a salad."
+   ],
+   "steps_ar": [
+    "اسلق الفرخة مع البصل والحبهان والورق لورا والقرفة والملح ٣٠ دقيقة، واحتفظ بكوب ونص شوربة.",
+    "اخلط الرز المغسول مع اللبن الدافي والقشطة والشوربة وملعقتين زبدة سايحة والملح في طاجن أو صينية فرن.",
+    "غطّيه كويس واخبزه على ١٦٠ درجة ٦٠ دقيقة، ثم اكشفه وحط قطع زبدة وكمّل على ٢٠٠ درجة ٢٠ دقيقة لحد ما الوش يحمر.",
+    "في الوقت ده حمّر الفراخ في الفرن على ٢٢٠ درجة ٢٠ دقيقة.",
+    "قدّم الرز المعمر مع الفراخ والسلطة."
+   ],
+   "tip_en": "Comfort food for a cool Sunday; a clay pot gives the best crust.",
+   "tip_ar": "أكلة دافية ليوم الأحد، والطاجن الفخار بيدي أحلى وش.",
+   "yt": "رز معمر بالفراخ"
+  }
+ ],
+ "breakfast": [
+  [
+   "Ful medames with olive oil, cumin, tomato and a boiled egg",
+   "فول مدمس بزيت الزيتون والكمون والطماطم وبيضة مسلوقة"
+  ],
+  [
+   "Eggs with tomatoes and peppers (shakshuka) and ½ baladi bread",
+   "شكشوكة بالطماطم والفلفل ونص رغيف بلدي"
+  ],
+  [
+   "Greek yogurt with oats, honey and walnuts",
+   "زبادي يوناني بالشوفان والعسل وعين الجمل"
+  ],
+  [
+   "White cheese, cucumber, tomato, olives and whole-wheat pita",
+   "جبنة بيضاء وخيار وطماطم وزيتون وعيش قمح كامل"
+  ],
+  [
+   "Baked falafel (ta'ameya) with tahini salad",
+   "طعمية في الفرن مع سلطة طحينة"
+  ],
+  [
+   "Whole-wheat toast with ricotta, tomato and basil",
+   "توست قمح كامل بالريكوتا والطماطم والريحان"
+  ],
+  [
+   "Oatmeal with dates, cinnamon and milk",
+   "شوفان بالبلح والقرفة واللبن"
+  ],
+  [
+   "Omelette with spinach and feta",
+   "أومليت بالسبانخ والجبنة الفيتا"
+  ],
+  [
+   "Labneh with za'atar, olive oil and veggies",
+   "لبنة بالزعتر وزيت الزيتون والخضار"
+  ],
+  [
+   "Cottage cheese with fruit and almonds",
+   "جبنة قريش بالفاكهة واللوز"
+  ]
+ ],
+ "snacks": [
+  [
+   "Apple with 2 tbsp peanut butter",
+   "تفاحة مع ملعقتين زبدة فول سوداني"
+  ],
+  [
+   "Carrots and cucumbers with hummus",
+   "جزر وخيار مع حمص"
+  ],
+  [
+   "Handful of almonds and 2 dates",
+   "حفنة لوز وتمرتين"
+  ],
+  [
+   "Laban (buttermilk) and a banana",
+   "كوب لبن رايب وموزة"
+  ],
+  [
+   "Roasted chickpeas",
+   "حمص محمص"
+  ],
+  [
+   "Guava or orange slices",
+   "جوافة أو شرائح برتقال"
+  ],
+  [
+   "Air-popped popcorn with cumin",
+   "فشار بدون زيت بالكمون"
+  ],
+  [
+   "Greek yogurt with berries",
+   "زبادي يوناني بالتوت"
+  ]
+ ],
+ "ayahs": [
+  "94:5",
+  "94:6",
+  "65:2",
+  "65:3",
+  "13:28",
+  "3:139",
+  "39:53",
+  "2:153",
+  "2:186",
+  "29:69",
+  "2:286",
+  "12:87",
+  "93:3",
+  "93:5",
+  "40:60",
+  "3:159",
+  "14:7",
+  "2:152",
+  "3:173",
+  "9:40",
+  "2:201",
+  "64:11",
+  "2:216",
+  "16:97",
+  "41:30",
+  "47:7",
+  "99:7",
+  "2:155",
+  "3:200",
+  "39:10",
+  "7:56",
+  "31:17",
+  "20:25",
+  "18:10",
+  "21:87",
+  "33:3",
+  "57:23",
+  "11:115",
+  "16:128",
+  "8:46",
+  "2:45",
+  "17:80",
+  "3:26",
+  "6:162",
+  "49:13",
+  "25:63",
+  "28:24",
+  "12:86",
+  "4:28",
+  "62:10"
+ ],
+ "classic": [
+  [
+   "The Godfather",
+   1972,
+   "Crime"
+  ],
+  [
+   "Heat",
+   1995,
+   "Crime / Action"
+  ],
+  [
+   "Se7en",
+   1995,
+   "Thriller"
+  ],
+  [
+   "The Silence of the Lambs",
+   1991,
+   "Thriller"
+  ],
+  [
+   "Die Hard",
+   1988,
+   "Action"
+  ],
+  [
+   "Raiders of the Lost Ark",
+   1981,
+   "Adventure"
+  ],
+  [
+   "The Dark Knight",
+   2008,
+   "Action / Crime"
+  ],
+  [
+   "Inception",
+   2010,
+   "Thriller / Action"
+  ],
+  [
+   "Mad Max: Fury Road",
+   2015,
+   "Action / Adventure"
+  ],
+  [
+   "No Country for Old Men",
+   2007,
+   "Crime / Thriller"
+  ],
+  [
+   "The Departed",
+   2006,
+   "Crime / Thriller"
+  ],
+  [
+   "Goodfellas",
+   1990,
+   "Crime"
+  ],
+  [
+   "The Fugitive",
+   1993,
+   "Action / Thriller"
+  ],
+  [
+   "Jaws",
+   1975,
+   "Thriller / Adventure"
+  ],
+  [
+   "The Usual Suspects",
+   1995,
+   "Crime / Thriller"
+  ],
+  [
+   "Zodiac",
+   2007,
+   "Crime / Thriller"
+  ],
+  [
+   "Prisoners",
+   2013,
+   "Crime / Thriller"
+  ],
+  [
+   "Sicario",
+   2015,
+   "Crime / Action"
+  ],
+  [
+   "Gladiator",
+   2000,
+   "Action / Adventure"
+  ],
+  [
+   "Top Gun: Maverick",
+   2022,
+   "Action"
+  ],
+  [
+   "Mission: Impossible – Fallout",
+   2018,
+   "Action"
+  ],
+  [
+   "Casino Royale",
+   2006,
+   "Action / Adventure"
+  ],
+  [
+   "The Bourne Ultimatum",
+   2007,
+   "Action / Thriller"
+  ],
+  [
+   "Indiana Jones and the Last Crusade",
+   1989,
+   "Adventure"
+  ],
+  [
+   "The Town",
+   2010,
+   "Crime / Thriller"
+  ],
+  [
+   "Gone Girl",
+   2014,
+   "Thriller"
+  ],
+  [
+   "Collateral",
+   2004,
+   "Crime / Thriller"
+  ],
+  [
+   "The French Connection",
+   1971,
+   "Crime / Action"
+  ],
+  [
+   "Dune: Part Two",
+   2024,
+   "Adventure / Action"
+  ],
+  [
+   "Edge of Tomorrow",
+   2014,
+   "Action"
+  ]
+ ],
+ "egyptian": [
+  [
+   "باب الحديد",
+   "Cairo Station",
+   1958,
+   "Drama / Thriller"
+  ],
+  [
+   "اللص والكلاب",
+   "The Thief and the Dogs",
+   1962,
+   "Crime"
+  ],
+  [
+   "شيء من الخوف",
+   "A Taste of Fear",
+   1969,
+   "Drama"
+  ],
+  [
+   "الكيف",
+   "Al-Keif",
+   1985,
+   "Drama / Crime"
+  ],
+  [
+   "الهروب",
+   "The Escape",
+   1991,
+   "Crime / Action"
+  ],
+  [
+   "الإرهاب والكباب",
+   "Terrorism and Kebab",
+   1992,
+   "Comedy / Drama"
+  ],
+  [
+   "عمارة يعقوبيان",
+   "The Yacoubian Building",
+   2006,
+   "Drama"
+  ],
+  [
+   "الجزيرة",
+   "The Island",
+   2007,
+   "Crime / Action"
+  ],
+  [
+   "إبراهيم الأبيض",
+   "Ibrahim Labyad",
+   2009,
+   "Crime / Action"
+  ],
+  [
+   "الفيل الأزرق",
+   "The Blue Elephant",
+   2014,
+   "Thriller"
+  ],
+  [
+   "ولاد رزق",
+   "Sons of Rizk",
+   2015,
+   "Action / Heist"
+  ],
+  [
+   "الممر",
+   "The Passage",
+   2019,
+   "War / Action"
+  ],
+  [
+   "كيرة والجن",
+   "Kira & El Gin",
+   2022,
+   "Historical / Action"
+  ],
+  [
+   "تيتو",
+   "Tito",
+   2004,
+   "Crime / Action"
+  ]
+ ],
+ "series": [
+  [
+   "Chernobyl",
+   2019,
+   5,
+   "Drama / Thriller",
+   false
+  ],
+  [
+   "Band of Brothers",
+   2001,
+   10,
+   "War / Action",
+   false
+  ],
+  [
+   "True Detective (Season 1)",
+   2014,
+   8,
+   "Crime / Thriller",
+   false
+  ],
+  [
+   "The Night Of",
+   2016,
+   8,
+   "Crime",
+   false
+  ],
+  [
+   "Mare of Easttown",
+   2021,
+   7,
+   "Crime",
+   false
+  ],
+  [
+   "Adolescence",
+   2025,
+   4,
+   "Crime / Drama",
+   false
+  ],
+  [
+   "Black Bird",
+   2022,
+   6,
+   "Crime / Thriller",
+   false
+  ],
+  [
+   "The Day of the Jackal",
+   2024,
+   10,
+   "Thriller / Action",
+   false
+  ],
+  [
+   "Shōgun",
+   2024,
+   10,
+   "Adventure / Drama",
+   false
+  ],
+  [
+   "Slow Horses (Season 1)",
+   2022,
+   6,
+   "Spy / Thriller",
+   false
+  ],
+  [
+   "Ripley",
+   2024,
+   8,
+   "Crime / Thriller",
+   false
+  ],
+  [
+   "ما وراء الطبيعة (Paranormal)",
+   2020,
+   6,
+   "Horror / Thriller",
+   true
+  ],
+  [
+   "بطلوع الروح (Batloo' El Rouh)",
+   2022,
+   15,
+   "Drama / Thriller",
+   true
+  ]
+ ],
+ "desserts": [
+  [
+   "Om Ali (bread-and-milk pudding with nuts)",
+   "أم علي بالمكسرات"
+  ],
+  [
+   "Basbousa with coconut",
+   "بسبوسة بجوز الهند"
+  ],
+  [
+   "Roz bel laban (rice pudding) with cinnamon",
+   "رز بلبن بالقرفة"
+  ],
+  [
+   "Konafa with cream",
+   "كنافة بالقشطة"
+  ],
+  [
+   "Mahalabia with pistachios",
+   "مهلبية بالفستق"
+  ],
+  [
+   "Qatayef with walnuts",
+   "قطايف بالمكسرات"
+  ]
+ ]
 }
