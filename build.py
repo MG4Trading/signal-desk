@@ -536,6 +536,7 @@ def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
     if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5:
+        prev["content"] = load_json(os.path.join(ROOT, "extras-content.json"), prev.get("content") or {})
         return prev
     content = load_json(os.path.join(ROOT, "extras-content.json"), {})
     day_no = (datetime.now(TZ).date() - datetime(2026, 1, 1).date()).days
