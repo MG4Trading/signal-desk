@@ -1,0 +1,1243 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Signal Desk</title>
+<meta name="description" content="Oakville weather, GO trains, markets and news for the family.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Signal Desk">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0B7A84">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:wght@400;700&family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --surface-2:#E3E8EE; --ink:#152233; --muted:#5B6B7D;
+  --line:#D3DAE2; --accent:#0B7A84; --accent-ink:#FFFFFF; --accent-soft:#D9EEF0;
+  --amber:#B86A00; --amber-soft:#FBEBD2; --danger:#B3261E; --up:#1E7A43; --down:#B3261E;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E1622; --surface:#16212F; --surface-2:#1F2C3C; --ink:#E6ECF2; --muted:#93A3B5;
+    --line:#2A394B; --accent:#3FB6BF; --accent-ink:#06212A; --accent-soft:#123540;
+    --amber:#F0A640; --amber-soft:#3A2A12; --danger:#F2867E; --up:#5CC98A; --down:#F2867E;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1622; --surface:#16212F; --surface-2:#1F2C3C; --ink:#E6ECF2; --muted:#93A3B5;
+  --line:#2A394B; --accent:#3FB6BF; --accent-ink:#06212A; --accent-soft:#123540;
+  --amber:#F0A640; --amber-soft:#3A2A12; --danger:#F2867E; --up:#5CC98A; --down:#F2867E;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding-inline:16px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.bar{position:sticky;z-index:5;background:var(--bg);margin-inline:-16px;padding:14px 16px 10px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-stretch:78%;font-weight:800;font-size:26px;letter-spacing:-.01em;line-height:1}
+.brand span{color:var(--accent)}
+.stamp{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.refresh{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:10px 16px;font-weight:600;font-size:14px;min-height:44px}
+.refresh svg{width:16px;height:16px}
+.refresh.spin svg{animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.rail{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.rail::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:500;min-height:36px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+.group{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.group-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;background:var(--surface-2)}
+.group-head strong{font-family:var(--display);font-stretch:85%;font-size:16px}
+.hl{display:flex;flex-direction:column;gap:3px;padding:12px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.group-head + .hl{border-top:0}
+.hl:hover .hl-title{text-decoration:underline}
+.hl-title{font-weight:600;font-size:15px;line-height:1.3}
+.hl-snip{font-size:13px;color:var(--muted)}
+.hl-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.new{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--amber-soft);color:var(--amber);border-radius:4px;padding:1px 6px}
+.empty{text-align:center;color:var(--muted);padding:28px 12px;background:var(--surface);border:1px dashed var(--line);border-radius:14px}
+
+.markets{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.markets::-webkit-scrollbar{display:none}
+.tick{flex:0 0 132px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.tick .label{font-size:10px}
+.tick .px{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.tick .chg{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums}
+.tick .chg.up{color:var(--up)} .tick .chg.down{color:var(--down)} .tick .chg.flat{color:var(--muted)}
+.tick svg{width:100%;height:26px;display:block;margin-top:4px}
+.tick.off .px{color:var(--muted);font-size:13px}
+
+.goboard{display:flex;flex-direction:column;gap:10px;padding:12px 16px}
+.gotabs{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--surface-2);border-radius:10px;padding:3px}
+.gotabs button{border:0;background:transparent;border-radius:8px;padding:8px 6px;font-size:13px;font-weight:600;color:var(--muted);min-height:38px}
+.gotabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.gotable{display:flex;flex-direction:column}
+.gorow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.gorow:first-child{border-top:0}
+.godep{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;min-width:86px}
+.gorow.first .godep{font-size:18px;color:var(--accent)}
+.gomid{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.gotag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:1px 6px}
+.gotag.bus{background:var(--amber-soft);color:var(--amber)}
+.gowait{font-family:var(--mono);font-size:12px;color:var(--ink);white-space:nowrap}
+.goall summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);list-style:none;min-height:32px;display:flex;align-items:center}
+.goall summary::-webkit-details-marker{display:none}
+.gogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:4px 12px;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;padding-top:6px}
+.gogrid .exp{color:var(--accent)} .gogrid .bus{color:var(--amber)}
+.gonote{font-size:11px;color:var(--muted)}
+
+footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;padding-top:4px}
+@media (prefers-reduced-motion:reduce){.refresh.spin svg{animation:none}}
+
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+.bar{top:0;padding-top:calc(14px + env(safe-area-inset-top,0px));margin-top:calc(-1 * env(safe-area-inset-top,0px))}
+.topbtns{display:flex;gap:8px;align-items:center}
+.ghostbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 12px;font-size:13px;font-weight:600;min-height:40px}
+.stale{color:var(--amber)}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+/* warnings */
+.warn{border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;background:var(--amber-soft);border:1px solid color-mix(in srgb, var(--amber) 35%, transparent);color:var(--ink);text-decoration:none}
+.warn.warning{background:color-mix(in srgb, var(--danger) 14%, var(--surface));border-color:color-mix(in srgb, var(--danger) 45%, transparent)}
+.warn strong{font-size:15px}
+.warn span{font-size:13px;color:var(--muted)}
+
+/* weather */
+.wx{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.wx-now{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:16px}
+.wx-icon{font-size:44px;line-height:1;grid-row:span 2}
+.wx-temp{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.wx-temp small{font-family:var(--body);font-size:14px;font-weight:500;color:var(--muted);margin-left:6px}
+.wx-sub{font-size:13px;color:var(--muted)}
+.wear{margin:0 16px 14px;background:var(--accent-soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.wear ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.hours{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:0 16px 14px}
+.hours::-webkit-scrollbar{display:none}
+.hr{flex:0 0 54px;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--bg);border-radius:10px;padding:8px 4px;font-variant-numeric:tabular-nums}
+.hr .t{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.hr .i{font-size:18px}
+.hr .d{font-weight:600;font-size:14px}
+.hr .p{font-family:var(--mono);font-size:10px;color:var(--accent)}
+.days{border-top:1px solid var(--line)}
+.day{display:grid;grid-template-columns:52px 28px 1fr auto;gap:10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-bottom:0;text-align:left;font:inherit;color:inherit}
+.day:first-child{border-top:0}
+.day .dn{font-weight:600}
+.day .di{font-size:20px;text-align:center}
+.range{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.range .track{flex:1;height:6px;border-radius:3px;background:var(--surface-2);position:relative;min-width:40px}
+.range .fill{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#4F9BD9,#E3A33B)}
+.day .dp{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:34px;text-align:right}
+.daywear{grid-column:1/-1;font-size:13px;color:var(--muted);padding-top:2px;display:none}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,20,30,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet-card{background:var(--surface);color:var(--ink);width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.sheet-card h3{font-family:var(--display);font-stretch:80%;font-size:20px;margin:0}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.toggle input{width:22px;height:22px;accent-color:var(--accent)}
+.alertbox{background:var(--bg);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.alertbox code{font-family:var(--mono);font-size:13px;user-select:all;word-break:break-all}
+.alertbox a{color:var(--accent);font-weight:600}
+.subrail{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.subrail::-webkit-scrollbar{display:none}
+.subrail .chip{min-height:32px;padding:5px 12px;font-size:12px}
+.primary{background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:11px 16px;font-weight:600;min-height:44px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--surface-2);border-radius:10px;padding:3px;margin:12px 16px 0}
+.seg button{border:0;background:transparent;border-radius:8px;padding:8px 6px;font-size:13px;font-weight:600;color:var(--muted);min-height:38px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 14px}
+.fact{background:var(--bg);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px}
+.fact b{font-family:var(--mono);font-weight:500;font-size:14px;font-variant-numeric:tabular-nums}
+.day.open .daywear{display:block}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px}
+.stat{display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--display);font-stretch:85%;font-size:22px;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat small{font-size:12px;color:var(--muted)}
+.trend{padding:0 16px 12px;font-size:13px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.trend svg{width:110px;height:26px;flex:0 0 auto}
+.home{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.home img{width:64px;height:48px;object-fit:cover;border-radius:8px;background:var(--surface-2)}
+.home .pr{font-family:var(--mono);font-weight:500;font-size:15px}
+.home .hl-title{font-size:14px}
+.evday{padding:8px 16px;background:var(--bg);font-size:12px;font-weight:600;color:var(--muted);border-top:1px solid var(--line)}
+.ev{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.evday + .ev{border-top:0}
+.ev .when{white-space:nowrap;font-family:var(--mono);font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
+.mylinks{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.mylinks::-webkit-scrollbar{display:none}
+.mylinks a{flex:0 0 auto;background:var(--accent-soft);color:var(--accent);border-radius:12px;padding:10px 14px;font-weight:600;font-size:14px;text-decoration:none}
+.form{display:flex;flex-direction:column;gap:8px}
+.form input,.form select,.form textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%}
+.form textarea{min-height:76px;resize:vertical}
+.form .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mylist{display:flex;flex-direction:column}
+.mylist div{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mylist button{border:0;background:transparent;color:var(--danger);font-weight:600;min-height:36px}
+.mk-rets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 16px 12px}
+.mk-ret{background:var(--bg);border-radius:10px;padding:7px 8px;display:flex;flex-direction:column;gap:1px}
+.mk-ret b{font-family:var(--mono);font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+.mk-ret b.up{color:var(--up)} .mk-ret b.down{color:var(--down)}
+.mk-price{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:12px 16px 8px}
+.mk-price strong{font-family:var(--display);font-stretch:80%;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.mk-chart{padding:0 16px 6px}
+.mk-chart svg{width:100%;height:170px;display:block;touch-action:pan-y}
+.mk-read{font-family:var(--mono);font-size:12px;color:var(--muted);padding:0 16px 8px;min-height:18px;font-variant-numeric:tabular-nums}
+.mk-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 14px;padding:4px 16px 14px;font-size:13px}
+.mk-stats span{color:var(--muted)} .mk-stats b{font-family:var(--mono);font-weight:500;font-variant-numeric:tabular-nums}
+.pill-sig{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;border-radius:999px;padding:2px 9px;background:var(--surface-2);color:var(--ink)}
+.pill-sig.good{background:color-mix(in srgb, var(--up) 16%, var(--surface));color:var(--up)}
+.pill-sig.bad{background:color-mix(in srgb, var(--down) 14%, var(--surface));color:var(--down)}
+.pill-sig.warn{background:var(--amber-soft);color:var(--amber)}
+.readrow{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-bottom:0;text-align:left;font:inherit;color:inherit}
+.readrow .sigs{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}
+.gauge{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--accent-soft) 0 45%,var(--surface-2) 45% 65%,var(--amber-soft) 65% 100%);margin:6px 16px 2px}
+.gauge i{position:absolute;top:-4px;width:4px;height:18px;border-radius:2px;background:var(--ink);transform:translateX(-2px)}
+.gauge-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 16px 12px}
+.ar{font-family:"Amiri","Noto Naskh Arabic","Geeza Pro",serif;direction:rtl;text-align:right;line-height:1.9}
+.bigcount .label{display:block}
+.ayah,.av .ar,.qn{font-family:"Amiri Quran","Amiri","Geeza Pro",serif}
+.ayah{font-size:26px;line-height:2.1;padding:14px 16px 6px}
+.ayah-en{font-size:15px;padding:0 16px 10px;color:var(--ink)}
+.pray{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 16px}
+.pray div{background:var(--bg);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:1px;align-items:center}
+.pray div.next{background:var(--accent);color:var(--accent-ink)}
+.pray div.next .label{color:var(--accent-ink)}
+.pray b{font-family:var(--mono);font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}
+.bigcount{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:12px 16px 0;flex-wrap:wrap}
+.bigcount strong{font-family:var(--display);font-stretch:80%;font-size:30px;line-height:1}
+.fold summary{cursor:pointer;list-style:none;color:var(--accent);font-weight:600;font-size:13px;padding:6px 16px 10px;min-height:32px}
+.fold summary::-webkit-details-marker{display:none}
+.fold .inner{padding:0 16px 12px;font-size:15px;white-space:pre-line}
+.av{border-top:1px solid var(--line);padding:10px 16px;display:flex;flex-direction:column;gap:6px}
+.av .num{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.av .ar{font-size:22px}
+.av .en{font-size:14px}
+.av .t{font-size:14px;color:var(--muted);white-space:pre-line}
+.langseg{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;background:var(--surface-2);border-radius:10px;padding:3px;margin:10px 16px 4px}
+.langseg button{border:0;background:transparent;border-radius:8px;padding:7px 4px;font-size:13px;font-weight:600;color:var(--muted);min-height:36px}
+.langseg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.recipe-meta{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+.ing{margin:0;padding:0 16px 10px 34px;display:flex;flex-direction:column;gap:4px;font-size:14px}
+.ing b{font-family:var(--mono);font-weight:500;font-size:13px}
+.steps{margin:0;padding:0 16px 12px 34px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+[dir="rtl"] .ing,[dir="rtl"] .steps{padding:0 34px 10px 16px}
+.menu-row{display:grid;grid-template-columns:86px 1fr;gap:10px;padding:10px 16px;border-top:1px solid var(--line);font-size:14px}
+.menu-row .label{padding-top:2px}
+.serv{display:flex;align-items:center;gap:8px;padding:0 16px 10px;font-size:13px;color:var(--muted)}
+.serv button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;line-height:1}
+.film{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line)}
+.film img{width:52px;height:78px;object-fit:cover;border-radius:6px;background:var(--surface-2)}
+.film .links{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;font-weight:600}
+.film .links a{color:var(--accent);text-decoration:none}
+.pod{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.raterow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ratebtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;min-height:32px;font-size:12px;font-weight:600;color:var(--muted)}
+.ratebtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.pod img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--surface-2)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:calc(100% - 32px);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="bar-row">
+      <div>
+        <div class="brand">Signal<span>Desk</span></div>
+        <div class="stamp" id="stamp">Loading…</div>
+      </div>
+      <div class="topbtns">
+        <button class="ghostbtn" id="custBtn" type="button">Settings</button>
+        <button class="refresh" id="refreshBtn" type="button" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+    </div>
+    <nav class="rail" id="rail" aria-label="Sections"></nav>
+  </header>
+
+  <main class="stack" id="main">
+    <div class="empty">Loading the latest…</div>
+  </main>
+
+  <footer>
+    <span>Updates about every 10 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, rentals from Kijiji, events from Meetup, markets from CNBC and Google Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
+  </footer>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-label="Settings">
+    <h3>Settings</h3>
+    <span class="label">Show these sections</span>
+    <div id="toggles"></div>
+    <span class="label">Phone alerts</span>
+    <div class="alertbox">
+      <span>Get breaking Oakville news, GO and traffic alerts, weather warnings and a 6:30 a.m. briefing:</span>
+      <span>1. Install the free <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener">ntfy app</a> (iPhone) or from Google Play (Android).</span>
+      <span>2. In ntfy, tap <b>+</b> and subscribe to this topic:</span>
+      <code id="topicName">signaldesk-oakville-0f2a7df8</code>
+      <button class="ghostbtn" id="copyTopic" type="button">Copy topic name</button>
+      <span>3. In iPhone Settings → Notifications → ntfy, turn on Allow Notifications, Lock Screen and Banners.</span>
+      <button class="ghostbtn" id="testPush" type="button">Send a test alert now</button>
+    </div>
+    <span class="label">My links · saved on this device only</span>
+    <div class="alertbox form">
+      <span>Pin your own pages to the top of the app, like a training or nutrition plan. They stay private on this phone.</span>
+      <div class="mylist" id="myList"></div>
+      <input id="myLabel" placeholder="Name, e.g. Training plan" autocomplete="off">
+      <input id="myUrl" type="url" placeholder="https://…" autocomplete="off" inputmode="url">
+      <button class="ghostbtn" id="myAdd" type="button">Add link</button>
+    </div>
+    <span class="label">Add or remove a topic</span>
+    <div class="alertbox form">
+      <span>Opens a ready-filled request on GitHub. Sign in as the site owner and tap <b>Create</b>; the change shows up here in about 10 minutes.</span>
+      <div class="row2">
+        <select id="tpAction"><option value="add">Add</option><option value="remove">Remove</option></select>
+        <input id="tpName" list="tpList" placeholder="Topic, new or existing" autocomplete="off"><datalist id="tpList"></datalist>
+      </div>
+      <textarea id="tpWords" placeholder="Search words, one per line&#10;e.g. Oakville soccer&#10;Leave empty with Remove to drop the whole topic"></textarea>
+      <div class="row2">
+        <select id="tpRegion"><option value="CA">Canada</option><option value="US">USA</option><option value="EG">Egypt</option><option value="AE">UAE</option><option value="SA">Saudi Arabia</option><option value="GB">UK</option></select>
+        <select id="tpLang"><option value="en">English</option><option value="ar">Arabic</option></select>
+      </div>
+      <button class="ghostbtn" id="tpSend" type="button">Send to GitHub</button>
+    </div>
+    <button class="primary" id="closeSheet" type="button">Done</button>
+  </div>
+</div>
+
+<script>
+const GO = {"wk_east":[["04:55","05:25","B",""],["05:00","05:45","B",""],["05:17","06:00","",""],["05:47","06:30","",""],["06:17","07:00","",""],["06:28","07:02","",""],["06:43","07:17","",""],["06:51","07:34","",""],["06:58","07:32","",""],["07:13","07:47","",""],["07:21","08:04","",""],["07:28","08:02","",""],["07:44","08:18","",""],["07:51","08:34","",""],["07:58","08:32","",""],["08:13","08:47","",""],["08:21","09:04","",""],["08:30","09:04","",""],["08:37","09:20","",""],["09:01","09:45","",""],["09:31","10:15","",""],["10:01","10:45","",""],["10:31","11:15","",""],["11:01","11:45","",""],["11:31","12:15","",""],["12:01","12:45","",""],["12:31","13:15","",""],["13:01","13:45","",""],["13:31","14:15","",""],["14:01","14:45","",""],["14:31","15:15","",""],["15:01","15:45","",""],["15:31","16:15","",""],["16:02","16:48","",""],["16:32","17:15","",""],["17:00","17:45","",""],["17:31","18:15","",""],["18:00","18:45","",""],["18:30","19:15","",""],["19:01","19:45","",""],["19:30","20:15","",""],["20:00","20:45","",""],["20:30","21:15","",""],["21:00","21:45","",""],["21:18","22:00","",""],["21:30","22:15","",""],["22:00","22:45","",""],["22:30","23:15","",""],["23:00","23:45","","F"],["23:05","23:50","B","MTh"],["23:30","00:15","",""],["00:01","00:45","","F"],["00:05","00:50","B","MTh"]],"wk_west":[["05:24","06:11","B",""],["06:10","06:51","",""],["06:40","07:21","",""],["07:17","07:59","",""],["07:47","08:29","",""],["08:17","08:59","",""],["08:47","09:29","",""],["09:17","09:59","",""],["09:47","10:29","",""],["10:17","10:59","",""],["10:47","11:29","",""],["11:17","11:59","",""],["11:47","12:29","",""],["12:17","12:59","",""],["12:47","13:29","",""],["13:17","13:59","",""],["13:47","14:29","",""],["14:17","14:59","",""],["14:47","15:29","",""],["15:17","15:59","",""],["15:35","16:19","",""],["15:50","16:22","",""],["15:59","16:31","",""],["16:05","16:50","",""],["16:20","16:52","",""],["16:29","17:02","",""],["16:35","17:20","",""],["16:50","17:22","",""],["16:59","17:31","",""],["17:05","17:50","",""],["17:20","17:52","",""],["17:29","18:02","",""],["17:35","18:18","",""],["17:50","18:22","",""],["17:53","18:35","",""],["18:17","19:00","",""],["18:47","19:30","",""],["19:17","20:00","",""],["19:47","20:30","",""],["20:17","21:00","",""],["20:47","21:30","",""],["21:15","21:55","",""],["21:17","22:00","",""],["21:47","22:30","",""],["22:17","23:00","",""],["22:47","23:30","",""],["23:04","23:48","","MTh"],["23:15","23:55","",""],["23:17","00:01","","F"],["23:47","00:30","",""],["00:17","01:00","","F"],["00:20","01:05","B","MTh"],["00:40","01:10","B","MTh"],["00:47","01:30","","F"],["01:10","01:50","B","MTh"],["01:20","02:05","B","F"],["01:40","02:10","B","F"],["02:30","03:17","B",""]],"we_east":[["05:10","05:55","B",""],["06:07","06:55","B",""],["06:35","07:25","B",""],["07:00","07:55","B",""],["07:30","08:10","B",""],["08:01","08:45","",""],["08:31","09:15","",""],["09:01","09:45","",""],["09:31","10:15","",""],["10:01","10:45","",""],["10:31","11:15","",""],["11:01","11:45","",""],["11:31","12:15","",""],["12:01","12:45","",""],["12:31","13:15","",""],["13:01","13:45","",""],["13:31","14:15","",""],["13:49","14:25","",""],["14:01","14:45","",""],["14:31","15:15","",""],["15:01","15:45","",""],["15:31","16:15","",""],["16:01","16:45","",""],["16:31","17:15","",""],["17:01","17:45","",""],["17:31","18:15","",""],["17:49","18:24","",""],["18:01","18:45","",""],["18:31","19:15","",""],["19:01","19:45","",""],["19:31","20:15","",""],["20:01","20:45","",""],["20:31","21:15","",""],["21:01","21:45","",""],["21:31","22:15","",""],["21:47","22:23","",""],["22:01","22:45","",""],["22:31","23:15","",""],["23:01","23:45","",""],["23:31","00:15","",""],["23:58","00:50","B","Su"],["00:01","00:38","",""],["00:01","00:45","","Sa"]],"we_west":[["06:40","07:28","B",""],["07:15","08:03","B",""],["07:45","08:33","B",""],["08:15","08:47","B",""],["08:25","09:20","B",""],["08:47","09:29","",""],["09:04","09:39","",""],["09:17","09:59","",""],["09:47","10:29","",""],["10:17","10:59","",""],["10:47","11:29","",""],["11:09","11:43","",""],["11:17","11:59","",""],["11:47","12:29","",""],["12:17","12:59","",""],["12:47","13:29","",""],["13:17","13:59","",""],["13:47","14:29","",""],["14:17","14:59","",""],["14:47","15:29","",""],["15:17","15:59","",""],["15:47","16:29","",""],["16:17","16:59","",""],["16:47","17:29","",""],["17:07","17:41","",""],["17:17","18:00","",""],["17:47","18:30","",""],["18:17","19:00","",""],["18:47","19:30","",""],["19:17","20:00","",""],["19:22","19:56","",""],["19:47","20:30","",""],["20:17","21:00","",""],["20:47","21:30","",""],["21:17","22:00","",""],["21:47","22:30","",""],["22:17","23:00","",""],["22:47","23:30","",""],["23:17","00:01","",""],["23:47","00:32","",""],["00:17","01:02","",""],["00:47","01:32","","Sa"],["01:05","01:52","B","Su"],["01:20","02:10","B","Sa"],["01:45","02:17","B","Sa"],["02:20","03:05","B","Sa"],["02:30","03:12","B","Su"],["02:40","03:10","B","Sa"]]};
+const $ = s => document.querySelector(s);
+const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+const store = { get(k, d){ try { const v = localStorage.getItem("sd:" + k); return v == null ? d : JSON.parse(v); } catch(_){ return d; } }, set(k, v){ try { localStorage.setItem("sd:" + k, JSON.stringify(v)); } catch(_){} } };
+const TRAVEL = ["GO alerts", "Accidents", "Traffic", "Road closures", "GO Transit", "Transit"];
+let X = null, faithLang = store.get("faithLang", "both"), kLang = store.get("kLang", "en"), kServ = store.get("kServ", 4), kPick = null, podTab = "ca", surahAll = false;
+let angle = "all", wxTab = store.get("wxTab", "today");
+let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
+
+function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer" }]; (D ? D.topics : []).filter(t => !t.in_markets && t.id !== "homes").forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
+function visible(id){ return !hidden.has(id); }
+
+function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+async function load(force){
+  $("#refreshBtn").classList.add("spin");
+  const before = D && D.generated;
+  try {
+    const r = await fetch("data.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 60000)), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    D = await r.json();
+    try { const r2 = await fetch("extras.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 600000)), { cache: "no-store" }); if (r2.ok) X = await r2.json(); } catch(_) {}
+    render();
+    if (force) toast(before && D.generated === before ? "Already the latest · updated " + ago(D.generated) : "Updated · " + ago(D.generated));
+  } catch (e) {
+    if (!D) $("#main").innerHTML = '<div class="empty">Could not load. Check your connection and tap Refresh.</div>';
+    else if (force) toast("No connection. Showing the last update.");
+  }
+  $("#refreshBtn").classList.remove("spin");
+}
+
+function renderStamp(){
+  if (!D) return;
+  const age = Date.now() / 1000 - D.generated, iv = D.interval || 600;
+  const next = Math.max(1, Math.round((D.generated + iv - Date.now() / 1000) / 60));
+  const s = $("#stamp");
+  s.textContent = "Updated " + ago(D.generated) + (age < iv ? " · next in ~" + next + " min" : age > iv * 3 ? " · updates delayed" : " · next any minute");
+  s.classList.toggle("stale", age > iv * 3);
+}
+
+function renderRail(){
+  const rail = $("#rail"); rail.textContent = "";
+  const mk = (id, label) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(view === id)); b.onclick = () => { view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }; rail.appendChild(b); };
+  mk("all", "All");
+  sections().filter(s => visible(s.id)).forEach(s => mk(s.id, s.name));
+}
+
+/* ---------- weather ---------- */
+function dayName(iso, i){ if (i === 0) return "Today"; if (i === 1) return "Tmrw"; return new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { weekday: "short" }); }
+function fmtHour(t){ let h = Number(t.slice(0, 2)); const ap = h >= 12 ? "p" : "a"; h = h % 12 || 12; return h + ap; }
+function weatherCard(full){
+  const W = D.weather; if (!W) return el("div", "empty", "Weather is unavailable right now.");
+  const box = el("div", "wx");
+  const seg = el("div", "seg");
+  [["today", "Today"], ["week", "7 days"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(wxTab === k)); b.onclick = () => { wxTab = k; store.set("wxTab", k); render(); }; seg.appendChild(b); });
+  box.appendChild(seg);
+  const d0 = W.days[0], c = W.current;
+  if (wxTab === "today"){
+    const now = el("div", "wx-now");
+    now.appendChild(el("div", "wx-icon", c.icon));
+    const t = el("div", "wx-temp", c.temp + "°"); t.appendChild(el("small", "", "feels " + c.feels + "°")); now.appendChild(t);
+    now.appendChild(el("div", "wx-sub", c.label + " · High " + d0.max + "° Low " + d0.min + "°" + (d0.pop ? " · " + d0.pop + "% rain" : "")));
+    box.appendChild(now);
+    const wear = el("div", "wear"); wear.appendChild(el("span", "label", "What to wear today"));
+    const ul = el("ul"); d0.wear.forEach(w => ul.appendChild(el("li", "", w))); wear.appendChild(ul);
+    box.appendChild(wear);
+    const hrs = el("div", "hours");
+    W.hours.slice(0, full ? 24 : 12).forEach(h => { const x = el("div", "hr"); x.appendChild(el("span", "t", fmtHour(h.t))); x.appendChild(el("span", "i", h.icon)); x.appendChild(el("span", "d", h.temp + "°")); x.appendChild(el("span", "p", h.pop ? h.pop + "%" : "")); hrs.appendChild(x); });
+    box.appendChild(hrs);
+    if (full){
+      const f = el("div", "facts");
+      const fact = (lab, val) => { const x = el("div", "fact"); x.appendChild(el("span", "label", lab)); x.appendChild(el("b", "", val)); f.appendChild(x); };
+      fact("Wind", c.wind + " km/h"); fact("Gusts", (c.gust || d0.gust) + " km/h"); fact("Humidity", (c.humidity ?? "—") + "%");
+      fact("Rain", d0.precip + " mm"); fact("UV max", String(d0.uv)); fact(d0.snow ? "Snow" : "Feels low", d0.snow ? d0.snow + " cm" : d0.feels_min + "°");
+      fact("Sunrise", fmt12(d0.sunrise)); fact("Sunset", fmt12(d0.sunset)); fact("Tomorrow", W.days[1] ? W.days[1].icon + " " + W.days[1].max + "°/" + W.days[1].min + "°" : "—");
+      box.appendChild(f);
+    }
+    return box;
+  }
+  const days = el("div", "days"); days.style.marginTop = "12px";
+  const lo = Math.min(...W.days.map(d => d.min)), hi = Math.max(...W.days.map(d => d.max)), span = (hi - lo) || 1;
+  W.days.forEach((d, i) => {
+    const row = el("button", "day" + (full ? " open" : "")); row.type = "button";
+    row.appendChild(el("span", "dn", dayName(d.date, i)));
+    row.appendChild(el("span", "di", d.icon));
+    const r = el("span", "range"); r.appendChild(el("span", "", d.min + "°"));
+    const tr = el("span", "track"), f = el("span", "fill"); f.style.left = ((d.min - lo) / span * 100) + "%"; f.style.right = ((hi - d.max) / span * 100) + "%"; tr.appendChild(f); r.appendChild(tr);
+    r.appendChild(el("span", "", d.max + "°")); row.appendChild(r);
+    row.appendChild(el("span", "dp", d.pop ? d.pop + "%" : ""));
+    const extra = [d.label + (d.precip ? ", " + d.precip + " mm" : "") + (d.snow ? ", " + d.snow + " cm snow" : ""), "wind to " + d.wind + " km/h", "UV " + d.uv];
+    row.appendChild(el("span", "daywear", extra.join(" · ") + ". Wear: " + d.wear.join("; ") + "."));
+    row.onclick = () => row.classList.toggle("open");
+    days.appendChild(row);
+  });
+  box.appendChild(days);
+  if (!full){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Tap a day for what to wear.")); box.appendChild(n); }
+  return box;
+}
+function warningsBlock(){
+  const w = D.warnings || []; if (!w.length) return null;
+  const s = el("div", "stack");
+  w.forEach(a => { const x = el("a", "warn " + a.type); x.href = "https://weather.gc.ca/en/location/index.html?coords=43.467,-79.688"; x.target = "_blank"; x.rel = "noopener"; x.appendChild(el("strong", "", "⚠️ " + a.name)); x.appendChild(el("span", "", a.summary)); s.appendChild(x); });
+  return s;
+}
+
+/* ---------- GO ---------- */
+const toMin = t => { const [h, m] = t.split(":").map(Number); const v = h * 60 + m; return v < 180 ? v + 1440 : v; };
+function torontoNow(){
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+  const g = k => (parts.find(p => p.type === k) || {}).value;
+  let dow = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(g("weekday")); let mins = (Number(g("hour")) % 24) * 60 + Number(g("minute"));
+  if (mins < 180){ mins += 1440; dow = (dow + 6) % 7; }
+  return { dow, mins };
+}
+function goTrips(dir, dow){
+  const list = GO[(dow === 0 || dow === 6 ? "we_" : "wk_") + dir];
+  return list.filter(([, , , d]) => !d || (d === "MTh" && dow >= 1 && dow <= 4) || (d === "F" && dow === 5) || (d === "Sa" && dow === 6) || (d === "Su" && dow === 0))
+    .map(([dep, arr, bus]) => ({ dep, arr, bus: bus === "B", dur: ((toMin(arr) - toMin(dep)) + 1440) % 1440 }));
+}
+function fmt12(t){ let [h, m] = t.split(":").map(Number); h = h % 24; const ap = h >= 12 ? "p.m." : "a.m."; h = h % 12 || 12; return h + ":" + String(m).padStart(2, "0") + " " + ap; }
+function item(it){
+  const a = el("a", "hl"); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
+  const m = el("div", "hl-meta"); m.appendChild(el("span", "tag", it.a));
+  if (Date.now() / 1000 - it.ts < 6 * 3600) m.appendChild(el("span", "new", "New"));
+  m.appendChild(el("span", "", (it.s || "") + " · " + ago(it.ts)));
+  a.appendChild(m); const tt = el("span", "hl-title", it.t); tt.dir = "auto"; a.appendChild(tt);
+  return a;
+}
+function goCard(){
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "GO Lakeshore West")); head.appendChild(el("span", "stamp", "Oakville GO ⇄ Union")); g.appendChild(head);
+  const box = el("div", "goboard");
+  const tabs = el("div", "gotabs");
+  [["east", "Oakville → Union"], ["west", "Union → Oakville"]].forEach(([d, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(goDir === d)); b.onclick = () => { goDir = d; store.set("goDir", d); render(); }; tabs.appendChild(b); });
+  box.appendChild(tabs);
+  const now = torontoNow();
+  let trips = goTrips(goDir, now.dow).filter(t => toMin(t.dep) >= now.mins), tomorrow = false;
+  if (!trips.length){ trips = goTrips(goDir, (now.dow + 1) % 7); tomorrow = true; }
+  const tbl = el("div", "gotable");
+  trips.slice(0, 4).forEach((t, i) => {
+    const r = el("div", "gorow" + (i === 0 ? " first" : "")); const w = toMin(t.dep) - now.mins;
+    r.appendChild(el("span", "godep", fmt12(t.dep)));
+    const mid = el("span", "gomid"); mid.appendChild(el("span", "", "Arrives " + fmt12(t.arr) + " · " + t.dur + " min"));
+    if (t.bus) mid.appendChild(el("span", "gotag bus", "Bus")); else if (t.dur <= 36) mid.appendChild(el("span", "gotag", "Express"));
+    r.appendChild(mid);
+    r.appendChild(el("span", "gowait", tomorrow ? "Tomorrow" : w < 1 ? "Now" : w < 60 ? "in " + w + " min" : "in " + Math.floor(w / 60) + " h " + (w % 60) + " min"));
+    tbl.appendChild(r);
+  });
+  box.appendChild(tbl);
+  const all = el("details", "goall"); all.appendChild(el("summary", "", (tomorrow ? "Tomorrow's" : "Today's") + " full schedule (" + trips.length + (tomorrow ? "" : " left") + ")"));
+  const grid = el("div", "gogrid");
+  trips.forEach(t => grid.appendChild(el("span", t.bus ? "bus" : (t.dur <= 36 ? "exp" : ""), fmt12(t.dep).replace(" a.m.", "a").replace(" p.m.", "p") + " → " + fmt12(t.arr).replace(" a.m.", "a").replace(" p.m.", "p"))));
+  all.appendChild(grid); box.appendChild(all);
+  box.appendChild(el("span", "gonote", "Scheduled times. Holidays run the weekend schedule. Check live departures during disruptions."));
+  g.appendChild(box);
+  [["Live GO departures", "Real-time times and delays", "https://www.gotransit.com/en"], ["Live traffic and closures", "511 Ontario for the QEW and 403", "https://511on.ca"]].forEach(([t, s, h]) => { const a = el("a", "hl"); a.href = h; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t + " ↗")); a.appendChild(el("span", "hl-snip", s)); g.appendChild(a); });
+  const alerts = ((D.headlines || {}).oakville || []).filter(it => TRAVEL.includes(it.a)).slice(0, 5);
+  const lab = el("div", "hl"); lab.appendChild(el("span", "label", "Travel alerts · GO, accidents, traffic, closures")); g.appendChild(lab);
+  if (!alerts.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "No travel alerts right now.")); g.appendChild(e); }
+  alerts.forEach(it => g.appendChild(item(it)));
+  return g;
+}
+
+/* ---------- markets ---------- */
+function spark(points){
+  const ns = "http://www.w3.org/2000/svg"; const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 100 26"); svg.setAttribute("preserveAspectRatio", "none");
+  if (!points || points.length < 5) return svg;
+  const min = Math.min(...points), max = Math.max(...points), span = (max - min) || 1;
+  const xy = points.map((p, i) => [(i / (points.length - 1)) * 100, 24 - ((p - min) / span) * 22]);
+  const up = points[points.length - 1] >= points[0];
+  const line = document.createElementNS(ns, "polyline"); line.setAttribute("points", xy.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" "));
+  line.setAttribute("fill", "none"); line.setAttribute("stroke", up ? "var(--up)" : "var(--down)"); line.setAttribute("stroke-width", "1.5"); line.setAttribute("vector-effect", "non-scaling-stroke"); svg.appendChild(line);
+  return svg;
+}
+function fmtPx(q){ const dec = q.price < 10 ? 4 : 2; return q.price.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec }); }
+function fmtAsOf(sec){ if (!sec) return ""; const d = new Date(sec * 1000), same = d.toDateString() === new Date().toDateString();
+  return (same ? "" : d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + " ") + d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" }); }
+function chgEl(q){ const p = q.pct || 0; return el("span", "chg " + (p > 0.005 ? "up" : p < -0.005 ? "down" : "flat"), (p > 0.005 ? "▲ " : p < -0.005 ? "▼ " : "") + Math.abs(p).toFixed(2) + "%"); }
+function marketsStrip(){
+  const box = el("div", "markets");
+  (D.quotes || []).forEach(q => {
+    const t = el(q.url ? "a" : "div", "tick" + (q.price == null ? " off" : "")); if (q.url){ t.href = q.url; t.target = "_blank"; t.rel = "noopener"; t.style.cssText = "text-decoration:none;color:inherit"; }
+    t.appendChild(el("span", "label", q.label));
+    if (q.price == null){ t.appendChild(el("span", "px", "Unavailable")); box.appendChild(t); return; }
+    t.appendChild(el("span", "px", fmtPx(q))); t.appendChild(chgEl(q));
+    t.appendChild(spark(q.spark));
+    t.appendChild(el("span", "chg flat", (q.stale ? "last seen " : "") + fmtAsOf(q.asof) + " · " + (q.source || "").split(" ")[0] + " ↗"));
+    box.appendChild(t);
+  });
+  return box;
+}
+function marketsTable(){
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Markets")); head.appendChild(el("span", "stamp", "tap a row for the source")); g.appendChild(head);
+  (D.quotes || []).forEach(q => {
+    const a = el(q.url ? "a" : "div", "hl"); if (q.url){ a.href = q.url; a.target = "_blank"; a.rel = "noopener"; }
+    const top = el("div", "hl-meta"); top.style.cssText = "justify-content:space-between;font-size:15px;color:var(--ink)";
+    top.appendChild(el("strong", "", q.label));
+    const r = el("span", ""); r.style.cssText = "display:flex;gap:10px;align-items:baseline;font-family:var(--mono);font-variant-numeric:tabular-nums";
+    if (q.price == null) r.appendChild(el("span", "", "Unavailable")); else { r.appendChild(el("span", "", fmtPx(q))); r.appendChild(chgEl(q)); }
+    top.appendChild(r); a.appendChild(top);
+    if (q.price != null) a.appendChild(el("span", "hl-snip", (q.stale ? "Source didn't answer; last seen " : "As of ") + fmtAsOf(q.asof) + " · " + (q.source || "") + (q.url ? " ↗" : "")));
+    g.appendChild(a);
+  });
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Prices can be delayed 15 minutes or more. Currency rates are mid-market.")); g.appendChild(n);
+  return g;
+}
+
+/* ---------- gas ---------- */
+function gasCard(compact){
+  const G = D.gas; if (!G || !(G.days || []).length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "⛽ Gas in Oakville")); head.appendChild(el("span", "stamp", "regular, ¢/L")); g.appendChild(head);
+  const t0 = G.days[0], t1 = G.days[1];
+  const top = el("div", "stats");
+  const one = (v, lab, c) => { const x = el("div", "stat"); const b = el("b", "", v); if (c) b.style.color = c; x.appendChild(b); x.appendChild(el("small", "", lab)); top.appendChild(x); };
+  one(G.avg ? G.avg.toFixed(1) : (t1 ? t1.price.toFixed(1) : "—"), "average now");
+  one(t0.price.toFixed(1), t0.day + (t0.chg ? " · " + t0.chg : " · no change"), t0.dir === "up" ? "var(--down)" : t0.dir === "down" ? "var(--up)" : "");
+  const O = G.outlook; one(O === "up" ? "▲ Rising" : O === "down" ? "▼ Falling" : "Steady", "rest of week", O === "up" ? "var(--down)" : O === "down" ? "var(--up)" : "");
+  g.appendChild(top);
+  if (!compact){
+    const wk = el("div", "days");
+    const base = t0.price, start = new Date();
+    for (let i = 0; i < 7; i++){
+      const d = new Date(start.getTime() + i * 864e5), row = el("div", "day"); row.style.cursor = "default";
+      row.appendChild(el("span", "dn", i === 0 ? "Today" : d.toLocaleDateString("en-CA", { weekday: "short" })));
+      let txt, sub;
+      if (i === 0){ txt = (t1 ? t1.price : base).toFixed(1); sub = "posted"; }
+      else if (i === 1){ txt = base.toFixed(1); sub = "Gas Wizard forecast" + (t0.chg ? " (" + t0.chg + ")" : ""); }
+      else { txt = O === "up" ? "↗ higher" : O === "down" ? "↘ lower" : "≈ " + base.toFixed(1); sub = "outlook from wholesale prices"; }
+      row.appendChild(el("span", "di", ""));
+      const r = el("span", "range"); r.appendChild(el("span", "", txt)); row.appendChild(r); row.appendChild(el("span", "dp", ""));
+      const w = el("span", "daywear", sub); w.style.display = "block"; row.appendChild(w);
+      wk.appendChild(row);
+    }
+    g.appendChild(wk);
+    if (G.wholesale){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Wholesale gasoline is " + (G.wholesale.chg3 >= 0 ? "up " : "down ") + Math.abs(G.wholesale.chg3).toFixed(1) + "¢/L over the last 3 trading days. Pump prices usually follow within a few days. Tomorrow's number is Gas Wizard's forecast; later days are a direction, not a price.")); g.appendChild(n); }
+    if ((G.hist || []).length >= 3){ const pts = G.hist.map(h => [Math.floor(new Date(h[0] + "T12:00:00Z") / 864e5), h[1]]); const readout = el("div", "mk-read"); const ch = el("div", "mk-chart"); ch.appendChild(chartSvg(pts, t => readout.textContent = t)); g.appendChild(ch); g.appendChild(readout); }
+  }
+  [["Cheapest stations near you (GasBuddy map) ↗", "https://www.gasbuddy.com/gasprices/ontario/oakville"], ["Gas Wizard forecast for Oakville ↗", G.url]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t)); g.appendChild(a); });
+  if (compact){ const b = el("button", "hl", "7-day gas outlook →"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; b.onclick = () => go("oakville"); g.appendChild(b); }
+  return g;
+}
+
+/* ---------- watchlist ---------- */
+function allQuotes(){ return [...(D.quotes || []), ...(((D.watch || {}).items) || []).map(w => ({ label: w.label, price: w.price, pct: w.pct, asof: w.asof, url: w.url, source: w.source, stale: w.stale }))]; }
+function allDeep(){ const o = Object.assign({}, (D.deep || {}).items || {}); (((D.watch || {}).items) || []).forEach(w => { if (w.deep) o[w.label] = w.deep; }); return o; }
+let wEdit = false;
+function watchIssue(action, fields){
+  const repo = (D && D.repo) || "MG4Trading/signal-desk";
+  const body = Object.entries(fields).filter(([, v]) => v !== "" && v != null).map(([k, v]) => k + ": " + v).join("\n");
+  window.open("https://github.com/" + repo + "/issues/new?title=" + encodeURIComponent("Signal Desk: watch " + action + " " + (fields.Symbol || "")) + "&body=" + encodeURIComponent(body), "_blank", "noopener");
+}
+function watchCard(){
+  const W = ((D.watch || {}).items) || [];
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "My watchlist"));
+  const eb = el("button", "ghostbtn", wEdit ? "Done" : "Edit"); eb.type = "button"; eb.style.cssText = "min-height:32px;padding:5px 12px"; eb.onclick = () => { wEdit = !wEdit; render(); }; head.appendChild(eb); g.appendChild(head);
+  if (!W.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "No stocks yet. Tap Edit to add one.")); g.appendChild(e); }
+  const deep = allDeep();
+  W.forEach(w => {
+    const r = el("div", "readrow"); r.style.cursor = "pointer";
+    const left = el("div", ""); left.appendChild(el("strong", "", w.label)); left.appendChild(el("div", "hl-snip", (w.name || "") + (w.tsx ? " · TSX" : ""))); r.appendChild(left);
+    const right = el("div", ""); right.style.cssText = "text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums";
+    right.appendChild(el("div", "", w.price != null ? fmtPx(w) : "—")); const ch = chgEl(w); right.appendChild(ch); r.appendChild(right);
+    const x = deep[w.label]; const bits = [];
+    if (x && x.rets) bits.push(["YTD " + pctTxt(x.rets.YTD), ""]);
+    signals(w.label).slice(0, 2).forEach(s2 => bits.push(s2));
+    if (w.above) bits.push(["Alert above " + w.above, "warn"]); if (w.below) bits.push(["Alert below " + w.below, "warn"]);
+    if (w.note) bits.push([w.note, ""]);
+    r.appendChild(sigEl(bits));
+    if (wEdit){ const acts = el("div", "acts"); acts.style.cssText = "grid-column:1/-1;display:flex;gap:8px";
+      const ed = el("button", "ghostbtn", "✎ Change alerts or note"); ed.type = "button"; ed.onclick = e => { e.stopPropagation(); wForm = { sym: w.sym, name: w.name, above: w.above || "", below: w.below || "", note: w.note || "" }; render(); };
+      const rm = el("button", "ghostbtn", "✕ Remove"); rm.type = "button"; rm.style.color = "var(--danger)"; rm.onclick = e => { e.stopPropagation(); watchIssue("remove", { Symbol: w.sym }); };
+      acts.appendChild(ed); acts.appendChild(rm); r.appendChild(acts); }
+    r.onclick = () => { if (wEdit) return; mkSel = w.label; store.set("mkSel", mkSel); render(); document.getElementById("mk-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    g.appendChild(r);
+  });
+  if (wEdit){
+    const f = el("div", "alertbox form"); f.style.margin = "10px 16px 14px";
+    f.appendChild(el("span", "", wForm.sym ? "Change " + wForm.sym : "Add a stock. Use the ticker, and add -T for Toronto shares (RY-T, SHOP-T)."));
+    const inp = (id, ph, v, mode) => { const i = document.createElement("input"); i.id = id; i.placeholder = ph; i.value = v || ""; i.autocomplete = "off"; if (mode) i.inputMode = mode; f.appendChild(i); return i; };
+    const si = inp("wSym", "Ticker, e.g. AAPL or RY-T", wForm.sym); if (wForm.sym) si.readOnly = true;
+    const ni = inp("wName", "Name (optional)", wForm.name);
+    const row = el("div", "row2"); const ab = document.createElement("input"); ab.id = "wAbove"; ab.placeholder = "Alert above (price)"; ab.inputMode = "decimal"; ab.value = wForm.above; const be = document.createElement("input"); be.id = "wBelow"; be.placeholder = "Alert below (price)"; be.inputMode = "decimal"; be.value = wForm.below; row.appendChild(ab); row.appendChild(be); f.appendChild(row);
+    const no = inp("wNote", "Note (optional), e.g. buy under 250", wForm.note);
+    const send = el("button", "primary", wForm.sym ? "Save changes on GitHub" : "Add on GitHub"); send.type = "button";
+    send.onclick = () => { const sym = si.value.trim().toUpperCase(); if (!sym) return toast("Type a ticker"); watchIssue(wForm.sym ? "edit" : "add", { Symbol: sym, Name: ni.value.trim(), "Alert above": ab.value.trim(), "Alert below": be.value.trim(), Note: no.value.trim() }); wForm = { sym: "", name: "", above: "", below: "", note: "" }; };
+    f.appendChild(send);
+    if (wForm.sym){ const c = el("button", "ghostbtn", "Cancel"); c.type = "button"; c.onclick = () => { wForm = { sym: "", name: "", above: "", below: "", note: "" }; render(); }; f.appendChild(c); }
+    f.appendChild(el("span", "hl-snip", "Opens a ready-filled request on GitHub. Sign in and tap Create; the list updates within about 10 minutes. A phone alert goes out the first time a price crosses your alert level each day."));
+    g.appendChild(f);
+  }
+  return g;
+}
+let wForm = { sym: "", name: "", above: "", below: "", note: "" };
+
+/* ---------- businesses for sale ---------- */
+let mkTab = store.get("mkTab", "mk"), bizArea = "all", bizSort = "new";
+function mkTabs(){
+  const t = el("div", "gotabs"); t.style.cssText = "grid-template-columns:1fr 1fr";
+  [["mk", "Markets"], ["biz", "Businesses for sale"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(mkTab === k)); b.onclick = () => { mkTab = k; store.set("mkTab", k); render(); }; t.appendChild(b); });
+  return t;
+}
+function bizView(){
+  const B = D.biz || {}, all = B.items || [], out = [];
+  const chips = el("div", "subrail");
+  [["all", "All areas"], ["Oakville & Halton", "Oakville & Halton"], ["GTA", "Rest of GTA"]].forEach(([k, lab]) => { const b = el("button", "chip", lab); b.type = "button"; b.setAttribute("aria-pressed", String(bizArea === k)); b.onclick = () => { bizArea = k; render(); }; chips.appendChild(b); });
+  [["new", "Newest"], ["low", "Price: low to high"], ["high", "Price: high to low"]].forEach(([k, lab]) => { const b = el("button", "chip", lab); b.type = "button"; b.setAttribute("aria-pressed", String(bizSort === k)); b.onclick = () => { bizSort = k; render(); }; chips.appendChild(b); });
+  out.push(chips);
+  let L = all.filter(x => bizArea === "all" || x.area === bizArea);
+  if (bizSort !== "new") L = L.slice().sort((a, b) => (a.p == null) - (b.p == null) || (bizSort === "low" ? a.p - b.p : b.p - a.p));
+  const priced = L.filter(x => x.p).map(x => x.p).sort((a, b) => a - b);
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Businesses for sale")); head.appendChild(el("span", "stamp", B.at ? L.length + " listings · checked " + ago(B.at) : "")); g.appendChild(head);
+  if (priced.length){ const st = el("div", "stats"); const one = (v, lab) => { const x = el("div", "stat"); x.appendChild(el("b", "", v)); x.appendChild(el("small", "", lab)); st.appendChild(x); };
+    const k = v => v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "M" : "$" + Math.round(v / 1000) + "k";
+    one(k(priced[Math.floor(priced.length / 2)]), "median asking"); one(k(priced[0]) + "–" + k(priced[priced.length - 1]).slice(1), "range"); one(String(L.length), "listings"); g.appendChild(st); }
+  if (!L.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", B.at ? "No listings in this area right now. Try the searches below." : "First check runs within the hour.")); g.appendChild(e); }
+  L.forEach(x => {
+    const a = el("a", "home"); a.href = x.l; a.target = "_blank"; a.rel = "noopener"; a.style.alignItems = "start";
+    const img = document.createElement("img"); img.loading = "lazy"; img.alt = ""; if (x.img) img.src = x.img; a.appendChild(img);
+    const t = el("div", "hl"); t.style.cssText = "padding:0;border:0;gap:3px";
+    const m = el("div", "hl-meta"); m.appendChild(el("span", "pr", x.p ? money(x.p) : "Price on request")); m.appendChild(el("span", "tag", x.kind));
+    if (x.ts && Date.now() / 1000 - x.ts < 3 * 86400) m.appendChild(el("span", "new", "New")); t.appendChild(m);
+    const tt = el("span", "hl-title", x.t); tt.dir = "auto"; t.appendChild(tt);
+    if (x.facts && x.facts.length){ const f = el("div", "sigs"); f.style.cssText = "display:flex;flex-wrap:wrap;gap:4px"; x.facts.forEach(z => f.appendChild(el("span", "pill-sig", z))); t.appendChild(f); }
+    const d = el("span", "hl-snip", x.d.slice(0, 220) + (x.d.length > 220 ? "…" : "")); d.dir = "auto"; t.appendChild(d);
+    t.appendChild(el("span", "hl-snip", [x.place, x.also && x.also.length ? "also listed in " + x.also.slice(0, 3).join(", ") : "", x.ts ? ago(x.ts) : "", "Kijiji ↗"].filter(Boolean).join(" · ")));
+    a.appendChild(t); g.appendChild(a);
+  });
+  out.push(g);
+  const links = el("div", "group"); const lh = el("div", "group-head"); lh.appendChild(el("strong", "", "More listings and brokers")); links.appendChild(lh);
+  [["BizBuySell · Oakville", "Largest marketplace, with financials on many listings", "https://www.bizbuysell.com/ontario/oakville-businesses-for-sale/"],
+   ["BizBuySell · Toronto and GTA", "", "https://www.bizbuysell.com/ontario/toronto-businesses-for-sale/"],
+   ["BusinessesForSale.com · Ontario", "Broker and owner listings", "https://ca.businessesforsale.com/canadian/search/businesses-for-sale-in-ontario"],
+   ["REALTOR.ca · businesses for sale", "Pick Commercial, then Business, and search Oakville", "https://www.realtor.ca/"],
+   ["Kijiji · business for sale, Oakville", "The source for the list above", "https://www.kijiji.ca/b-other-business-industrial/oakville-halton-region/business-for-sale/k0c145l1700277?sort=dateDesc"],
+   ["Franchise opportunities in Canada", "Canadian Franchise Association directory", "https://www.cfa.ca/"]].forEach(([t, s2, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t + " ↗")); if (s2) a.appendChild(el("span", "hl-snip", s2)); links.appendChild(a); });
+  const note = el("div", "hl"); note.appendChild(el("span", "hl-snip", "Before making an offer: ask for 3 years of financials and tax returns, check the lease terms and any franchise fees, and have an accountant and a lawyer review the deal.")); links.appendChild(note);
+  out.push(links);
+  return out;
+}
+
+/* ---------- market deep dive ---------- */
+let mkSel = store.get("mkSel", "S&P/TSX"), mkRange = store.get("mkRange", "1Y"), mkAngle = "all";
+const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(v != null && Math.abs(v) >= 100 ? 0 : 1) + "%";
+const cls = v => v == null ? "" : v > 0.005 ? "up" : v < -0.005 ? "down" : "";
+function signals(label){
+  const x = allDeep()[label], q = allQuotes().find(z => z.label === label) || {}; if (!x) return [];
+  const out = [];
+  if (x.trend) out.push([x.trend, x.trend === "Uptrend" || x.trend === "Above 50-day" ? "good" : x.trend === "Downtrend" || x.trend === "Below 50-day" ? "bad" : ""]);
+  if (x.rsi != null) out.push(["RSI " + Math.round(x.rsi) + (x.rsi >= 70 ? " · overbought" : x.rsi <= 30 ? " · oversold" : ""), x.rsi >= 70 || x.rsi <= 30 ? "warn" : ""]);
+  if (x.from_hi != null) out.push([x.from_hi > -1 ? "At 52-week high" : pctTxt(x.from_hi) + " from 52-week high", x.from_hi > -1 ? "good" : x.from_hi < -10 ? "bad" : ""]);
+  if (x.ma200 && q.price) out.push([(q.price >= x.ma200 ? "Above" : "Below") + " 200-day avg", q.price >= x.ma200 ? "good" : "bad"]);
+  return out;
+}
+function sigEl(sig){ const box = el("span", "sigs"); sig.forEach(([t, c]) => box.appendChild(el("span", "pill-sig " + c, t))); return box; }
+function marketRead(){
+  const items = (D.deep || {}).items || {}; if (!Object.keys(items).length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Today's read")); head.appendChild(el("span", "stamp", "signals, not advice")); g.appendChild(head);
+  (D.quotes || []).forEach(q => {
+    const x = items[q.label]; if (!x) return;
+    const r = el("button", "readrow"); r.type = "button";
+    const left = el("div", ""); left.appendChild(el("strong", "", q.label)); r.appendChild(left);
+    const right = el("span", ""); right.style.cssText = "font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;display:flex;gap:10px";
+    right.appendChild(el("span", cls(q.pct) === "up" ? "" : "", "Day " + pctTxt(q.pct)));
+    right.appendChild(el("span", "", "YTD " + pctTxt(x.rets.YTD))); r.appendChild(right);
+    r.appendChild(sigEl(signals(q.label)));
+    r.onclick = () => { mkSel = q.label; store.set("mkSel", mkSel); render(); document.getElementById("mk-detail")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
+    g.appendChild(r);
+  });
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Trend compares the price with its 50- and 200-day averages. RSI above 70 often means stretched; below 30, washed out. These are general market signals, not personal financial advice.")); g.appendChild(n);
+  return g;
+}
+function chartSvg(pts, onRead){
+  const ns = "http://www.w3.org/2000/svg", W = 340, H = 170, L = 50, R = 8, T = 10, B = 22;
+  const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", `0 0 ${W} ${H}`); svg.setAttribute("role", "img");
+  if (pts.length < 2) return svg;
+  const vs = pts.map(p => p[1]); let lo = Math.min(...vs), hi = Math.max(...vs); const pad = (hi - lo) * 0.08 || hi * 0.01; lo -= pad; hi += pad;
+  const x0 = pts[0][0], x1 = pts[pts.length - 1][0];
+  const X = d => L + (d - x0) / ((x1 - x0) || 1) * (W - L - R), Y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+  const mk = (tag, attrs) => { const e = document.createElementNS(ns, tag); Object.entries(attrs).forEach(([k, v]) => e.setAttribute(k, v)); svg.appendChild(e); return e; };
+  const dec = hi < 10 ? 3 : hi < 1000 ? 1 : 0, fmt = v => v.toLocaleString("en-CA", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  [0, 0.5, 1].forEach(f => { const v = lo + (hi - lo) * (1 - f), y = Y(v); mk("line", { x1: L, x2: W - R, y1: y, y2: y, stroke: "var(--line)", "stroke-width": 1 }); const t = mk("text", { x: L - 6, y: y + 4, "text-anchor": "end", "font-size": 10, fill: "var(--muted)", "font-family": "var(--mono)" }); t.textContent = fmt(v); });
+  const dstr = d => new Date(d * 864e5).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: (x1 - x0) > 200 ? "2-digit" : undefined, timeZone: "UTC" });
+  [[x0, "start"], [x1, "end"]].forEach(([d, a]) => { const t = mk("text", { x: X(d), y: H - 6, "text-anchor": a, "font-size": 10, fill: "var(--muted)" }); t.textContent = dstr(d); });
+  const up = vs[vs.length - 1] >= vs[0], col = up ? "var(--up)" : "var(--down)";
+  const line = pts.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join(" ");
+  mk("path", { d: line + ` L${X(x1).toFixed(1)} ${H - B} L${X(x0).toFixed(1)} ${H - B} Z`, fill: col, "fill-opacity": 0.08, stroke: "none" });
+  mk("path", { d: line, fill: "none", stroke: col, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" });
+  const cross = mk("line", { y1: T, y2: H - B, stroke: "var(--muted)", "stroke-width": 1, "stroke-dasharray": "3 3", visibility: "hidden" });
+  const dot = mk("circle", { r: 4.5, fill: col, stroke: "var(--surface)", "stroke-width": 2, cx: X(x1), cy: Y(vs[vs.length - 1]) });
+  const read = i => { const p = pts[i]; dot.setAttribute("cx", X(p[0])); dot.setAttribute("cy", Y(p[1])); onRead(dstr(p[0]) + " · " + fmt(p[1]) + " · " + pctTxt((p[1] / pts[0][1] - 1) * 100) + " from start"); };
+  const move = e => { const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W; let best = 0, bd = 1e9; pts.forEach((p, i) => { const d = Math.abs(X(p[0]) - x); if (d < bd){ bd = d; best = i; } }); cross.setAttribute("x1", X(pts[best][0])); cross.setAttribute("x2", X(pts[best][0])); cross.setAttribute("visibility", "visible"); read(best); };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerdown", move);
+  svg.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); read(pts.length - 1); });
+  read(pts.length - 1);
+  return svg;
+}
+function marketDetail(){
+  const items = allDeep(), labels = allQuotes().map(q => q.label).filter(l => items[l]); if (!labels.length) return null;
+  if (!items[mkSel]) mkSel = labels[0];
+  const x = items[mkSel], q = allQuotes().find(z => z.label === mkSel) || {};
+  const g = el("div", "group"); g.id = "mk-detail";
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Deep dive")); head.appendChild(el("span", "stamp", "history updated " + ago(D.deep.at))); g.appendChild(head);
+  const pills = el("div", "subrail"); pills.style.cssText = "margin:10px 0 0;padding:0 16px";
+  labels.forEach(l => { const b = el("button", "chip", l); b.type = "button"; b.setAttribute("aria-pressed", String(l === mkSel)); b.onclick = () => { mkSel = l; store.set("mkSel", l); render(); }; pills.appendChild(b); });
+  g.appendChild(pills);
+  const pr = el("div", "mk-price"); pr.appendChild(el("strong", "", q.price != null ? fmtPx(q) : "—")); if (q.price != null) pr.appendChild(chgEl(q));
+  if (q.url){ const a = el("a", "", (q.source || "Source") + " ↗"); a.href = q.url; a.target = "_blank"; a.rel = "noopener"; a.style.cssText = "margin-left:auto;font-size:12px;color:var(--accent);font-weight:600"; pr.appendChild(a); }
+  g.appendChild(pr);
+  const sg = sigEl(signals(mkSel)); sg.style.cssText = "display:flex;flex-wrap:wrap;gap:5px;padding:0 16px 10px"; g.appendChild(sg);
+  const rets = el("div", "mk-rets");
+  [["Day", q.pct], ["1W", x.rets["1W"]], ["1M", x.rets["1M"]], ["3M", x.rets["3M"]], ["YTD", x.rets.YTD], ["1Y", x.rets["1Y"]], ["3Y", x.rets["3Y"]], ["5Y", x.rets["5Y"]]].forEach(([k, v]) => { const c = el("div", "mk-ret"); c.appendChild(el("span", "label", k)); c.appendChild(el("b", cls(v), pctTxt(v))); rets.appendChild(c); });
+  g.appendChild(rets);
+  const now = Math.floor(Date.now() / 864e5), ytd = Math.floor(Date.UTC(new Date().getFullYear(), 0, 1) / 864e5);
+  const ranges = { "1M": [x.daily, now - 31], "3M": [x.daily, now - 92], "YTD": [x.daily, ytd], "1Y": [x.daily, now - 366], "5Y": [x.weekly && x.weekly.length ? x.weekly : x.daily, now - 5 * 366] };
+  const rp = el("div", "gotabs"); rp.style.cssText = "grid-template-columns:repeat(5,1fr);margin:0 16px 8px";
+  Object.keys(ranges).forEach(k => { const b = el("button", "", k); b.type = "button"; b.setAttribute("aria-pressed", String(k === mkRange)); b.onclick = () => { mkRange = k; store.set("mkRange", k); render(); }; rp.appendChild(b); });
+  g.appendChild(rp);
+  const [src, from] = ranges[mkRange] || ranges["1Y"]; let pts = (src || []).filter(p => p[0] >= from);
+  if (q.price != null && pts.length && pts[pts.length - 1][0] < now) pts = pts.concat([[now, q.price]]);
+  const readout = el("div", "mk-read"); const ch = el("div", "mk-chart");
+  ch.appendChild(pts.length > 1 ? chartSvg(pts, t => readout.textContent = t) : el("div", "hl-snip", "Not enough history for this range yet."));
+  g.appendChild(ch); g.appendChild(readout);
+  const st = el("div", "mk-stats"); const f = v => v == null ? "—" : fmtPx({ price: v });
+  [["52-week high", f(x.hi52)], ["52-week low", f(x.lo52)], ["50-day average", f(x.ma50)], ["200-day average", f(x.ma200)], ["RSI (14-day)", x.rsi == null ? "—" : String(x.rsi)], ["From 52-week high", pctTxt(x.from_hi)]].forEach(([k, v]) => { const d = el("div", ""); d.appendChild(el("span", "", k + " ")); d.appendChild(el("b", "", v)); st.appendChild(d); });
+  g.appendChild(st);
+  if (x.limited){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Only about a month of history is available for this market, so long-term returns and averages are blank.")); g.appendChild(n); }
+  return g;
+}
+function ratesCard(){
+  const R = (D.rates || {}).items || []; if (!R.length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Interest rates")); head.appendChild(el("span", "stamp", "tap for source")); g.appendChild(head);
+  R.forEach(r => {
+    const a = el("a", "hl"); a.href = r.url; a.target = "_blank"; a.rel = "noopener";
+    const top = el("div", "hl-meta"); top.style.cssText = "justify-content:space-between;font-size:15px;color:var(--ink)";
+    top.appendChild(el("strong", "", r.label)); top.appendChild(el("span", "", "")).style.cssText = "flex:1";
+    const v = el("span", "", r.value.toFixed(2) + "%"); v.style.cssText = "font-family:var(--mono);font-weight:500"; top.appendChild(v); a.appendChild(top);
+    const bits = [];
+    if (r.moved) bits.push("last move " + (r.moved.by > 0 ? "+" : "") + r.moved.by.toFixed(2) + " pts on " + new Date(r.moved.date + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" }));
+    if (r.yoy != null) bits.push((r.yoy > 0 ? "+" : "") + r.yoy.toFixed(2) + " pts over 12 months");
+    bits.push("as of " + (typeof r.asof === "number" ? fmtAsOf(r.asof) : new Date(r.asof + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric" })) + " · " + r.source + " ↗");
+    a.appendChild(el("span", "hl-snip", bits.join(" · "))); g.appendChild(a);
+  });
+  return g;
+}
+function housingCard(){
+  const H = D.housing; if (!H || H.snlr == null) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Housing: buyer's or seller's market?")); head.appendChild(el("span", "stamp", "Canada")); g.appendChild(head);
+  const top = el("div", "mk-price"); top.appendChild(el("strong", "", H.verdict)); top.appendChild(el("span", "chg flat", "sales-to-new-listings " + H.snlr + "%")); g.appendChild(top);
+  const gg = el("div", "gauge"); const i = el("i"); i.style.left = Math.max(0, Math.min(100, (H.snlr - 30) / 50 * 100)) + "%"; gg.appendChild(i);
+  gg.style.background = `linear-gradient(90deg,var(--accent-soft) 0 ${(45 - 30) / 50 * 100}%,var(--surface-2) ${(45 - 30) / 50 * 100}% ${(65 - 30) / 50 * 100}%,var(--amber-soft) ${(65 - 30) / 50 * 100}% 100%)`; g.appendChild(gg);
+  const gl = el("div", "gauge-l"); ["Buyer's · under 45%", "Balanced", "Seller's · over 65%"].forEach(t => gl.appendChild(el("span", "", t))); g.appendChild(gl);
+  const st = el("div", "mk-stats");
+  [["Months of inventory", H.moi == null ? "—" : String(H.moi)], ["Benchmark price, year over year", pctTxt(H.hpi_yoy)], ["Average price, year over year", pctTxt(H.avg_yoy)], ["Report", H.date || "—"]].forEach(([k, v]) => { const d = el("div", ""); d.appendChild(el("span", "", k + " ")); d.appendChild(el("b", "", v)); st.appendChild(d); });
+  g.appendChild(st);
+  const src = el("a", "hl"); src.href = H.url; src.target = "_blank"; src.rel = "noopener"; src.appendChild(el("span", "hl-title", (H.title || "CREA monthly report") + " ↗")); src.appendChild(el("span", "hl-snip", "CREA national statistics. Local Oakville numbers come from the regional board; see the links below.")); g.appendChild(src);
+  if (D.rentals && D.rentals.stats){ const a = el("button", "hl"); a.type = "button"; a.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer"; a.appendChild(el("span", "hl-title", "Oakville 3-bed rent: " + money(D.rentals.stats.median) + " median →")); a.appendChild(el("span", "hl-snip", D.rentals.stats.count + " listings tracked · see Homes")); a.onclick = () => go("homes"); g.appendChild(a); }
+  [["TRREB Market Watch (includes Oakville)", "https://trreb.ca/market-data/market-watch/"], ["CREA MLS® Home Price Index", "https://www.crea.ca/housing-market-stats/mls-home-price-index/"]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t + " ↗")); g.appendChild(a); });
+  return g;
+}
+function marketNews(){
+  const t = (D.topics || []).find(z => z.in_markets); if (!t) return null;
+  const items = (D.headlines || {})[t.id] || [];
+  const wrap = el("div", "stack");
+  const angles = [...new Set(items.map(it => it.a))];
+  const sub = el("div", "subrail"); ["all", ...angles].forEach(a => { const b = el("button", "chip", a === "all" ? "All market news" : a); b.type = "button"; b.setAttribute("aria-pressed", String(mkAngle === a)); b.onclick = () => { mkAngle = a; render(); }; sub.appendChild(b); });
+  wrap.appendChild(sub);
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Analysts, rates and market news")); head.appendChild(el("span", "stamp", items.length + " stories")); g.appendChild(head);
+  (mkAngle === "all" ? items : items.filter(it => it.a === mkAngle)).slice(0, 25).forEach(it => g.appendChild(item(it)));
+  wrap.appendChild(g);
+  return wrap;
+}
+
+/* ---------- faith ---------- */
+const PR = [["Fajr","الفجر"],["Sunrise","الشروق"],["Dhuhr","الظهر"],["Asr","العصر"],["Maghrib","المغرب"],["Isha","العشاء"]];
+function hm(t){ const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+function nextPrayer(){
+  const P = X && X.prayer; if (!P) return null;
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Toronto", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+  const g = k => (parts.find(p => p.type === k) || {}).value; const today = g("year") + "-" + g("month") + "-" + g("day"); const mins = (Number(g("hour")) % 24) * 60 + Number(g("minute"));
+  const d0 = P.days.find(d => d.date === today) || P.days[0], d1 = P.days.find(d => d.date > today);
+  for (const [k, ar] of PR){ if (k === "Sunrise") continue; if (hm(d0.times[k]) > mins) return { k, ar, t: d0.times[k], wait: hm(d0.times[k]) - mins, day: d0 }; }
+  if (d1) return { k: "Fajr", ar: "الفجر", t: d1.times.Fajr, wait: 1440 - mins + hm(d1.times.Fajr), day: d0, tomorrow: true };
+  return null;
+}
+const waitTxt = w => w < 60 ? "in " + w + " min" : "in " + Math.floor(w / 60) + " h " + (w % 60) + " min";
+function qibla(){ const r = Math.PI / 180, la1 = 43.4675 * r, lo1 = -79.6877 * r, la2 = 21.4225 * r, lo2 = 39.8262 * r;
+  const y = Math.sin(lo2 - lo1) * Math.cos(la2), x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(lo2 - lo1); return Math.round((Math.atan2(y, x) / r + 360) % 360); }
+function prayerCard(full){
+  const P = X && X.prayer; if (!P) return el("div", "empty", "Prayer times load with the next update.");
+  const n = nextPrayer(), d0 = n ? n.day : P.days[0];
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Prayer times · Oakville"));
+  const hj = el("span", "stamp ar", d0.hijri_ar); head.appendChild(hj); g.appendChild(head);
+  if (n){ const b = el("div", "bigcount"); const l = el("div", ""); l.appendChild(el("span", "label", "Next prayer")); const st = el("strong", "", n.k + " " + fmt12(n.t)); l.appendChild(st); b.appendChild(l);
+    const r = el("div", ""); r.style.textAlign = "right"; r.appendChild(el("div", "ar", n.ar)); r.appendChild(el("span", "gowait", (n.tomorrow ? "tomorrow · " : "") + waitTxt(n.wait))); b.appendChild(r); g.appendChild(b); }
+  const grid = el("div", "pray");
+  PR.forEach(([k, ar]) => { const c = el("div", n && n.k === k && !n.tomorrow ? "next" : ""); c.appendChild(el("span", "label", k)); c.appendChild(el("span", "ar", ar)).style.cssText = "font-size:15px;line-height:1.3"; c.appendChild(el("b", "", fmt12(d0.times[k]).replace(" a.m.", "a").replace(" p.m.", "p"))); grid.appendChild(c); });
+  g.appendChild(grid);
+  if (full){ const n2 = el("div", "hl"); n2.appendChild(el("span", "hl-snip", "Method: " + P.method + " · Qibla " + qibla() + "° from north (northeast) · Friday Jumu'ah: check your masjid's time · " + d0.hijri_en)); g.appendChild(n2);
+    const a = el("a", "hl"); a.href = "https://www.google.com/maps/search/mosque+near+Oakville+ON"; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", "Mosques near Oakville ↗")); g.appendChild(a); }
+  return g;
+}
+function faithMini(){
+  if (!X || !X.prayer) return null;
+  const g = prayerCard(false);
+  const A = X.faith && X.faith.ayah;
+  if (A){ const b = el("button", "hl"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer";
+    b.appendChild(el("span", "ar", A.ar)).style.fontSize = "20px"; b.appendChild(el("span", "hl-snip", A.en + " (" + A.surah_en + " " + A.ref + ")"));
+    b.onclick = () => go("faith"); g.appendChild(b); }
+  return g;
+}
+function ayahCard(){
+  const A = X && X.faith && X.faith.ayah; if (!A) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Verse of the day")); head.appendChild(el("span", "stamp ar", A.surah_ar + " · " + A.ref)); g.appendChild(head);
+  g.appendChild(el("div", "ar ayah", A.ar)); g.appendChild(el("div", "ayah-en", A.en));
+  const f = el("details", "fold"); f.appendChild(el("summary", "", "التفسير الميسر · Tafsir")); const inn = el("div", "inner ar", A.tafsir_ar); f.appendChild(inn); g.appendChild(f);
+  const a = el("a", "hl"); a.href = A.url; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", "Read and listen on Quran.com ↗")); g.appendChild(a);
+  return g;
+}
+function hadithCard(){
+  const H = X && X.faith && X.faith.hadith; if (!H) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "حديث اليوم · Hadith of the day")); head.appendChild(el("span", "stamp", "#" + H.num)); g.appendChild(head);
+  const ar = el("div", "ar"); ar.style.cssText = "font-size:19px;padding:12px 16px"; ar.textContent = H.ar; g.appendChild(ar);
+  const f = el("details", "fold"); f.appendChild(el("summary", "", "English translation")); f.appendChild(el("div", "inner", H.en)); g.appendChild(f);
+  const a = el("a", "hl"); a.href = H.url; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", H.book + " ↗")); a.appendChild(el("span", "hl-snip", "Source and grading on Sunnah.com")); g.appendChild(a);
+  return g;
+}
+function surahCard(){
+  const S = X && X.faith && X.faith.surah; if (!S) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Surah of the day")); head.appendChild(el("span", "stamp", S.type === "Meccan" ? "Meccan · مكية" : "Medinan · مدنية")); g.appendChild(head);
+  const top = el("div", "bigcount"); const l = el("div", ""); l.appendChild(el("strong", "", S.name_en)); l.appendChild(el("div", "hl-snip", S.meaning + " · " + S.count + " verses · surah " + S.n)); top.appendChild(l);
+  const r = el("div", "ar qn"); r.style.fontSize = "26px"; r.textContent = S.name_ar; top.appendChild(r); g.appendChild(top);
+  if (new Date().getDay() === 5 && S.n === 18){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Friday: Surah Al-Kahf.")); g.appendChild(n); }
+  if (S.intro_ar){ const f = el("details", "fold"); f.open = true; f.appendChild(el("summary", "", "عن السورة ومقاصدها · About the surah")); f.appendChild(el("div", "inner ar", S.intro_ar)); g.appendChild(f); }
+  const seg = el("div", "langseg"); [["both", "Both"], ["ar", "عربي"], ["en", "English"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(faithLang === k)); b.onclick = () => { faithLang = k; store.set("faithLang", k); render(); }; seg.appendChild(b); }); g.appendChild(seg);
+  const list = surahAll ? S.ayahs : S.ayahs.slice(0, 12);
+  list.forEach(v => {
+    const box = el("div", "av"); box.appendChild(el("span", "num", S.name_en + " " + S.n + ":" + v.n));
+    if (faithLang !== "en") box.appendChild(el("div", "ar", v.ar));
+    if (faithLang !== "ar") box.appendChild(el("div", "en", v.en));
+    const f = el("details", "fold"); f.style.margin = "0 -16px"; f.appendChild(el("summary", "", faithLang === "en" ? "Tafsir (Al-Mukhtasar)" : "التفسير (المختصر)"));
+    const t = el("div", "inner" + (faithLang === "en" ? "" : " ar")); t.textContent = faithLang === "en" ? v.t_en : v.t_ar; f.appendChild(t); box.appendChild(f);
+    g.appendChild(box);
+  });
+  if (!surahAll && S.ayahs.length > 12){ const b = el("button", "hl", "Show all " + S.count + " verses"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; b.onclick = () => { surahAll = true; render(); }; g.appendChild(b); }
+  [["Background and reasons of revelation (Quran.com) ↗", S.info_url], ["Read and listen to the full surah ↗", S.read_url]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t)); g.appendChild(a); });
+  return g;
+}
+
+/* ---------- kitchen ---------- */
+function kc(){ return (X && X.content) || {}; }
+function egR(){ return (kc().recipes || []).filter(r => r.cuisine === "Egyptian"); }
+function dayInfo(off){ const d = new Date(Date.now() + off * 864e5), dow = d.getDay(), ed = Math.floor((d.getTime() - d.getTimezoneOffset() * 6e4) / 864e5); return { dow, k: Math.floor((ed + 3) / 7), wknd: dow === 6 || dow === 0 }; }
+function recipeFor(off){
+  const R = egR(); if (!R.length) return null; const { dow, k, wknd } = dayInfo(off);
+  const CL = R.filter(r => r.style === "classic"), LT = R.filter(r => r.style !== "classic");
+  if (wknd && CL.length) return CL[(2 * k + (dow === 0 ? 1 : 0)) % CL.length];
+  const L = LT.length ? LT : R; return L[(5 * k + Math.max(0, dow - 1)) % L.length];
+}
+function todayRecipe(){ const R = egR(); if (!R.length) return null; return kPick != null ? R[kPick] : recipeFor(0); }
+function scaleAmt(txt){
+  if (kServ === 4) return txt;
+  const f = kServ / 4, map = { "½": .5, "¼": .25, "¾": .75, "⅓": 1 / 3, "⅔": 2 / 3 };
+  const m = txt.match(/^(\d+)?\s*([½¼¾⅓⅔])?/); if (!m || (!m[1] && !m[2])) return txt;
+  const v = (m[1] ? Number(m[1]) : 0) + (m[2] ? map[m[2]] : 0), n = Math.round(v * f * 4) / 4;
+  const whole = Math.floor(n), frac = n - whole, fr = { 0.25: "¼", 0.5: "½", 0.75: "¾" }[frac] || "";
+  return ((whole || !fr ? whole : "") + fr) + txt.slice(m[0].length);
+}
+function arAmt(t){
+  const w = [[/\bcups?\b/g, "كوب"], [/\btbsp\b/g, "م.ك"], [/\btsp\b/g, "م.ص"], [/\bcloves?\b/g, "فص"], [/\bcans?\b/g, "علبة"], [/\bhandful\b/g, "حفنة"],
+    [/\blarge\b/g, "كبير"], [/\bmedium\b/g, "متوسط"], [/\blight\b/g, "خفيف"], [/\beach\b/g, "من كل نوع"], [/\bto serve\b/g, "للتقديم"], [/\babout\b/g, "حوالي"], [/(\d)\s?g\b/g, "$1 جم"], [/(\d)\s?ml\b/g, "$1 مل"]];
+  return w.reduce((a, [re, r]) => a.replace(re, r), t);
+}
+function kitchenMini(){
+  const r = todayRecipe(); if (!r) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", "Tonight's family dinner · for " + kServ)); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
+  const b = el("button", "hl"); b.type = "button"; b.style.cssText = "border:0;background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer";
+  b.appendChild(el("span", "hl-title", r.en)); b.appendChild(el("span", "ar", r.ar)).style.fontSize = "17px";
+  b.appendChild(el("span", "hl-snip", (r.youth ? "Youth favourite · " : "") + (r.style === "classic" ? "Weekend treat · " : "") + r.mins + " min · about " + r.kcal + " kcal and " + r.protein + " g protein per serving · tap for the recipe")); b.onclick = () => go("kitchen"); g.appendChild(b);
+  return g;
+}
+function kitchenView(){
+  const C = kc(), R = egR(); if (!R.length) return el("div", "empty", "Recipes load with the next update.");
+  const ar = kLang === "ar", r = todayRecipe(), dn = X.day_no || 0;
+  const wrap = el("div", "stack");
+  const g = el("div", "group"); if (ar) g.dir = "rtl";
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", ar ? "قائمة اليوم للعائلة" : "Today's family menu")); head.appendChild(el("span", "stamp", r.cuisine)); g.appendChild(head);
+  const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["en", "English"], ["ar", "عربي"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(kLang === k)); b.onclick = () => { kLang = k; store.set("kLang", k); render(); }; seg.appendChild(b); }); g.appendChild(seg);
+  const bf = (C.breakfast || [])[dn % (C.breakfast || [1]).length], sn = (C.snacks || [])[dn % (C.snacks || [1]).length];
+  const DI = dayInfo(0), ds = (C.desserts || []), dz = DI.wknd && ds.length ? ds[(2 * DI.k + (DI.dow === 0 ? 1 : 0)) % ds.length] : null;
+  [[ar ? "الفطار" : "Breakfast", bf && bf[ar ? 1 : 0]], [ar ? "سناك" : "Snack", sn && sn[ar ? 1 : 0]], [ar ? "الغدا / العشا" : "Dinner", (ar ? r.ar : r.en) + (ar ? " · لـ " + kServ + " أفراد" : " · for " + kServ)]].concat(dz ? [[ar ? "حلو الويك إند" : "Weekend dessert", dz[ar ? 1 : 0]]] : []).forEach(([k, v]) => { const row = el("div", "menu-row"); row.appendChild(el("span", "label", k)); row.appendChild(el("span", ar ? "ar" : "", v || "")); g.appendChild(row); });
+  wrap.appendChild(g);
+  const c = el("div", "group"); if (ar) c.dir = "rtl";
+  const h2 = el("div", "group-head"); h2.appendChild(el("strong", ar ? "ar" : "", ar ? r.ar : r.en)); h2.appendChild(el("span", "stamp", kPick != null ? (ar ? "مفاجأة" : "surprise pick") : (ar ? "وصفة اليوم" : "recipe of the day"))); c.appendChild(h2);
+  const meta = el("div", "recipe-meta"); meta.style.paddingTop = "10px";
+  [(ar ? "⏱ " + r.mins + " دقيقة" : "⏱ " + r.mins + " min"), (ar ? "🔥 حوالي " + r.kcal + " سعر للفرد" : "🔥 about " + r.kcal + " kcal a serving"), (ar ? "💪 " + r.protein + " جم بروتين" : "💪 " + r.protein + " g protein"), (ar ? "حلال" : "Halal"), (r.style === "classic" ? (ar ? "أكلة الويك إند" : "Weekend treat") : (ar ? "أخف لأيام الأسبوع" : "Lighter weeknight"))].concat(r.youth ? [ar ? "مفضلة الشباب" : "Youth favourite"] : []).forEach(t => meta.appendChild(el("span", "pill-sig", t)));
+  c.appendChild(meta);
+  const sv = el("div", "serv"); const minus = el("button", "", "−"), plus = el("button", "", "+"); minus.type = plus.type = "button";
+  minus.onclick = () => { kServ = Math.max(2, kServ - 1); store.set("kServ", kServ); render(); }; plus.onclick = () => { kServ = Math.min(10, kServ + 1); store.set("kServ", kServ); render(); };
+  sv.appendChild(minus); sv.appendChild(el("span", "", (ar ? "عدد الأفراد: " : "Serves ") + kServ)); sv.appendChild(plus); c.appendChild(sv);
+  c.appendChild(el("div", "label", ar ? "المكونات" : "Ingredients")).style.padding = "0 16px 6px";
+  const ing = el("ul", "ing"); r.ing.forEach(([en, a, amt]) => { const li = el("li", ""); li.appendChild(el("b", "", (ar ? arAmt(scaleAmt(amt)) : scaleAmt(amt)) + " ")); li.appendChild(document.createTextNode(ar ? a : en)); ing.appendChild(li); }); c.appendChild(ing);
+  c.appendChild(el("div", "label", ar ? "الطريقة" : "Steps")).style.padding = "0 16px 6px";
+  const st = el("ol", "steps"); (ar ? r.steps_ar : r.steps_en).forEach(t => st.appendChild(el("li", "", t))); c.appendChild(st);
+  const tip = el("div", "hl"); tip.appendChild(el("span", "hl-snip", "💡 " + (ar ? r.tip_ar : r.tip_en))); c.appendChild(tip);
+  const acts = el("div", "acts"); acts.style.cssText = "padding:0 16px 14px;display:flex;flex-wrap:wrap;gap:8px";
+  const sp = el("button", "primary", ar ? "🎲 فاجئني بوصفة تانية" : "🎲 Surprise me"); sp.type = "button"; sp.onclick = () => { let i; do { i = Math.floor(Math.random() * R.length); } while (R.length > 1 && R[i] === r); kPick = i; render(); window.scrollTo({ top: 0 }); }; acts.appendChild(sp);
+  const yt = el("a", "ghostbtn", ar ? "فيديو الطريقة ↗" : "Watch how ↗"); yt.href = "https://www.youtube.com/results?search_query=" + encodeURIComponent(r.yt); yt.target = "_blank"; yt.rel = "noopener"; yt.style.textDecoration = "none"; yt.style.color = "var(--ink)"; acts.appendChild(yt);
+  if (kPick != null){ const back = el("button", "ghostbtn", ar ? "رجوع لوصفة اليوم" : "Back to today's"); back.type = "button"; back.onclick = () => { kPick = null; render(); }; acts.appendChild(back); }
+  c.appendChild(acts); wrap.appendChild(c);
+  const w = el("div", "group"); if (ar) w.dir = "rtl"; const h3 = el("div", "group-head"); h3.appendChild(el("strong", "", ar ? "الأيام الجاية" : "Coming up this week")); w.appendChild(h3);
+  for (let i = 1; i <= 6; i++){ const rr = recipeFor(i), d = new Date(Date.now() + i * 864e5); const row = el("button", "menu-row"); row.type = "button"; row.style.cssText = "width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:inherit;font:inherit;color:inherit;cursor:pointer";
+    row.appendChild(el("span", "label", d.toLocaleDateString(ar ? "ar-EG" : "en-CA", { weekday: "short" }))); row.appendChild(el("span", ar ? "ar" : "", ar ? rr.ar : rr.en)); row.onclick = () => { kPick = R.indexOf(rr); render(); window.scrollTo({ top: 0 }); }; w.appendChild(row); }
+  wrap.appendChild(w);
+  return wrap;
+}
+
+/* ---------- watch & listen ---------- */
+const jw = t => "https://www.justwatch.com/ca/search?q=" + encodeURIComponent(t), imdb = t => "https://www.imdb.com/find/?q=" + encodeURIComponent(t);
+function filmRow(title, sub, links, img){
+  const r = el("div", "film"); const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; if (img) im.src = img; else im.style.visibility = "hidden"; r.appendChild(im);
+  const b = el("div", ""); b.style.cssText = "display:flex;flex-direction:column;gap:3px;min-width:0"; const tt = el("span", "hl-title", title); tt.dir = "auto"; b.appendChild(tt); if (sub) b.appendChild(el("span", "hl-snip", sub));
+  const ls = el("div", "links"); links.forEach(([t, u]) => { const a = el("a", "", t + " ↗"); a.href = u; a.target = "_blank"; a.rel = "noopener"; ls.appendChild(a); }); b.appendChild(ls); r.appendChild(b); return r;
+}
+function grp(title, stamp){ const g = el("div", "group"); const h = el("div", "group-head"); h.appendChild(el("strong", "", title)); if (stamp) h.appendChild(el("span", "stamp", stamp)); g.appendChild(h); return g; }
+/* ---------- taste: your ratings rank films and podcasts (kept on this device only) ---------- */
+const taste = () => Object.assign({ f:{}, p:{}, s:{} }, store.get("taste", {}));
+const rates = () => store.get("rate", {});
+const FILM_KW = [["Crime", /crime|heist|detective|murder|cartel|gang|mafia|cop|police|killer|robber/i], ["Spy", /spy|agent|cia|mi6|espionage|assassin/i], ["War", /war\b|soldier|military|battle/i], ["Sci-fi", /sci-?fi|future|space|alien|robot|science fiction/i], ["Comedy", /comed|funny|hilarious/i], ["Drama", /drama|family|love|life/i], ["Horror", /horror|haunt|demon|terrif/i], ["True story", /true story|based on|real[- ]life/i], ["Martial arts", /martial|kung fu|fighter|boxing|mma/i]];
+function filmTags(m){ const s = new Set((m.tags || []).filter(t => !/chart|New release/.test(t)).map(t => t.replace(/ · .*/, ""))); if (m.genre) s.add(m.genre === "Action & Adventure" ? "Action & adventure" : m.genre); FILM_KW.forEach(([t, r]) => { if (r.test((m.sum || "") + " " + (m.t || ""))) s.add(t); }); return [...s]; }
+const filmId = m => m.id || (String(m.url || "").match(/\/id(\d+)/) || [])[1] || m.t;
+const filmScore = m => filmTags(m).reduce((a, t) => a + (taste().f[t] || 0), 0);
+function rateFilm(m, v){
+  const id = "f:" + filmId(m), R = rates(), T = taste(), old = R[id] || 0; if (old === v) v = 0;
+  filmTags(m).forEach(t => { T.f[t] = (T.f[t] || 0) - old + v; if (!T.f[t]) delete T.f[t]; });
+  if (v) R[id] = v; else delete R[id]; store.set("rate", R); store.set("taste", T); render();
+}
+function rateRow(id, onRate){
+  const v = rates()[id] || 0, r = el("div", "raterow");
+  [[1, "👍", "More like this"], [-1, "👎", "Not for me"]].forEach(([k, ic, lab]) => { const b = el("button", "ratebtn", ic + " " + lab); b.type = "button"; b.setAttribute("aria-pressed", String(v === k)); b.onclick = e => { e.preventDefault(); e.stopPropagation(); onRate(k); }; r.appendChild(b); });
+  return r;
+}
+function tasteLine(map, names){
+  const e = Object.entries(map).filter(([, w]) => w).sort((a, b) => b[1] - a[1]); if (!e.length) return null;
+  const n = el("div", "hl"); const sp = el("span", "hl-snip", "Your taste: " + e.slice(0, 6).map(([k, w]) => (w > 0 ? "👍 " : "👎 ") + ((names && names[k]) || k) + (Math.abs(w) > 1 ? " ×" + Math.abs(w) : "")).join(" · ")); n.appendChild(sp); return n;
+}
+/* daily inspiration: short podcast episodes */
+const PTOP = [["sales", "💼 Sales & business"], ["tech", "🤖 Tech & digital"], ["sport", "🏃 Sport & adventure"], ["mind", "🧠 Mindset & faith"]];
+const PNAME = Object.fromEntries(PTOP);
+let podTopic = store.get("podTopic", "all"), podMore = false;
+function jit(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return ((h >>> 0) % 1000) / 1000; }
+function podPicks(){
+  const L = X.inspire || [], T = taste(), R = rates(), day0 = X.date || "";
+  const sc = e => 3 * (T.p[e.topic] || 0) + 2 * (T.s[e.sid] || 0) + (e.age <= 2 ? 2 : e.age <= 7 ? 1 : 0) + 2 * jit(e.id + day0);
+  const pool = L.filter(e => R["p:" + e.id] !== -1 && (T.s[e.sid] || 0) > -3 && (T.p[e.topic] || 0) > -4 && (podTopic === "all" || (podTopic === "ar" ? e.ar : e.topic === podTopic))).map(e => Object.assign({ sc:sc(e) }, e)).sort((a, b) => b.sc - a.sc);
+  const out = [], shows = new Set();
+  if (podTopic === "all"){ PTOP.forEach(([k]) => { const e = pool.find(x => x.topic === k && !x.ar && !shows.has(x.sid)); if (e && (T.p[k] || 0) > -2){ out.push(e); shows.add(e.sid); } });
+    const ar = pool.find(x => x.ar && !shows.has(x.sid)); if (ar){ out.push(ar); shows.add(ar.sid); } }
+  const nSeed = out.length;
+  pool.forEach(e => { if (out.length < 15 && !shows.has(e.sid) && !out.includes(e)){ out.push(e); shows.add(e.sid); } });
+  pool.forEach(e => { if (out.length < 15 && !out.includes(e)) out.push(e); });
+  const by = (a, b) => b.sc - a.sc; return out.slice(0, nSeed).sort(by).concat(out.slice(nSeed).sort(by));
+}
+function ratePod(e, v){
+  const id = "p:" + e.id, R = rates(), T = taste(), old = R[id] || 0; if (old === v) v = 0;
+  T.p[e.topic] = (T.p[e.topic] || 0) - old + v; T.s[e.sid] = (T.s[e.sid] || 0) + 2 * (v - old);
+  ["p", "s"].forEach(k => Object.keys(T[k]).forEach(x => { if (!T[k][x]) delete T[k][x]; }));
+  if (v) R[id] = v; else delete R[id]; store.set("rate", R); store.set("taste", T);
+  render();
+}
+function inspireGroup(){
+  if (!(X.inspire || []).length) return null;
+  const P = podPicks(), g = grp("🎧 Daily inspiration", "4–15 min · fresh picks every day");
+  const ch = el("div", "chips"); ch.style.cssText = "display:flex;gap:6px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none";
+  [["all", "All"], ...PTOP, ["ar", "🇪🇬 عربي"]].forEach(([k, l]) => { const b = el("button", "ghostbtn", l); b.type = "button"; b.style.cssText = "flex:0 0 auto;min-height:34px;padding:5px 12px"; b.setAttribute("aria-pressed", String(podTopic === k)); if (podTopic === k){ b.style.background = "var(--ink)"; b.style.color = "var(--bg)"; } b.onclick = () => { podTopic = k; store.set("podTopic", k); podMore = false; render(); }; ch.appendChild(b); });
+  g.appendChild(ch);
+  if (!P.length) g.appendChild(el("div", "empty", "Nothing left here today. Try another topic."));
+  P.slice(0, podMore ? 15 : 8).forEach(e => { const r = el("div", "pod"); const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = e.img; r.appendChild(im);
+    const b = el("div", ""); b.style.cssText = "display:flex;flex-direction:column;gap:3px;min-width:0";
+    const a = el("a", "hl-title", e.t); a.href = e.url; a.target = "_blank"; a.rel = "noopener"; a.dir = "auto"; a.style.cssText = "color:var(--ink);text-decoration:none"; b.appendChild(a);
+    const meta = el("span", "hl-snip", e.show + " · " + e.min + " min · " + (PNAME[e.topic] || "") + (e.age <= 1 ? " · new" : "")); meta.dir = "auto"; b.appendChild(meta);
+    b.appendChild(rateRow("p:" + e.id, v => ratePod(e, v))); r.appendChild(b); g.appendChild(r); });
+  if (!podMore && P.length > 8){ const m = el("button", "hl", "Show " + Math.min(7, P.length - 8) + " more"); m.type = "button"; m.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer;width:100%"; m.onclick = () => { podMore = true; render(); }; g.appendChild(m); }
+  const T = taste(), names = {}; (X.inspire || []).forEach(e => names[e.sid] = e.show); Object.assign(names, PNAME);
+  const tl = tasteLine(Object.assign({}, T.p, T.s), names); if (tl) g.appendChild(tl);
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Rate a few: 👍 brings more from that show and topic, 👎 hides it. Ratings stay on this phone, so each family member gets their own picks.")); g.appendChild(n);
+  return g;
+}
+
+function funView(){
+  if (!X) return [el("div", "empty", "Loading…")];
+  const C = kc(), dn = X.day_no || 0, out = [];
+  const FY = (X.foryou || {}).picks || [], hid = new Set(store.get("hideFilms", [])), RT = rates();
+  const fy = FY.filter(m => !hid.has(m.id) && RT["f:" + filmId(m)] !== -1).map((m, i) => [m, filmScore(m) * 10 - i]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  if (fy.length){ const g = grp("Suggested for you today", "new picks every day");
+    fy.forEach(m => { const r = filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.tags || []).join(" · ") + (m.sum ? " · " + m.sum.slice(0, 120) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["Trailer", "https://www.youtube.com/results?search_query=" + encodeURIComponent(m.t + " " + (m.year || "") + " trailer")]], m.img);
+      r.lastChild.appendChild(rateRow("f:" + filmId(m), v => rateFilm(m, v))); g.appendChild(r); });
+    const tl = tasteLine(taste().f); if (tl) g.appendChild(tl);
+    const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Picked from today's action, thriller and crime charts in Canada and the U.S. Rate them: your 👍 and 👎 reorder these and the new releases to your taste, on this phone only.")); g.appendChild(n);
+    out.push(g); }
+  out.push(inspireGroup());
+  if ((X.egypt_cinema || []).length){ const g = grp("أخبار السينما المصرية · Egyptian cinema news", ""); X.egypt_cinema.slice(0, 6).forEach(it => g.appendChild(item(it))); out.push(g); }
+  const cl = C.classic || [], eg = C.egyptian || [];
+  if (cl.length || eg.length){ const g = grp("Tonight's picks", "changes daily");
+    const a = cl[dn % cl.length], e = eg[dn % eg.length];
+    if (a) g.appendChild(filmRow(a[0] + " (" + a[1] + ")", "American classic · " + a[2], [["Where to watch", jw(a[0])], ["IMDb", imdb(a[0] + " " + a[1])], ["Trailer", "https://www.youtube.com/results?search_query=" + encodeURIComponent(a[0] + " " + a[1] + " trailer")]]));
+    if (e) g.appendChild(filmRow(e[0] + " · " + e[1] + " (" + e[2] + ")", "Egyptian film · " + e[3], [["شاهد / Watch", "https://www.youtube.com/results?search_query=" + encodeURIComponent("فيلم " + e[0])], ["IMDb", imdb(e[1] + " " + e[2])], ["Where to watch", jw(e[1])]]));
+    out.push(g); }
+  const nw = [...(X.movies_action || []).slice(0, 8), ...(X.movies_thriller || []).slice(0, 8)];
+  if (nw.length){ const g = grp("New and trending", "Apple TV charts, Canada"); const seen = new Set();
+    const RT2 = rates(); nw.map((m, i) => [m, filmScore(m) * 10 - i]).sort((a, b) => b[1] - a[1]).map(x => x[0]).forEach(m => { if (seen.has(m.t) || RT2["f:" + filmId(m)] === -1) return; seen.add(m.t); const r = filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.genre || "") + (m.sum ? " · " + m.sum.slice(0, 110) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["IMDb", imdb(m.t + " " + m.year)]], m.img); r.lastChild.appendChild(rateRow("f:" + filmId(m), v => rateFilm(m, v))); g.appendChild(r); }); out.push(g); }
+  if ((C.series || []).length){ const g = grp("Short series, highly rated", "4 to 15 episodes");
+    C.series.forEach(([t, y, n, gen]) => g.appendChild(filmRow(t + " (" + y + ")", n + " episodes · " + gen, [["Where to watch", jw(t.replace(/\s*\(.*\)/, ""))], ["IMDb", imdb(t.replace(/\s*\(.*\)/, "") + " " + y)]]))); out.push(g); }
+  if (cl.length){ const g = grp("American action, crime and thrillers", "classics and modern"); cl.forEach(([t, y, gen]) => g.appendChild(filmRow(t + " (" + y + ")", gen, [["Where to watch", jw(t)], ["IMDb", imdb(t + " " + y)]]))); out.push(g); }
+  if (eg.length){ const g = grp("أفلام مصرية · Egyptian films", "old and new"); eg.forEach(([a, en, y, gen]) => g.appendChild(filmRow(a + " · " + en + " (" + y + ")", gen, [["YouTube", "https://www.youtube.com/results?search_query=" + encodeURIComponent("فيلم " + a)], ["IMDb", imdb(en + " " + y)]]))); out.push(g); }
+  const pods = podTab === "ca" ? (X.podcasts_ca || []) : (X.podcasts_eg || []);
+  const g = grp("Podcast charts", "top shows, latest episode 30 min or less");
+  const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["ca", "Top in Canada"], ["eg", "عربي · Egypt"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(podTab === k)); b.onclick = () => { podTab = k; render(); }; seg.appendChild(b); }); g.appendChild(seg);
+  if (!pods.length) g.appendChild(el("div", "empty", "No short shows in the chart today."));
+  pods.forEach(p => { const a = el("a", "pod"); a.href = p.ep_url || p.url; a.target = "_blank"; a.rel = "noopener"; const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = p.img; a.appendChild(im);
+    const b = el("div", ""); b.style.cssText = "display:flex;flex-direction:column;gap:2px;min-width:0"; const tt = el("span", "hl-title", p.name); tt.dir = "auto"; b.appendChild(tt);
+    const ep = el("span", "hl-snip", "#" + p.rank + " · " + (p.mins || "<1") + " min · " + p.ep); ep.dir = "auto"; b.appendChild(ep); a.appendChild(b); g.appendChild(a); });
+  out.push(g);
+  return out;
+}
+
+/* ---------- homes ---------- */
+const money = n => "$" + Math.round(n).toLocaleString("en-CA");
+function linksGroup(t, title){
+  if (!t || !t.links || !t.links.length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", title)); g.appendChild(head);
+  t.links.forEach(([lab, sub, href]) => { const a = el("a", "hl"); a.href = href; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", lab + " ↗")); a.appendChild(el("span", "hl-snip", sub)); g.appendChild(a); });
+  return g;
+}
+function homesCard(compact){
+  const R = D.rentals || {}; const L = R.listings || [];
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Homes for rent · Oakville")); head.appendChild(el("span", "stamp", R.at ? "checked " + ago(R.at) : "")); g.appendChild(head);
+  if (R.stats){
+    const st = el("div", "stats");
+    const one = (v, lab) => { const x = el("div", "stat"); x.appendChild(el("b", "", v)); x.appendChild(el("small", "", lab)); st.appendChild(x); };
+    one(money(R.stats.median), "median / month"); one("$" + (R.stats.low / 1000).toFixed(1) + "–" + (R.stats.high / 1000).toFixed(1) + "k", "range"); one(String(R.stats.count), "listings now");
+    g.appendChild(st);
+    const H = R.hist || [];
+    const tr = el("div", "trend");
+    if (H.length >= 2){
+      const pts = H.map(h => h[1]); tr.appendChild(spark(pts.length >= 5 ? pts : [pts[0], ...pts, pts[pts.length - 1], pts[pts.length - 1], pts[pts.length - 1]].slice(0, 6)));
+      const ref = H.find(h => (Date.now() - new Date(h[0] + "T12:00:00")) / 864e5 <= 8) || H[0];
+      const ch = ref[1] ? (R.stats.median - ref[1]) / ref[1] * 100 : 0;
+      tr.appendChild(el("span", "", (Math.abs(ch) < 0.5 ? "Flat" : (ch > 0 ? "▲ " : "▼ ") + Math.abs(ch).toFixed(1) + "%") + " vs " + new Date(ref[0] + "T12:00:00").toLocaleDateString("en-CA", { month: "short", day: "numeric" }) + " · tracked daily"));
+    } else tr.appendChild(el("span", "", "Price tracking started. The trend line fills in day by day."));
+    g.appendChild(tr);
+  }
+  const lab = el("div", "hl"); lab.appendChild(el("span", "label", R.filter || "3 bed, 3 bath near Oakville")); g.appendChild(lab);
+  if (!L.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", R.at ? "No matching listings right now. Try the searches below." : "First check runs within the hour.")); g.appendChild(e); }
+  L.slice(0, compact ? 3 : 40).forEach(x => {
+    const a = el("a", "home"); a.href = x.l; a.target = "_blank"; a.rel = "noopener";
+    const img = document.createElement("img"); img.loading = "lazy"; img.alt = ""; if (x.img) img.src = x.img; a.appendChild(img);
+    const t = el("div", "hl"); t.style.cssText = "padding:0;border:0;gap:2px";
+    const m = el("div", "hl-meta"); m.appendChild(el("span", "pr", money(x.p) + "/mo"));
+    if (x.ts && Date.now() / 1000 - x.ts < 36 * 3600) m.appendChild(el("span", "new", "New"));
+    t.appendChild(m); t.appendChild(el("span", "hl-title", x.t));
+    t.appendChild(el("span", "hl-snip", [x.beds + " bed", x.baths + " bath", x.kind, x.hood, x.ts ? ago(x.ts) : ""].filter(Boolean).join(" · ")));
+    a.appendChild(t); g.appendChild(a);
+  });
+  if (compact && L.length > 3){ const more = el("button", "hl", "See all " + L.length + " homes and price trend"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => go("homes"); g.appendChild(more); }
+  return g;
+}
+
+/* ---------- events ---------- */
+const EV_CATS = ["Business", "Jobs", "Gatherings", "Music"];
+function evTime(sec){ return new Date(sec * 1000).toLocaleTimeString("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" }).replace(":00", ""); }
+function evDay(sec){
+  const f = s => new Date(s * 1000).toLocaleDateString("en-CA", { timeZone: "America/Toronto" });
+  const d = f(sec), today = f(Date.now() / 1000), tmrw = f(Date.now() / 1000 + 86400);
+  return d === today ? "Today" : d === tmrw ? "Tomorrow" : new Date(sec * 1000).toLocaleDateString("en-CA", { timeZone: "America/Toronto", weekday: "long", month: "short", day: "numeric" });
+}
+function eventsCard(limit){
+  const E = D.events || {}; let L = (E.items || []).filter(e => e.start > Date.now() / 1000 - 3600);
+  if (!limit && angle !== "all") L = L.filter(e => e.c === angle);
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Upcoming · Oakville, Mississauga, GTA")); head.appendChild(el("span", "stamp", L.length + " events")); g.appendChild(head);
+  if (!L.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", E.at ? "Nothing listed for this category yet. Try the calendars below." : "First check runs within the hour.")); g.appendChild(e); }
+  let last = "";
+  L.slice(0, limit || 60).forEach(x => {
+    const day = evDay(x.start); if (day !== last){ g.appendChild(el("div", "evday", day)); last = day; }
+    const a = el("a", "ev"); a.href = x.l; a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(el("span", "when", evTime(x.start)));
+    const t = el("div", "hl"); t.style.cssText = "padding:0;border:0;gap:2px";
+    const m = el("div", "hl-meta"); m.appendChild(el("span", "tag", x.c)); m.appendChild(el("span", "", x.where)); t.appendChild(m);
+    const tt = el("span", "hl-title", x.t); tt.dir = "auto"; t.appendChild(tt);
+    if (x.org) t.appendChild(el("span", "hl-snip", x.org));
+    a.appendChild(t); g.appendChild(a);
+  });
+  if (limit && L.length > limit){ const more = el("button", "hl", "See all " + L.length + " events"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => go("events"); g.appendChild(more); }
+  return g;
+}
+
+/* ---------- my links (this device only) ---------- */
+let myLinks = store.get("myLinks", []);
+function myLinksRow(){
+  if (!myLinks.length) return null;
+  const r = el("div", "mylinks"); myLinks.forEach(([lab, href]) => { const a = el("a", "", lab + " ↗"); a.href = href; a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); return r;
+}
+function go(id){ view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }
+
+/* ---------- headlines ---------- */
+function topicGroup(t, limit){
+  const items = (D.headlines || {})[t.id] || [];
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", t.id === "homes" ? "Rent and new-build news" : t.id === "events" ? "Event news" : t.name)); head.appendChild(el("span", "stamp", items.length + " stories")); g.appendChild(head);
+  if (!items.length){ const e = el("div", "hl"); e.appendChild(el("span", "hl-snip", "Nothing new in the last few days.")); g.appendChild(e); }
+  let list = items;
+  if (t.id === "oakville" && limit) list = items.filter(it => !TRAVEL.includes(it.a));
+  if (!limit && angle !== "all") list = items.filter(it => it.a === angle);
+  list.slice(0, limit || 60).forEach(it => g.appendChild(item(it)));
+  if (limit && list.length > limit){ const more = el("button", "hl", "See all " + items.length + " " + t.name + " stories"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => { view = t.id; store.set("view", view); render(); window.scrollTo({ top: 0 }); }; g.appendChild(more); }
+  return g;
+}
+
+function render(){
+  if (!D) return;
+  if (view !== "all" && !sections().some(s => s.id === view)) view = "all";
+  renderStamp(); renderRail();
+  const main = $("#main"); main.textContent = "";
+  const add = n => n && main.appendChild(n);
+  add(warningsBlock());
+  const topic = id => D.topics.find(x => x.id === id);
+  if (view === "all"){
+    add(myLinksRow());
+    if (visible("weather")) add(weatherCard(false));
+    if (visible("faith")) add(faithMini());
+    if (visible("kitchen")) add(kitchenMini());
+    if (visible("oakville")) add(goCard());
+    if (visible("oakville")) add(gasCard(true));
+    if (visible("markets")) add(marketsStrip());
+    D.topics.filter(t => visible(t.id) && !t.in_markets).forEach(t => {
+      if (t.id === "homes" && D.rentals) add(homesCard(true));
+      else if (t.id === "events" && D.events) add(eventsCard(5));
+      else add(topicGroup(t, 5));
+    });
+  } else if (view === "weather") add(weatherCard(true));
+  else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); }
+  else if (view === "kitchen"){ add(kitchenView()); }
+  else if (view === "fun"){ funView().forEach(add); }
+  else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
+  else {
+    const t = topic(view);
+    let angles = [...new Set(((D.headlines || {})[t.id] || []).map(it => it.a))];
+    if (t.id === "events") angles = [...new Set([...EV_CATS, ...angles])];
+    if (t.id === "homes"){ add(homesCard(false)); add(linksGroup(t, "Search listings")); }
+    if (angles.length > 1){
+      const sub = el("div", "subrail");
+      ["all", ...angles].forEach(a => { const b = el("button", "chip", a === "all" ? "Everything" : a); b.type = "button"; b.setAttribute("aria-pressed", String(angle === a)); b.onclick = () => { angle = a; render(); }; sub.appendChild(b); });
+      if (!angles.includes(angle)) angle = "all";
+      add(sub);
+    }
+    if (t.id === "oakville" && angle === "all"){ add(gasCard(false)); add(goCard()); }
+    if (t.id === "events") add(eventsCard(0));
+    add(topicGroup(t, 0));
+    if (t.id === "events") add(linksGroup(t, "Event calendars"));
+    else if (t.id !== "homes") add(linksGroup(t, "Links"));
+    if (t.id === "oakville" && angle === "all"){ const hm = topic("homes"); if (hm && D.rentals){ add(homesCard(false)); add(linksGroup(hm, "Search home listings")); } }
+  }
+}
+
+/* ---------- settings ---------- */
+function openSheet(){
+  const box = $("#toggles"); box.textContent = "";
+  sections().forEach(s => {
+    const lab = el("label", "toggle"); lab.appendChild(el("span", "", s.name));
+    const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = visible(s.id); cb.id = "tg-" + s.id;
+    cb.onchange = () => { if (cb.checked) hidden.delete(s.id); else hidden.add(s.id); store.set("hidden", [...hidden]); render(); };
+    lab.appendChild(cb); box.appendChild(lab);
+  });
+  const dl = $("#tpList"); dl.textContent = ""; (D ? D.topics : []).forEach(t => { const o = document.createElement("option"); o.value = t.name; dl.appendChild(o); });
+  renderMyList();
+  $("#sheet").hidden = false;
+}
+function renderMyList(){
+  const box = $("#myList"); box.textContent = "";
+  myLinks.forEach(([lab], i) => { const r = el("div"); r.appendChild(el("span", "", lab)); const b = el("button", "", "Remove"); b.type = "button"; b.onclick = () => { myLinks.splice(i, 1); store.set("myLinks", myLinks); renderMyList(); render(); }; r.appendChild(b); box.appendChild(r); });
+}
+$("#myAdd").onclick = () => {
+  const lab = $("#myLabel").value.trim(); let u = $("#myUrl").value.trim();
+  if (!lab || !u) return toast("Add a name and a link");
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  myLinks.push([lab.slice(0, 30), u]); store.set("myLinks", myLinks); $("#myLabel").value = ""; $("#myUrl").value = ""; renderMyList(); render(); toast("Pinned to the top");
+};
+$("#testPush").onclick = async () => {
+  const b = $("#testPush"); b.textContent = "Sending…";
+  try { const r = await fetch("https://ntfy.sh/" + encodeURIComponent($("#topicName").textContent.trim()), { method: "POST", body: "Alerts are working. You will get breaking Oakville news, GO and traffic alerts, weather warnings and the 6:30 a.m. briefing.", headers: { Title: "Signal Desk test", Tags: "white_check_mark" } }); b.textContent = r.ok ? "Sent. Check your phone" : "Could not send"; }
+  catch(_){ b.textContent = "Could not send"; }
+  setTimeout(() => b.textContent = "Send a test alert now", 4000);
+};
+$("#tpSend").onclick = () => {
+  const act = $("#tpAction").value, name = $("#tpName").value.trim(), words = $("#tpWords").value.split("\n").map(w => w.trim()).filter(Boolean);
+  if (!name) return toast("Type a topic name");
+  if (act === "add" && !words.length) return toast("Add at least one search word");
+  const body = "Topic: " + name + "\nRegion: " + $("#tpRegion").value + "\nLanguage: " + $("#tpLang").value + "\nKeywords:\n" + words.map(w => "- " + w).join("\n");
+  const repo = (D && D.repo) || "MG4Trading/signal-desk";
+  window.open("https://github.com/" + repo + "/issues/new?title=" + encodeURIComponent("Signal Desk: " + act + " " + name) + "&body=" + encodeURIComponent(body), "_blank", "noopener");
+};
+$("#custBtn").onclick = openSheet;
+$("#closeSheet").onclick = () => { $("#sheet").hidden = true; };
+$("#sheet").onclick = e => { if (e.target.id === "sheet") $("#sheet").hidden = true; };
+$("#copyTopic").onclick = async () => { const b = $("#copyTopic"); try { await navigator.clipboard.writeText($("#topicName").textContent); b.textContent = "Copied"; } catch(_){ const r = document.createRange(); r.selectNodeContents($("#topicName")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected, tap Copy"; } setTimeout(() => b.textContent = "Copy topic name", 2000); };
+$("#refreshBtn").onclick = () => load(true);
+
+load(false);
+setInterval(() => { if (document.visibilityState === "visible") load(false); }, 5 * 60 * 1000);
+setInterval(() => { if (D && !document.querySelector(".goall[open]") && $("#sheet").hidden) { renderStamp(); if (view === "all" || view === "oakville") render(); } }, 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(false); });
+if (navigator.serviceWorker) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>

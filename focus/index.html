@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Focus</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Focus">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0B7A84">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Archivo:wdth,wght@75..100,600..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EEF1F4;--surface:#FFFFFF;--surface-2:#E3E8EE;--ink:#152233;--muted:#5B6B7D;--line:#D3DAE2;
+  --accent:#0B7A84;--accent-ink:#FFFFFF;--accent-soft:#D9EEF0;--amber:#B86A00;--amber-soft:#FBEBD2;--up:#1E7A43;--up-soft:#DDF1E4;--down:#B3261E;
+  --display:"Archivo","Arial Narrow",Arial,sans-serif;--body:"IBM Plex Sans",-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1622;--surface:#16212F;--surface-2:#1F2C3C;--ink:#E6ECF2;--muted:#93A3B5;--line:#2A394B;
+  --accent:#3FB6BF;--accent-ink:#06212A;--accent-soft:#123540;--amber:#F0A640;--amber-soft:#3A2A12;--up:#5CC98A;--up-soft:#143224;--down:#F2867E;}}
+:root[data-theme="dark"]{--bg:#0E1622;--surface:#16212F;--surface-2:#1F2C3C;--ink:#E6ECF2;--muted:#93A3B5;--line:#2A394B;
+  --accent:#3FB6BF;--accent-ink:#06212A;--accent-soft:#123540;--amber:#F0A640;--amber-soft:#3A2A12;--up:#5CC98A;--up-soft:#143224;--down:#F2867E;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body);padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:calc(10px + env(safe-area-inset-top,0px)) 0 10px;border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:12px}
+.brand{font-family:var(--display);font-stretch:85%;font-weight:800;font-size:26px;letter-spacing:-.01em;line-height:1}
+.brand span{color:var(--accent)}
+.sub{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px}
+.ring{width:48px;height:48px;flex:0 0 auto;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:600}
+.icon{border:1px solid var(--line);background:var(--surface);border-radius:999px;min-width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;font-size:16px;text-decoration:none;padding:0 12px;font-weight:600}
+.grow{flex:1;min-width:0}
+main{display:flex;flex-direction:column;gap:14px;padding:14px 0}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.gh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 16px;background:var(--surface-2)}
+.gh strong{font-family:var(--display);font-stretch:85%;font-size:17px}
+.stamp{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+.pad{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.note{font-size:13px;color:var(--muted)}
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.inp{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;min-height:44px;font-size:16px}
+.chk{width:28px;height:28px;border-radius:50%;border:2px solid var(--line);background:transparent;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#fff;padding:0}
+.chk.on{background:var(--up);border-color:var(--up)}
+.toprow{display:grid;grid-template-columns:28px 1fr 40px;gap:8px;align-items:center}
+.toprow.on .inp{text-decoration:line-through;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;min-height:40px;font-weight:600;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.sm{min-height:32px;padding:4px 10px;font-size:12px}
+.btn.ghost{background:transparent}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;min-height:34px;font-size:13px;font-weight:600;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.timer{font-family:var(--mono);font-size:40px;font-weight:600;letter-spacing:.02em;line-height:1}
+.blk{border-top:1px solid var(--line)}
+.blk:first-child{border-top:0}
+.bh{display:grid;grid-template-columns:62px 1fr auto;gap:10px;align-items:center;padding:12px 16px;width:100%;border:0;background:transparent;text-align:left}
+.bh .when{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.bh .tt{font-weight:600;font-size:15px;line-height:1.25}
+.bh .ss{font-size:12px;color:var(--muted);margin-top:2px}
+.prog{font-family:var(--mono);font-size:11px;font-weight:600;border-radius:999px;padding:3px 8px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.prog.full{background:var(--up-soft);color:var(--up)}
+.blk.now{background:var(--accent-soft)}
+.blk.now .when{color:var(--accent);font-weight:600}
+.blk.past .tt{color:var(--muted)}
+.bbody{padding:0 16px 12px 88px;display:flex;flex-direction:column;gap:2px}
+.item{display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:6px 0;text-align:left;width:100%;min-height:40px;font-size:14px}
+.item.on span:last-child{text-decoration:line-through;color:var(--muted)}
+.item .chk{width:24px;height:24px;font-size:12px}
+.ev{font-size:13px;color:var(--amber);font-weight:600;padding:3px 0}
+.bar{height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.week{display:flex;gap:6px;align-items:flex-end;height:46px}
+.week div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;font-size:10px;color:var(--muted);height:100%;font-family:var(--mono)}
+.week i{display:block;width:100%;border-radius:4px;background:var(--accent);min-height:3px}
+.idea{border-top:1px solid var(--line);padding:10px 16px;display:flex;flex-direction:column;gap:8px}
+.idea .t{font-weight:600}
+.mini{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:600;min-height:30px}
+.mini[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.map{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 16px}
+.map .box{border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:13px;background:var(--bg);display:flex;flex-direction:column;gap:4px;min-height:60px}
+.map .box div{border-top:1px dashed var(--line);padding-top:4px}
+.map .box .label + div{border-top:0}
+.co{border-top:1px solid var(--line)}
+.co:first-child{border-top:0}
+.role{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px dashed var(--line);text-decoration:none}
+.role:first-child{border-top:0}
+.new{font-family:var(--mono);font-size:10px;background:var(--amber-soft);color:var(--amber);border-radius:4px;padding:1px 6px;margin-left:6px}
+.act{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.act pre{white-space:pre-wrap;font:13px/1.5 var(--body);margin:0;max-height:220px;overflow:auto}
+.act.on{opacity:.55}
+details summary{cursor:pointer;list-style:none}
+details summary::-webkit-details-marker{display:none}
+.fold summary{font-size:13px;font-weight:600;color:var(--accent);padding:8px 0;min-height:36px}
+.ar{font-family:"Amiri",serif;direction:rtl;font-size:19px;line-height:1.7}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding:6px 0 calc(8px + env(safe-area-inset-bottom,0px))}
+nav .wrap{display:grid;grid-template-columns:repeat(3,1fr)}
+nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);min-height:50px;position:relative}
+nav button span{font-size:21px;line-height:1.1}
+nav button[aria-pressed="true"]{color:var(--accent)}
+nav .dot{position:absolute;top:2px;left:calc(50% + 10px);min-width:18px;height:18px;border-radius:9px;background:var(--amber);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(8,14,22,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet>div{background:var(--surface);width:100%;max-width:560px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.days button{border:1px solid var(--line);background:var(--surface);border-radius:10px;min-height:38px;font-weight:600}
+.days button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.toast{position:fixed;left:50%;top:calc(76px + env(safe-area-inset-top,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.empty{border:1px dashed var(--line);border-radius:14px;padding:18px;text-align:center;color:var(--muted);font-size:14px}
+ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+</style>
+</head>
+<body>
+<header><div class="wrap hrow">
+  <div class="ring" id="ring" aria-label="Today's progress"></div>
+  <div class="grow"><div class="brand">Fo<span>cus</span></div><div class="sub" id="hsub">Loading…</div></div>
+  <a class="icon" href="../" aria-label="Open Signal Desk">📰</a>
+  <button class="icon" type="button" id="setBtn" aria-label="Settings">⚙︎</button>
+</div></header>
+<main class="wrap" id="main"></main>
+<nav><div class="wrap">
+  <button type="button" data-tab="today" aria-pressed="true"><span>🧭</span>Today</button>
+  <button type="button" data-tab="inbox" aria-pressed="false"><span>📥</span>Inbox<i class="dot" id="ideaDot" hidden></i></button>
+  <button type="button" data-tab="jobs" aria-pressed="false"><span>🎯</span>Target jobs<i class="dot" id="jobDot" hidden></i></button>
+</div></nav>
+<div class="sheet" id="sheet" hidden><div id="sheetBody"></div></div>
+
+<script>
+/* ---------- basics ---------- */
+const $ = s => document.querySelector(s);
+const el = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+const pad = n => String(n).padStart(2, "0");
+const store = { get(k, d){ try { const v = localStorage.getItem("fz:" + k); return v == null ? d : JSON.parse(v); } catch(_){ return d; } }, set(k, v){ try { localStorage.setItem("fz:" + k, JSON.stringify(v)); } catch(_){} }, del(k){ try { localStorage.removeItem("fz:" + k); } catch(_){} } };
+function toast(m){ const t = el("div", "toast", m); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+const dkey = (off = 0) => { const d = new Date(Date.now() + off * 864e5); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); };
+const nowMin = () => { const n = new Date(); return n.getHours() * 60 + n.getMinutes(); };
+const hm = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; const h = Math.floor(m / 60); return (h % 12 || 12) + ":" + pad(m % 60) + (h >= 12 ? " p.m." : " a.m."); };
+const hmS = m => hm(m).replace(" a.m.", "a").replace(" p.m.", "p");
+const isoMin = s => { const d = new Date(s); return d.getHours() * 60 + d.getMinutes(); };
+function S(){ return Object.assign({ gymDays:[1, 3, 5], wird:4, shortcut:"Focus Reminder", syncShortcut:"Sync to Focus", doneShortcut:"Focus Done", tickIOS:true }, store.get("set", {})); }
+function setS(p){ store.set("set", Object.assign(S(), p)); }
+function day(off = 0){ return Object.assign({ top:["", "", ""], done:[false, false, false], ref:[], chk:{}, rv:["", "", ""] }, store.get("d:" + dkey(off), {})); }
+function saveDay(o, off = 0){ o.score = score(o); store.set("d:" + dkey(off), o); }
+(function prune(){ try { const keep = new Date(Date.now() - 70 * 864e5).toISOString().slice(0, 10); Object.keys(localStorage).filter(k => k.startsWith("fz:d:") && k.slice(5) < keep).forEach(k => localStorage.removeItem(k)); } catch(_){} })();
+
+/* ---------- links out: Google Calendar and iPhone Reminders ---------- */
+function calLink(title, a, b, details){
+  const d = new Date(), f = m => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(Math.floor(m / 60) % 24) + pad(m % 60) + "00";
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE&text=" + encodeURIComponent(title) + "&dates=" + f(a) + "/" + f(b) + "&ctz=America/Toronto&details=" + encodeURIComponent((details || "") + "\n\nFrom Focus");
+}
+function remLink(title, atMin, off){
+  off = off || 0; if (atMin == null){ atMin = Math.ceil((nowMin() + 60) / 15) * 15; }
+  if (atMin >= 1440){ atMin -= 1440; off += 1; }
+  const when = " | " + dkey(off) + " " + pad(Math.floor(atMin / 60)) + ":" + pad(atMin % 60);
+  return "shortcuts://run-shortcut?name=" + encodeURIComponent(S().shortcut) + "&input=text&text=" + encodeURIComponent(title + when);
+}
+async function copy(t){ try { await navigator.clipboard.writeText(t); toast("Copied"); } catch(_){ toast("Press and hold to copy"); } }
+
+/* ---------- prayer times: Signal Desk first, own calculation as backup ---------- */
+function prayCalc(date, lat, lng){
+  const R = Math.PI / 180, ds = d => Math.sin(d * R), dc = d => Math.cos(d * R), dt = d => Math.tan(d * R);
+  const as = x => Math.asin(x) / R, ac = x => Math.acos(Math.max(-1, Math.min(1, x))) / R, at2 = (y, x) => Math.atan2(y, x) / R, acot = x => Math.atan(1 / x) / R;
+  const fix = (a, b) => { a = a - b * Math.floor(a / b); return a < 0 ? a + b : a; };
+  let Y = date.getFullYear(), M = date.getMonth() + 1; const Dd = date.getDate(); if (M <= 2){ Y -= 1; M += 12; }
+  const A = Math.floor(Y / 100), B = 2 - A + Math.floor(A / 4), jd = Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6001 * (M + 1)) + Dd + B - 1524.5 - lng / 360;
+  const tz = -new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12).getTimezoneOffset() / 60;
+  const sun = j => { const D = j - 2451545, g = fix(357.529 + .98560028 * D, 360), q = fix(280.459 + .98564736 * D, 360), L = fix(q + 1.915 * ds(g) + .02 * ds(2 * g), 360), e = 23.439 - .00000036 * D; return { decl:as(ds(e) * ds(L)), eqt:q / 15 - fix(at2(dc(e) * ds(L), dc(L)) / 15, 24) }; };
+  const mid = t => fix(12 - sun(jd + t).eqt, 24), ang = (a, t, ccw) => { const d = sun(jd + t).decl, T = ac((-ds(a) - ds(d) * ds(lat)) / (dc(d) * dc(lat))) / 15; return mid(t) + (ccw ? -T : T); };
+  const asr = t => { const d = sun(jd + t).decl; return ang(-acot(1 + dt(Math.abs(lat - d))), t); };
+  const t = { Fajr:ang(15, 5 / 24, true), Sunrise:ang(.833, 6 / 24, true), Dhuhr:mid(.5), Asr:asr(13 / 24), Maghrib:ang(.833, .75), Isha:ang(15, .75) };
+  const o = {}; for (const k in t) o[k] = Math.round((t[k] + tz - lng / 15) * 60); return o;
+}
+let X = null;
+function prayer(){
+  const d = X && X.prayer && X.prayer.days.find(x => x.date === dkey());
+  if (d){ const o = {}; for (const [k, v] of Object.entries(d.times)){ const [h, m] = v.split(":").map(Number); o[k] = h * 60 + m; } return o; }
+  return prayCalc(new Date(), 43.4675, -79.6877);
+}
+
+/* ---------- private data ---------- */
+let P = null, ST = null, lockErr = "";
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function decrypt(blob, pass){
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({ name:"PBKDF2", salt:b64(blob.salt), iterations:blob.iter, hash:"SHA-256" }, base, { name:"AES-GCM", length:256 }, false, ["decrypt"]);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name:"AES-GCM", iv:b64(blob.iv) }, key, b64(blob.ct))));
+}
+async function loadPrivate(pass){
+  pass = pass || store.get("pass", "");
+  if (!pass) return false;
+  try {
+    const r = await fetch("data.enc?t=" + Math.floor(Date.now() / 60000), { cache:"no-store" }); if (!r.ok) throw new Error("none");
+    P = await decrypt(await r.json(), pass); store.set("pass", pass); lockErr = ""; return true;
+  } catch(e){ if (e && e.message === "none") lockErr = "Private data isn't published yet. Finish setup in Settings."; else { lockErr = "That passcode didn't unlock your data."; } P = null; return false; }
+}
+async function loadAll(){
+  try { const r = await fetch("status.json?t=" + Math.floor(Date.now() / 60000), { cache:"no-store" }); ST = r.ok ? await r.json() : null; } catch(_){ ST = null; }
+  try { const r = await fetch("../extras.json?t=" + Math.floor(Date.now() / 600000), { cache:"no-store" }); if (r.ok) X = await r.json(); } catch(_){}
+  await loadPrivate();
+  render();
+}
+const calToday = () => ((P && P.cal) || []).filter(e => e.s && e.s.slice(0, 10) === dkey() && !e.t.startsWith("🎯"));
+
+/* ---------- the day: prayer-anchored blocks with built-in anchors ---------- */
+const isWeekend = () => [0, 6].includes(new Date().getDay());
+function blocks(){
+  const t = prayer(), wk = isWeekend(), dow = new Date().getDay(), s = S(), D = day();
+  const gymEv = calToday().find(e => /gym|workout|training/i.test(e.t));
+  const gym = !!gymEv || wk || s.gymDays.includes(dow);
+  const wake = Math.min(300, t.Fajr - 20), bed = Math.max(wake - 450 + 1440, t.Isha + 40);
+  const top = i => D.top[i] ? D.top[i] : (wk ? ["Family goal", "Personal goal", "Prep for the week"] : ["Top 1", "Top 2", "Top 3"])[i];
+  const g0 = gymEv ? isoMin(gymEv.s) : wk ? 480 : Math.max(t.Fajr + 30, wake + 50);
+  const g1 = gymEv ? isoMin(gymEv.e) + 20 : g0 + (gym ? (wk ? 90 : 80) : 30);
+  const wird = s.wird + " pages of Quran";
+  const L = wk ? [
+    { k:"dawn", a:wake, b:g0, t:"🌅 Quiet start + Fajr", s:"No work today. Fajr, adhkar, Quran, breakfast with family", items:[["Fajr","Fajr on time"],["am","Morning adhkar"],["wird",wird],["water1","Two glasses of water"]] },
+    { k:"gym", a:g0, b:g1, t:gym ? "🏋️ Gym (opens 8 a.m.), then Meal 1" : "🚶 Long walk or sport, then Meal 1", s:"Train, then a high-protein breakfast", items:[["gym", gym ? "Gym session" : "Walk or sport"],["m1","Meal 1: about 40 g protein"]] },
+    { k:"fam", a:g1, b:t.Dhuhr, t:"👨‍👩‍👧 Family & errands", s:top(0), items:[["top0", top(0)]], cal:true },
+    { k:"dhuhr", a:t.Dhuhr, b:t.Asr, t:"🕌 Dhuhr · rest or outing", s:top(1), items:[["Dhuhr","Dhuhr"],["top1", top(1)]] },
+    { k:"asr", a:t.Asr, b:t.Maghrib, t:"🕌 Asr · walk, read, prep", s:dow === 0 ? "Weekly review: Inbox and next week's priorities" : top(2), items:[["Asr","Asr"],["read","Read 10 minutes"],["snack","Protein snack"],["top2", top(2)]].concat(dow === 0 ? [["review","Weekly idea review"]] : []) },
+    { k:"maghrib", a:t.Maghrib, b:t.Isha, t:"👨‍👩‍👧 Maghrib · family dinner", s:"Meal 2 together, phones away", items:[["Maghrib","Maghrib"],["m2","Meal 2 before Isha"],["phone","Phone away at dinner"]] },
+    { k:"isha", a:t.Isha, b:bed, t:"🌙 Isha · wind down", s:"Evening adhkar, 2-min shutdown, lights out " + hm(bed), items:[["Isha","Isha"],["pm","Evening adhkar"],["shut","2-min shutdown"],["sleep","Lights out on time"]] },
+  ] : [
+    { k:"dawn", a:wake, b:g0, t:"🌅 Quiet start + Fajr", s:"Water, adhkar, Quran, glance at Top 3", items:[["Fajr","Fajr on time"],["am","Morning adhkar"],["wird",wird],["water1","Two glasses of water"]] },
+    { k:"gym", a:g0, b:g1, t:gym ? "🏋️ Gym, then Meal 1" : "🚶 Walk or mobility, then Meal 1", s:gym ? "Train, then a high-protein breakfast within the hour" : "Move 20 minutes, then a high-protein breakfast", items:[["gym", gym ? "Gym session" : "20-min walk"],["m1","Meal 1: about 40 g protein"]] },
+    { k:"deep", a:g1, b:t.Dhuhr, t:"🎯 Deep work", s:"90-min sprints · phone in another room · Deep Work Focus on", items:[["top0", top(0)],["top1", top(1)]], cal:true },
+    { k:"dhuhr", a:t.Dhuhr, b:t.Asr, t:"🕌 Dhuhr · people time", s:"Calls, meetings and messages in one batch", items:[["Dhuhr","Dhuhr"],["msgs","Inbox and messages: one batch"]] },
+    { k:"asr", a:t.Asr, b:t.Maghrib, t:"🕌 Asr · finish strong", s:"Top 3, admin, protein snack, 10-min walk", items:[["Asr","Asr"],["top2", top(2)],["snack","Protein snack"],["walk","10-min walk"]].concat(dow === 5 ? [["review","Weekly idea review"]] : []) },
+    { k:"maghrib", a:t.Maghrib, b:t.Isha, t:"👨‍👩‍👧 Maghrib · family", s:"Meal 2, family time, phone on Do Not Disturb", items:[["Maghrib","Maghrib"],["m2","Meal 2 before Isha"],["phone","Phone away at family time"]] },
+    { k:"isha", a:t.Isha, b:bed, t:"🌙 Isha · shut down", s:"Evening adhkar, 2-min review, read, lights out " + hm(bed), items:[["Isha","Isha"],["pm","Evening adhkar"],["read","Read 10 minutes"],["shut","2-min shutdown"],["sleep","Lights out on time"]] },
+  ];
+  return { list:L, t, wake, bed };
+}
+const isOn = (D, k) => k.startsWith("top") ? !!D.done[Number(k.slice(3))] : !!D.chk[k];
+function score(D){ const L = blocksCache().list.flatMap(b => b.items); return L.length ? Math.round(L.filter(([k]) => isOn(D, k)).length * 100 / L.length) : 0; }
+let _bc = null, _bcAt = 0; function blocksCache(){ if (!_bc || Date.now() - _bcAt > 5000){ _bc = blocks(); _bcAt = Date.now(); } return _bc; }
+function toggleItem(k){ const D = day(); if (k.startsWith("top")){ const i = Number(k.slice(3)); D.done[i] = !D.done[i]; saveDay(D); if (D.ref && D.ref[i]) setDone(D.ref[i], D.done[i]); } else { D.chk[k] = !D.chk[k]; saveDay(D); } render(); }
+
+/* ---------- header ---------- */
+function header(){
+  const D = day(), sc = score(D), r = 20, c = 2 * Math.PI * r;
+  $("#ring").innerHTML = `<svg width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="24" cy="24" r="${r}" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - sc / 100)}"/></svg><b>${sc}%</b>`;
+  const t = prayer(), n = nowMin(), nx = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].find(k => t[k] > n);
+  const w = nx ? t[nx] - n : null;
+  $("#hsub").textContent = new Date().toLocaleDateString("en-CA", { weekday:"short", month:"short", day:"numeric" }) + (isWeekend() ? " · weekend" : "") + (nx ? " · " + nx + " in " + (w < 60 ? w + " min" : Math.floor(w / 60) + " h " + (w % 60) + " min") : "");
+  const hot = openItems().filter(x => bucket(x) === "now").length; $("#ideaDot").hidden = !hot; $("#ideaDot").textContent = hot;
+  const acts = jobActions().filter(a => !store.get("ja:" + a.id, false)).length; $("#jobDot").hidden = !acts; $("#jobDot").textContent = acts;
+}
+
+/* ---------- TODAY ---------- */
+let open = null;
+function grp(title, stamp){ const g = el("section", "group"), h = el("div", "gh"); h.appendChild(el("strong", "", title)); if (stamp != null) h.appendChild(el("span", "stamp", stamp)); g.appendChild(h); return g; }
+function viewToday(){
+  const out = [], D = day(), wk = isWeekend();
+  // Today's list: first 3 are the must-dos, no cap after that
+  const nT = D.top.filter(Boolean).length, nD = D.top.filter((v, i) => v && D.done[i]).length;
+  const g = grp(wk ? "Weekend list" : "Today's list", nD + "/" + Math.max(nT, 3) + " done"), p = el("div", "pad");
+  const rowFor = i => { const v = D.top[i] || ""; const r = el("div", "toprow" + (D.done[i] ? " on" : "")); const c = el("button", "chk" + (D.done[i] ? " on" : ""), D.done[i] ? "✓" : ""); c.type = "button"; c.setAttribute("aria-label", "Done"); c.onclick = () => toggleItem("top" + i);
+    const inp = el("input", "inp"); inp.value = v; inp.placeholder = i < 3 ? (wk ? ["Family goal for today", "Personal goal", "Prep for next week"][i] : ["#1: the one thing that moves the needle", "#2", "#3"][i]) : "Another task"; inp.enterKeyHint = "done"; if (i < 3) inp.style.fontWeight = "600";
+    inp.onchange = () => { const o = day(); o.top[i] = inp.value.trim(); if (o.ref) o.ref[i] = null; saveDay(o); _bc = null; }; inp.onkeydown = e => { if (e.key === "Enter") inp.blur(); };
+    const rm = el("a", "icon", i < 3 ? "⏰" : "✕"); rm.href = "#"; rm.setAttribute("aria-label", i < 3 ? "Add to Reminders" : "Remove");
+    rm.onclick = e => { e.preventDefault(); if (i >= 3){ const o = day(); o.top.splice(i, 1); o.done.splice(i, 1); (o.ref || []).splice(i, 1); saveDay(o); return render(); }
+      const val = day().top[i]; if (!val) return toast("Type it first"); const dp = blocksCache().list.find(x => x.items.some(([k]) => k === "top" + i)); location.href = remLink(val, dp && dp.a > nowMin() ? dp.a : null); };
+    r.appendChild(c); r.appendChild(inp); r.appendChild(rm); return r; };
+  for (let i = 0; i < Math.max(3, D.top.length); i++){ if (i === 3) p.appendChild(el("span", "label", "Also today")); p.appendChild(rowFor(i)); }
+  const ar = el("div", "row"); const ad = el("input", "inp"); ad.placeholder = "+ Add another task"; ad.enterKeyHint = "done"; ad.style.flex = "1";
+  const push = () => { const t = ad.value.trim(); if (!t) return; const o = day(); let i = o.top.findIndex(z => !z); if (i < 0) i = o.top.length; o.top[i] = t; o.done[i] = false; saveDay(o); ad.value = ""; ad.blur(); _bc = null; render(); };
+  ad.onkeydown = e => { if (e.key === "Enter") push(); }; ar.appendChild(ad); p.appendChild(ar);
+  const fr = el("div", "row"); const fb = el("button", "btn sm pri", "✨ Fill from Inbox"); fb.type = "button"; fb.onclick = fillToday; fr.appendChild(fb);
+  const O = openItems(), hot = O.filter(x => bucket(x) === "now" && x.kind !== "idea").length; const ib = el("button", "btn sm ghost", "📥 " + O.length + " in Inbox" + (hot ? " · " + hot + " 🔥" : "")); ib.type = "button"; ib.onclick = () => go("inbox"); fr.appendChild(ib); p.appendChild(fr);
+  p.appendChild(el("div", "note", wk ? "No work today. Lead with family, health and one personal win; add as much as you like below." : "Top 3 first, then anything else. Focus ranks your Inbox so the next thing is always clear."));
+  g.appendChild(p); out.push(g);
+  // Focus zone
+  const sp = store.get("sprint", null), z = grp("Focus zone", sp ? "in a sprint" : "one task, no switching"), zp = el("div", "pad");
+  const tr = el("div", "row"); tr.style.justifyContent = "space-between"; const tm = el("div", "timer", "--:--"); tm.id = "timer"; tr.appendChild(tm);
+  const bt = el("div", "row");
+  if (sp){ const b = el("button", "btn", "Stop"); b.type = "button"; b.onclick = () => { store.del("sprint"); render(); }; bt.appendChild(b); }
+  else [25, 50, 90].forEach(m => { const b = el("button", "btn" + (m === 50 ? " pri" : ""), m + "m"); b.type = "button"; b.onclick = () => { store.set("sprint", { end:Date.now() + m * 6e4, m }); render(); tick(); }; bt.appendChild(b); });
+  tr.appendChild(bt); zp.appendChild(tr);
+  zp.appendChild(el("div", "note", sp ? "Stay on one task. New idea? Drop it in the Inbox and come back." : "Turn on your Deep Work Focus, then start a sprint."));
+  z.appendChild(zp); out.push(z);
+  // Plan with anchors
+  const B = blocksCache(), n = nowMin(), cur = B.list.findIndex(b => n >= b.a && n < b.b), ev = calToday();
+  const done = B.list.flatMap(b => b.items).filter(([k]) => isOn(D, k)).length, tot = B.list.flatMap(b => b.items).length;
+  const pl = grp(wk ? "Weekend plan" : "Today's plan", done + "/" + tot + " done");
+  const bar = el("div", "bar"); bar.style.margin = "0 16px 4px"; const bi = el("i"); bi.style.width = Math.round(done * 100 / tot) + "%"; bar.appendChild(bi); const bw = el("div", "pad"); bw.style.paddingBottom = "4px"; bw.appendChild(bar); pl.appendChild(bw);
+  B.list.forEach((b, i) => {
+    const its = b.items, dn = its.filter(([k]) => isOn(D, k)).length, past = n >= b.b, isNow = i === cur;
+    const exp = open === b.k || (open == null && isNow);
+    const box = el("div", "blk" + (isNow ? " now" : "") + (past ? " past" : ""));
+    const h = el("button", "bh"); h.type = "button"; h.onclick = () => { open = exp ? "" : b.k; render(); };
+    h.appendChild(el("span", "when", hmS(b.a)));
+    const tx = el("span", ""); tx.appendChild(el("div", "tt", b.t + (isNow ? " · now" : ""))); if (exp || isNow) tx.appendChild(el("div", "ss", b.s)); h.appendChild(tx);
+    h.appendChild(el("span", "prog" + (dn === its.length ? " full" : ""), dn + "/" + its.length)); box.appendChild(h);
+    if (exp){
+      const body = el("div", "bbody");
+      ev.filter(e => isoMin(e.s) < b.b && isoMin(e.e) > b.a).forEach(e => body.appendChild(el("div", "ev", "📅 " + hm(isoMin(e.s)) + " " + e.t)));
+      its.forEach(([k, l]) => { const it = el("button", "item" + (isOn(D, k) ? " on" : "")); it.type = "button"; it.appendChild(el("span", "chk" + (isOn(D, k) ? " on" : ""), isOn(D, k) ? "✓" : "")); it.appendChild(el("span", "", l)); it.onclick = () => toggleItem(k); body.appendChild(it); });
+      const ar = el("div", "row"); ar.style.marginTop = "6px";
+      const cl = el("a", "btn sm", "📅 Calendar"); cl.href = calLink(b.t.replace(/^\S+\s/, "") + (b.cal && D.top[0] ? ": " + D.top[0] : ""), isNow ? Math.ceil(n / 5) * 5 : b.a, b.b, b.s); cl.target = "_blank"; cl.rel = "noopener"; ar.appendChild(cl);
+      const rm = el("a", "btn sm", "⏰ Remind me"); rm.href = remLink(b.t.replace(/^\S+\s/, ""), b.a); ar.appendChild(rm);
+      if (b.k === "isha"){ const sh = el("button", "btn sm", "🌙 Shutdown"); sh.type = "button"; sh.onclick = () => openSheet(shutdownSheet); ar.appendChild(sh); }
+      body.appendChild(ar); box.appendChild(body);
+    }
+    pl.appendChild(box);
+  });
+  out.push(pl);
+  // Week + fuel
+  const wg = grp("This week", "daily score"), wp = el("div", "pad"), wkb = el("div", "week");
+  for (let i = 6; i >= 0; i--){ const o = store.get("d:" + dkey(-i), null), s = o ? (i === 0 ? score(D) : (o.score || 0)) : 0, c = el("div"); const bb = el("i"); bb.style.height = Math.max(3, s * 0.36) + "px"; bb.style.opacity = i ? ".55" : "1"; c.appendChild(bb); c.appendChild(document.createTextNode(new Date(Date.now() - i * 864e5).toLocaleDateString("en-CA", { weekday:"narrow" }))); wkb.appendChild(c); }
+  wp.appendChild(wkb);
+  const fold = el("details", "fold"); fold.appendChild(el("summary", "", "🥗 Fat-loss rhythm · 2 meals + 1 snack"));
+  [["Meal 1", "After the gym: eggs, ful or Greek yogurt with oats. About 40 g protein."], ["Snack", "3–4 p.m.: Greek yogurt, tuna, boiled eggs or labneh, plus fruit or a few nuts."], ["Meal 2", "Around Maghrib: half the plate vegetables, a palm of protein, a fist of carbs (fewer on rest days)."], ["Rules", "Protein at every meal, whole foods, no whey, kitchen closed after Isha, 7+ hours of sleep."]]
+    .forEach(([k, v]) => { const r = el("div", "note"); r.style.padding = "4px 0"; const bb = el("b", "", k + ": "); bb.style.color = "var(--ink)"; r.appendChild(bb); r.appendChild(document.createTextNode(v)); fold.appendChild(r); });
+  const adh = el("details", "fold"); adh.appendChild(el("summary", "", "🕋 Morning and evening adhkar"));
+  [["آية الكرسي", "Ayat al-Kursi · ×1"], ["قل هو الله أحد، والمعوذتين", "Al-Ikhlas, Al-Falaq, An-Nas · ×3"], ["سبحان الله وبحمده", "SubhanAllah wa bihamdih · ×100"], ["لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير", "La ilaha illallah wahdahu... · ×10"], ["أستغفر الله وأتوب إليه", "Astaghfirullah wa atubu ilayh · ×100"], ["أعوذ بكلمات الله التامات من شر ما خلق", "Evening: A'udhu bi kalimatillah... · ×3"]]
+    .forEach(([a, e]) => { const r = el("div", ""); r.style.cssText = "padding:6px 0;border-top:1px dashed var(--line)"; r.appendChild(el("div", "ar", a)); r.appendChild(el("div", "note", e)); adh.appendChild(r); });
+  wp.appendChild(fold); wp.appendChild(adh); wg.appendChild(wp); out.push(wg);
+  if (n >= B.t.Isha - 30 || n < B.wake){ const sg = grp("Evening shutdown", "2 minutes"); const sp2 = el("div", "pad"); shutdownBody(sp2); sg.appendChild(sp2); out.push(sg); }
+  return out;
+}
+function shutdownBody(p){
+  ["What went well today?", "What drained my energy?", "Tomorrow's #1 is…"].forEach((q, i) => { const inp = el("input", "inp"); inp.placeholder = q; inp.value = day().rv[i] || ""; inp.enterKeyHint = "done";
+    inp.onchange = () => { const o = day(); o.rv[i] = inp.value.trim(); saveDay(o); if (i === 2 && inp.value.trim()){ const t = day(1); t.top[0] = inp.value.trim(); saveDay(t, 1); toast("Saved as tomorrow's #1"); } }; inp.onkeydown = e => { if (e.key === "Enter") inp.blur(); }; p.appendChild(inp); });
+  p.appendChild(el("div", "note", "Tomorrow's #1 goes straight to the top of tomorrow's list."));
+}
+function shutdownSheet(b){ b.appendChild(el("strong", "", "Evening shutdown")); shutdownBody(b); }
+
+/* ---------- INBOX: drop anything, Focus ranks it ---------- */
+const AREAS = [["work", "💼 Work"], ["biz", "🤝 Business"], ["family", "👨‍👩‍👧 Family"], ["health", "🏋️ Health"], ["faith", "🕌 Faith"]];
+const KINDS = [["todo", "✅ To-do"], ["idea", "💡 Idea"], ["rem", "⏰ Reminder"]];
+let area = store.get("area", "work"), kind = store.get("kind", "todo"), inView = store.get("inView", "rank");
+function inbox(){
+  let L = store.get("inbox", null);
+  if (!L){ L = store.get("ideas", []).filter(x => x.q !== "drop").map(x => ({ id:x.id, t:x.t, kind:"idea", src:"me", due:"", a:x.a || "work", u:x.q === "now" ? true : null, i:x.q === "now" || x.q === "plan" ? true : x.q === "hand" ? false : null, done:false, added:x.id })); store.set("inbox", L); }
+  return L;
+}
+const saveInbox = L => store.set("inbox", L.slice(0, 600));
+const ymd = d => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+function dueDays(due){ if (!due) return null; const d = new Date(due.slice(0, 10) + "T00:00"); if (isNaN(d)) return null; const t = new Date(); t.setHours(0, 0, 0, 0); return Math.round((d - t) / 864e5); }
+function dueLabel(due){ const d = dueDays(due); if (d == null) return ""; const tm = due.length > 10 ? " " + hmS(Number(due.slice(11, 13)) * 60 + Number(due.slice(14, 16))) : "";
+  return (d < 0 ? "overdue " + (-d) + "d" : d === 0 ? "today" : d === 1 ? "tomorrow" : d < 7 ? new Date(due.slice(0, 10) + "T00:00").toLocaleDateString("en-CA", { weekday:"short" }) : due.slice(5, 10)) + tm; }
+function parseDrop(s){
+  let due = "", t = s, m;
+  const day0 = new Date(); day0.setHours(0, 0, 0, 0);
+  if ((m = t.match(/\b(?:by |on )?(today|tonight|tomorrow|tmrw|mon(?:day)?|tue(?:s(?:day)?)?|wed(?:nesday)?|thu(?:rs(?:day)?)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?)\b/i))){
+    const w = m[1].toLowerCase(); let d = new Date(day0);
+    if (w === "tomorrow" || w === "tmrw") d.setDate(d.getDate() + 1);
+    else if (w !== "today" && w !== "tonight"){ const want = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"].indexOf(w.slice(0, 3)); let k = (want - d.getDay() + 7) % 7; if (k === 0) k = 7; d.setDate(d.getDate() + k); }
+    due = ymd(d); t = t.replace(m[0], " ");
+  }
+  if ((m = t.match(/\b(?:at )?(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)(?=\s|$)/i)) || (m = t.match(/\b(?:at )?([01]?\d|2[0-3]):([0-5]\d)\b/))){
+    let h = Number(m[1]) % 12; const ap = (m[3] || "").toLowerCase(); if (!m[3]) h = Number(m[1]); else if (ap.startsWith("p")) h += 12;
+    if (!due){ const n = new Date(); due = ymd(n); if (h * 60 + Number(m[2] || 0) <= nowMin()) due = ymd(new Date(Date.now() + 864e5)); }
+    due += " " + pad(h) + ":" + pad(Number(m[2] || 0)); t = t.replace(m[0], " ");
+  }
+  t = t.replace(/\s{2,}/g, " ").trim();
+  let k = null; if (/^idea[:\-]\s*/i.test(t)){ k = "idea"; t = t.replace(/^idea[:\-]\s*/i, ""); } else if (/^(remind me( to)?|reminder[:\-])\s*/i.test(t)){ k = "rem"; t = t.replace(/^(remind me( to)?|reminder[:\-])\s*/i, ""); }
+  return { t:t || s, due, kind:k };
+}
+/* the ranking */
+const JOB = /samsara|clio|geotab|teradata|manulife|interview|apply|application|recruiter|resume|cv\b|linkedin|cover letter|job|hiring|offer|network/i;
+const MONEY = /pay|bill|tax|cra\b|invoice|bank|insurance|renew|rent|mortgage|credit|refund|fee|fine/i;
+const FAM = /kid|son|daughter|malek|maloka|family|school|universit|wife|mom|dad|doctor|dentist|appointment|clinic|parent/i;
+const BIZ = /u-?thentic|etsy|amazon|shopify|client|mg business|order|supplier|ward|campaign|proposal/i;
+const QUICK = /^(call|email|text|whatsapp|pay|book|reply|send|order|renew|sign|cancel|confirm|check|buy|print)\b/i;
+function tags(x){ const s = x.t; const o = []; if (JOB.test(s)) o.push("🎯 Job"); if (MONEY.test(s)) o.push("💵 Money"); if (FAM.test(s)) o.push("👨‍👩‍👧 Family"); if (BIZ.test(s)) o.push("🤝 Business"); if (QUICK.test(s) || s.split(/\s+/).length <= 4) o.push("⚡ Quick"); return o; }
+function autoU(x){ const d = dueDays(x.due); return d != null && d <= 1; }
+function autoI(x){ return JOB.test(x.t) || MONEY.test(x.t) || FAM.test(x.t) || BIZ.test(x.t); }
+const isU = x => x.u == null ? autoU(x) : x.u, isI = x => x.i == null ? autoI(x) : x.i;
+function rank(x){
+  let s = 0; const d = dueDays(x.due);
+  if (d != null) s += d < 0 ? 60 : d === 0 ? 45 : d === 1 ? 28 : d <= 3 ? 16 : d <= 7 ? 8 : 2;
+  if (x.u === true) s += 30; if (x.u === false) s -= 10;
+  if (x.i === true) s += 30; if (x.i === false) s -= 15;
+  if (JOB.test(x.t)) s += 20; if (MONEY.test(x.t)) s += 14; if (BIZ.test(x.t)) s += 10; if (FAM.test(x.t)) s += 12;
+  if (QUICK.test(x.t)) s += 6;
+  s += Math.min(10, Math.floor((Date.now() - (x.added || Date.now())) / 864e5));
+  if (x.kind === "idea" && x.i !== true) s -= 20;
+  return s;
+}
+function bucket(x){ const u = isU(x), i = isI(x); return u && i ? "now" : i ? "plan" : u ? "quick" : "later"; }
+const BUCKETS = [["now", "🔥 Do now", "Urgent and important"], ["plan", "📅 Schedule", "Important, not urgent: book a time"], ["quick", "⚡ Quick win / hand off", "Urgent, low impact: batch it or delegate"], ["later", "🧊 Later", "Park it; review on Friday"]];
+const openItems = () => inbox().filter(x => !x.done).map(x => Object.assign({}, x, { r:rank(x) })).sort((a, b) => b.r - a.r);
+function addItem(raw, extra){
+  const p = parseDrop(raw), L = inbox(), k = p.kind || kind;
+  const it = Object.assign({ id:Date.now() + Math.floor(Math.random() * 1000), t:p.t, kind:k, src:"me", due:p.due, a:area, u:null, i:null, done:false, added:Date.now() }, extra || {});
+  L.unshift(it); saveInbox(L); return it;
+}
+function setDone(id, v){ const L = inbox(), y = L.find(z => z.id === id); if (!y) return null; y.done = v; y.doneAt = v ? Date.now() : null; saveInbox(L);
+  const D = day(), j = (D.ref || []).indexOf(id); if (j >= 0 && D.done[j] !== v){ D.done[j] = v; saveDay(D); }
+  if (v && y.src === "ios" && S().tickIOS) setTimeout(() => { location.href = "shortcuts://run-shortcut?name=" + encodeURIComponent(S().doneShortcut) + "&input=text&text=" + encodeURIComponent(y.t); }, 350);
+  return y; }
+/* iPhone Reminders in: one line per reminder "Title | yyyy-MM-dd HH:mm | List" */
+function importReminders(text){
+  const lines = String(text || "").split(/\r?\n/).map(s => s.trim()).filter(Boolean); if (!lines.length) return 0;
+  const L = inbox(), seen = new Set(); let added = 0;
+  lines.forEach(line => { const [t0, d0, l0] = line.split(/\s*\|\s*/); const t = (t0 || "").trim(); if (!t) return; let due = "";
+    if (d0){ const m = d0.match(/(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2}))?/); if (m) due = m[1] + "-" + m[2] + "-" + m[3] + (m[4] ? " " + pad(m[4]) + ":" + m[5] : ""); else { const dt = new Date(d0); if (!isNaN(dt)) due = ymd(dt) + (/\d:\d/.test(d0) ? " " + pad(dt.getHours()) + ":" + pad(dt.getMinutes()) : ""); } }
+    const key = t.toLowerCase(); seen.add(key);
+    const y = L.find(z => z.src === "ios" && z.t.toLowerCase() === key);
+    if (y){ y.due = due; y.list = l0 || y.list || ""; if (y.done && !y.doneAt) y.done = false; }
+    else { L.unshift({ id:Date.now() + added, t, kind:"rem", src:"ios", due, list:l0 || "", a:"work", u:null, i:null, done:false, added:Date.now() }); added++; } });
+  L.forEach(z => { if (z.src === "ios" && !z.done && !seen.has(z.t.toLowerCase())){ z.done = true; z.doneAt = Date.now(); z.gone = true; } });
+  saveInbox(L); store.set("syncAt", Date.now()); return added;
+}
+async function syncFromClipboard(){
+  try { const t = await navigator.clipboard.readText(); if (!t || !/\S/.test(t)) return toast("Run “" + S().syncShortcut + "” first, then tap Sync");
+    const n = importReminders(t); toast(n ? n + " new from Reminders" : "Reminders up to date"); render();
+  } catch(_){ openSheet(b => { b.appendChild(el("strong", "", "Paste your reminders")); const ta = el("textarea", "inp"); ta.rows = 6; ta.placeholder = "Long-press here and Paste"; b.appendChild(ta); const ok = el("button", "btn pri", "Import"); ok.type = "button"; ok.onclick = () => { const n = importReminders(ta.value); closeSheet(); toast(n + " new from Reminders"); render(); }; b.appendChild(ok); }); }
+}
+function hashImport(){ const m = location.hash.match(/^#rem=(.*)$/s); if (m){ try { const n = importReminders(decodeURIComponent(m[1])); setTimeout(() => toast(n + " new from Reminders"), 400); } catch(_){} history.replaceState(null, "", location.pathname); tab = "inbox"; } }
+function toToday(x){ const D = day(); D.ref = D.ref || []; if (D.ref.includes(x.id) || D.top.includes(x.t)) return toast("Already on today's list");
+  let i = D.top.findIndex(z => !z); if (i < 0) i = D.top.length; D.top[i] = x.t; D.done[i] = false; D.ref[i] = x.id; saveDay(D); toast("Added to today"); }
+function fillToday(){
+  const D = day(); D.ref = D.ref || []; const have = new Set(D.top.filter(Boolean)); let n = 0;
+  const pick = openItems().filter(x => x.kind !== "idea" && !D.ref.includes(x.id) && !have.has(x.t));
+  pick.forEach(x => { const slot = D.top.findIndex(z => !z); const firstFree = slot >= 0 && slot < 3;
+    if (!firstFree && (bucket(x) !== "now" || D.top.length >= 12)) return;
+    const i = slot >= 0 ? slot : D.top.length; D.top[i] = x.t; D.done[i] = false; D.ref[i] = x.id; n++; });
+  saveDay(D); _bc = null; toast(n ? n + " added from your Inbox" : "Nothing urgent waiting in the Inbox"); render();
+}
+function itemRow(x, compact){
+  const it = el("div", "idea"), top = el("div", "row"); top.style.flexWrap = "nowrap"; top.style.alignItems = "flex-start";
+  const c = el("button", "chk", ""); c.type = "button"; c.setAttribute("aria-label", "Done"); c.onclick = () => { setDone(x.id, true); toast("Done ✓"); render(); }; top.appendChild(c);
+  const tx = el("div", "grow"); tx.appendChild(el("div", "t", x.t));
+  const meta = [x.kind === "idea" ? "💡 idea" : x.src === "ios" ? "📲 Reminders" + (x.list ? " · " + x.list : "") : "", dueLabel(x.due) ? "⏳ " + dueLabel(x.due) : "", ...tags(x)].filter(Boolean).join("  ·  ");
+  if (meta){ const mm = el("div", "note", meta); if (dueDays(x.due) != null && dueDays(x.due) < 0) mm.style.color = "var(--down)"; tx.appendChild(mm); }
+  top.appendChild(tx); it.appendChild(top);
+  if (!compact){
+    const row = el("div", "row"); row.style.paddingLeft = "38px";
+    const u = el("button", "mini", "Urgent"); u.type = "button"; u.setAttribute("aria-pressed", String(isU(x))); if (x.u == null) u.title = "auto"; u.onclick = () => { const L = inbox(), y = L.find(z => z.id === x.id); y.u = !isU(y); saveInbox(L); render(); };
+    const im = el("button", "mini", "Important"); im.type = "button"; im.setAttribute("aria-pressed", String(isI(x))); im.onclick = () => { const L = inbox(), y = L.find(z => z.id === x.id); y.i = !isI(y); saveInbox(L); render(); };
+    row.appendChild(u); row.appendChild(im);
+    const td = el("button", "mini", "→ Today"); td.type = "button"; td.onclick = () => { toToday(x); render(); }; row.appendChild(td);
+    if (x.src !== "ios"){ const rm = el("a", "mini", "⏰"); const dd = dueDays(x.due), tm = x.due && x.due.length > 10 ? Number(x.due.slice(11, 13)) * 60 + Number(x.due.slice(14, 16)) : 540; rm.href = remLink(x.t, tm, dd != null && dd > 0 ? dd : (dd === 0 && tm > nowMin() ? 0 : 1)); rm.style.textDecoration = "none"; rm.setAttribute("aria-label", "Add to iPhone Reminders"); row.appendChild(rm); }
+    const del = el("button", "mini", "✕"); del.type = "button"; del.setAttribute("aria-label", "Delete"); del.onclick = () => { saveInbox(inbox().filter(z => z.id !== x.id)); render(); }; row.appendChild(del);
+    it.appendChild(row);
+  }
+  return it;
+}
+function viewInbox(){
+  const out = [], O = openItems();
+  // drop box
+  const g = grp("Drop anything", "to-dos, ideas, reminders"), p = el("div", "pad");
+  const r = el("div", "row"); r.style.flexWrap = "nowrap"; const inp = el("input", "inp"); inp.placeholder = "e.g. Call Geotab recruiter Tue 10am"; inp.enterKeyHint = "done"; inp.id = "dropInp";
+  const add = () => { const v = inp.value.trim(); if (!v) return inp.focus(); const it = addItem(v); inp.value = ""; inp.blur();
+    if (it.kind === "rem" && it.due){ const tm = it.due.length > 10 ? Number(it.due.slice(11, 13)) * 60 + Number(it.due.slice(14, 16)) : 540; const dd = dueDays(it.due); toast("Saved. Opening Reminders…"); setTimeout(() => location.href = remLink(it.t, tm, Math.max(0, dd || 0)), 300); }
+    else toast(bucket(Object.assign(it)) === "now" ? "Saved · ranked 🔥 Do now" : "Saved. Back to your task."); render(); };
+  inp.onkeydown = e => { if (e.key === "Enter") add(); };
+  const b = el("button", "btn pri", "Drop"); b.type = "button"; b.onclick = add; r.appendChild(inp); r.appendChild(b); p.appendChild(r);
+  const ch = el("div", "chips"); KINDS.forEach(([k, l]) => { const c = el("button", "chip", l); c.type = "button"; c.setAttribute("aria-pressed", String(kind === k)); c.onclick = () => { kind = k; store.set("kind", k); render(); }; ch.appendChild(c); });
+  const sep = el("span", "note", "·"); sep.style.alignSelf = "center"; ch.appendChild(sep);
+  AREAS.forEach(([k, l]) => { const c = el("button", "chip", l); c.type = "button"; c.setAttribute("aria-pressed", String(area === k)); c.onclick = () => { area = k; store.set("area", k); render(); }; ch.appendChild(c); }); p.appendChild(ch);
+  p.appendChild(el("div", "note", "Write dates naturally: “today”, “tomorrow”, “Fri 3pm”. Start with “idea:” or “remind me” to switch type."));
+  const sr = el("div", "row"); const sy = el("button", "btn sm", "📲 Sync iPhone Reminders"); sy.type = "button"; sy.onclick = syncFromClipboard; sr.appendChild(sy);
+  const at = store.get("syncAt", 0); sr.appendChild(el("span", "note", at ? "last sync " + new Date(at).toLocaleString("en-CA", { weekday:"short", hour:"numeric", minute:"2-digit" }) : "set up once in ⚙︎"));
+  p.appendChild(sr); g.appendChild(p); out.push(g);
+  if (!O.length){ out.push(el("div", "empty", "Inbox zero. Drop anything here, or sync your iPhone Reminders, and Focus ranks it for you.")); return out; }
+  // ranked
+  const nNow = O.filter(x => bucket(x) === "now").length;
+  const v = grp("Your priorities", O.length + " open · " + nNow + " to do now"), vs = el("div", "pad"), seg = el("div", "chips");
+  [["rank", "Ranked"], ["matrix", "Matrix"], ["ideas", "Ideas only"]].forEach(([k, l]) => { const c = el("button", "chip", l); c.type = "button"; c.setAttribute("aria-pressed", String(inView === k)); c.onclick = () => { inView = k; store.set("inView", k); render(); }; seg.appendChild(c); });
+  vs.appendChild(seg);
+  const fr = el("div", "row"); const fb = el("button", "btn sm pri", "✨ Fill today's list from here"); fb.type = "button"; fb.onclick = () => { fillToday(); go("today"); }; fr.appendChild(fb); vs.appendChild(fr);
+  if ([5, 0].includes(new Date().getDay())) vs.appendChild(el("div", "note", "Weekly review: tap Important on what matters, ✕ the rest without guilt."));
+  v.appendChild(vs);
+  if (inView === "rank"){
+    BUCKETS.forEach(([k, l, hint]) => { const its = O.filter(x => bucket(x) === k && x.kind !== "idea"); if (!its.length) return;
+      const hd = el("div", "pad"); hd.style.cssText = "padding:10px 16px 2px;border-top:1px solid var(--line)"; const lb = el("span", "label", l + " · " + its.length); hd.appendChild(lb); hd.appendChild(el("div", "note", hint)); v.appendChild(hd);
+      its.slice(0, k === "later" ? 25 : 60).forEach(x => v.appendChild(itemRow(x))); });
+    const nI = O.filter(x => x.kind === "idea").length; if (nI){ const c = el("div", "pad"); c.style.borderTop = "1px solid var(--line)"; const b2 = el("button", "btn sm ghost", "💡 " + nI + " idea" + (nI > 1 ? "s" : "") + " parked ›"); b2.type = "button"; b2.onclick = () => { inView = "ideas"; store.set("inView", "ideas"); render(); }; c.appendChild(b2); v.appendChild(c); }
+  } else if (inView === "matrix"){
+    const m = el("div", "map"); BUCKETS.forEach(([k, l]) => { const its = O.filter(x => bucket(x) === k); const bx = el("div", "box"); bx.appendChild(el("span", "label", l + " · " + its.length)); its.slice(0, 8).forEach(x => bx.appendChild(el("div", "", x.t))); if (its.length > 8) bx.appendChild(el("div", "note", "+" + (its.length - 8) + " more")); m.appendChild(bx); }); v.appendChild(m);
+  } else {
+    const I = O.filter(x => x.kind === "idea"); if (!I.length) v.appendChild(el("div", "empty", "No ideas parked."));
+    AREAS.forEach(([k, l]) => { const its = I.filter(x => (x.a || "work") === k); if (!its.length) return; const hd = el("div", "pad"); hd.style.cssText = "padding:10px 16px 2px;border-top:1px solid var(--line)"; hd.appendChild(el("span", "label", l + " · " + its.length)); v.appendChild(hd); its.forEach(x => v.appendChild(itemRow(x))); });
+  }
+  out.push(v);
+  const doneN = inbox().filter(x => x.done).length;
+  if (doneN){ const c = el("div", "pad"); const b2 = el("button", "btn sm ghost", "Clear " + doneN + " done"); b2.type = "button"; b2.onclick = () => { saveInbox(inbox().filter(z => !z.done)); render(); }; c.appendChild(b2); out.push(c); }
+  return out;
+}
+
+/* ---------- TARGET JOBS ---------- */
+function hash(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); }
+function jobActions(){
+  if (!P || !P.jobs) return [];
+  const today = dkey();
+  return P.jobs.flatMap(c => (c.actions || []).filter(a => a.d === today).map(a => ({ co:c.name, t:a.t, text:a.text, id:today + hash(a.t + a.text) })));
+}
+const li = q => "https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(q) + "&origin=FACETED_SEARCH";
+function viewJobs(){
+  const out = [];
+  if (!P){ const g = grp("Target jobs", "locked"), p = el("div", "pad");
+    p.appendChild(el("div", "note", lockErr || "Enter your passcode to unlock your calendar and target jobs. It stays on this phone."));
+    lockForm(p); g.appendChild(p); out.push(g); return out; }
+  const acts = jobActions(), ag = grp("Today's actions", acts.length ? acts.filter(a => store.get("ja:" + a.id, false)).length + "/" + acts.length + " done" : "from your 8 a.m. briefs"), ap = el("div", "pad");
+  acts.forEach(a => { const on = store.get("ja:" + a.id, false), c = el("div", "act" + (on ? " on" : ""));
+    const top = el("div", "row"); top.style.justifyContent = "space-between"; top.style.flexWrap = "nowrap"; const tt = el("strong", "", a.t.replace(/^🎯\s*/, "")); tt.style.fontSize = "14px"; top.appendChild(tt);
+    const ck = el("button", "chk" + (on ? " on" : ""), on ? "✓" : ""); ck.type = "button"; ck.setAttribute("aria-label", "Done"); ck.onclick = () => { store.set("ja:" + a.id, !on); render(); }; top.appendChild(ck); c.appendChild(top);
+    if (a.text){ c.appendChild(el("pre", "", a.text)); const r = el("div", "row"); const cp = el("button", "btn sm", "Copy all"); cp.type = "button"; cp.onclick = () => copy(a.text); r.appendChild(cp); const rm = el("a", "btn sm", "⏰ Remind me"); rm.href = remLink(a.t.replace(/^🎯\s*/, ""), null); r.appendChild(rm); c.appendChild(r); }
+    ap.appendChild(c); });
+  ag.appendChild(ap); if (acts.length) out.push(ag);
+  const nNew = P.jobs.reduce((s, c) => s + c.roles.filter(r => r.new).length, 0);
+  const cg = grp("Companies", nNew ? nNew + " new role" + (nNew > 1 ? "s" : "") : "roles checked " + (P.jobs_at ? hmS(isoMin(new Date(P.jobs_at * 1000))) : ""));
+  P.jobs.forEach(c => {
+    const d = el("details", "co"); if (c.roles.some(r => r.new)) d.open = true;
+    const s = el("summary", "bh"); s.style.gridTemplateColumns = "1fr auto"; const tx = el("span", ""); tx.appendChild(el("div", "tt", c.name)); tx.appendChild(el("div", "ss", c.goal)); s.appendChild(tx);
+    const nn = c.roles.filter(r => r.new).length; s.appendChild(el("span", "prog" + (nn ? " full" : ""), nn ? nn + " new" : c.roles.length + " roles")); d.appendChild(s);
+    const b = el("div", "pad"); b.style.paddingTop = "0";
+    b.appendChild(el("span", "label", "Live roles"));
+    if (c.err) b.appendChild(el("div", "note", "Couldn't check the careers site this time."));
+    if (!c.roles.length) b.appendChild(el("div", "note", "No matching Sales Ops / RevOps roles in Canada or remote right now."));
+    const rl = el("div", ""); c.roles.forEach(r => { const a = el("a", "role"); a.href = r.url; a.target = "_blank"; a.rel = "noopener"; const t = el("span", ""); const tt = el("span", "", r.t); tt.style.fontWeight = "600"; t.appendChild(tt); if (r.new) t.appendChild(el("span", "new", "NEW")); t.appendChild(el("div", "note", r.loc + (r.date ? " · " + r.date : ""))); a.appendChild(t); a.appendChild(el("span", "note", "Apply ↗")); rl.appendChild(a); }); b.appendChild(rl);
+    if (c.people && c.people.length){ b.appendChild(el("span", "label", "People map")); c.people.forEach(([n, t, why]) => { const a = el("a", "role"); a.href = li(n + " " + c.name); a.target = "_blank"; a.rel = "noopener"; const x = el("span", ""); const nn2 = el("span", "", n); nn2.style.fontWeight = "600"; x.appendChild(nn2); x.appendChild(el("div", "note", t + (why ? " · " + why : ""))); a.appendChild(x); a.appendChild(el("span", "note", "LinkedIn ↗")); b.appendChild(a); }); }
+    if (c.search && c.search.length){ b.appendChild(el("span", "label", "Find more on LinkedIn")); const r = el("div", "row"); c.search.forEach(([l, q]) => { const a = el("a", "btn sm", l + " ↗"); a.href = li(q); a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); b.appendChild(r); }
+    if (c.careers){ const a = el("a", "btn sm ghost", "Careers site ↗"); a.href = c.careers; a.target = "_blank"; a.rel = "noopener"; a.style.alignSelf = "flex-start"; b.appendChild(a); }
+    d.appendChild(b); cg.appendChild(d);
+  });
+  out.push(cg);
+  return out;
+}
+function lockForm(p){
+  const r = el("div", "row"); r.style.flexWrap = "nowrap"; const i = el("input", "inp"); i.type = "password"; i.placeholder = "Passcode"; i.autocomplete = "current-password";
+  const b = el("button", "btn pri", "Unlock"); b.type = "button";
+  const go2 = async () => { if (!i.value) return i.focus(); i.blur(); b.disabled = true; b.textContent = "…"; const ok = await loadPrivate(i.value); b.disabled = false; b.textContent = "Unlock"; if (ok){ toast("Unlocked"); closeSheet(); } render(); };
+  b.onclick = go2; i.onkeydown = e => { if (e.key === "Enter") go2(); }; r.appendChild(i); r.appendChild(b); p.appendChild(r);
+}
+
+/* ---------- settings ---------- */
+function openSheet(fill){ const b = $("#sheetBody"); b.textContent = ""; fill(b); $("#sheet").hidden = false; }
+function closeSheet(){ $("#sheet").hidden = true; }
+$("#sheet").onclick = e => { if (e.target.id === "sheet") closeSheet(); };
+function settings(b){
+  const s = S();
+  b.appendChild(el("strong", "", "Settings"));
+  b.appendChild(el("span", "label", "Gym days (weekends always plan the gym at 8 a.m.)"));
+  const dd = el("div", "days"); ["S", "M", "T", "W", "T", "F", "S"].forEach((x, i) => { const bt = el("button", "", x); bt.type = "button"; bt.setAttribute("aria-pressed", String(s.gymDays.includes(i))); bt.onclick = () => { const g = new Set(S().gymDays); g.has(i) ? g.delete(i) : g.add(i); setS({ gymDays:[...g].sort() }); _bc = null; settings2(); }; dd.appendChild(bt); }); b.appendChild(dd);
+  b.appendChild(el("span", "label", "Quran per day"));
+  const wr = el("div", "row"); const mi = el("button", "btn sm", "−"), pl = el("button", "btn sm", "+"); mi.type = pl.type = "button";
+  mi.onclick = () => { setS({ wird:Math.max(1, S().wird - 1) }); settings2(); }; pl.onclick = () => { setS({ wird:Math.min(40, S().wird + 1) }); settings2(); };
+  wr.appendChild(mi); wr.appendChild(el("strong", "", s.wird + " pages")); wr.appendChild(pl); wr.appendChild(el("span", "note", "about " + Math.ceil(604 / s.wird / 30) + " months per khatma")); b.appendChild(wr);
+  b.appendChild(el("span", "label", "Private data"));
+  if (P){ const r = el("div", "row"); r.appendChild(el("span", "note", "Unlocked on this phone.")); const lk = el("button", "btn sm", "Lock"); lk.type = "button"; lk.onclick = () => { store.del("pass"); P = null; closeSheet(); render(); }; r.appendChild(lk); b.appendChild(r); }
+  else { if (lockErr) b.appendChild(el("div", "note", lockErr)); lockForm(b); }
+  const st = ST || {}; b.appendChild(el("div", "note", "Passcode secret " + (st.key ? "✓" : "✗ not set") + " · Calendar link " + (st.cal ? (st.cal_ok === false ? "⚠︎ check the link" : "✓") : "✗ not set") + " · Target jobs " + (st.jobs ? "✓" : "✗")));
+  b.appendChild(el("span", "label", "iPhone Reminders shortcut name"));
+  const sc = el("input", "inp"); sc.value = s.shortcut; sc.onchange = () => setS({ shortcut:sc.value.trim() || "Focus Reminder" }); b.appendChild(sc);
+  const how = el("details", "fold"); how.appendChild(el("summary", "", "How to create the Reminders shortcut (2 minutes)"));
+  const ol = el("ol", "steps"); ["Open the Shortcuts app and tap + to make a new shortcut. Name it “Focus Reminder”.", "Add “Split Text”. Set it to split the Shortcut Input by Custom: “ | ” (space, bar, space).", "Add “Get Item from List” → First Item. Then add another “Get Item from List” → Last Item.", "Add “Add New Reminder”. Title = the first item. Tap Show More, turn on Remind Me, choose At Time and set it to the last item.", "Tap Done. Now tap ⏰ anywhere in Focus to test it: Top 3 and plan items remind you at their block, ideas at 9 a.m. tomorrow, job actions in an hour."].forEach(t => ol.appendChild(el("li", "", t)));
+  how.appendChild(ol); b.appendChild(how);
+  b.appendChild(el("span", "label", "Read your iPhone Reminders"));
+  const how2 = el("details", "fold"); how2.appendChild(el("summary", "", "Create “Sync to Focus” (3 minutes, once)"));
+  const ol2 = el("ol", "steps"); ["In Shortcuts, tap + and name it “Sync to Focus”.", "Add “Find Reminders”. Tap Add Filter → Is Not Completed. Sort by Due Date, Oldest First.", "Add “Repeat with Each”. Inside it add a “Text” action and type: Repeat Item’s Title, then “ | ”, then Repeat Item’s Due Date, then “ | ”, then Repeat Item’s List. (Tap Repeat Item to choose each property. On Due Date, set Date Format to Custom: yyyy-MM-dd HH:mm.)", "After End Repeat, add “Combine Text”: Repeat Results, separated by New Lines.", "Add “Copy to Clipboard”, then “Show Notification”: Copied. Open Focus and tap Sync.", "Add it to your Home Screen or Control Centre. Run it, open Focus → Inbox → 📲 Sync. Your reminders stay on your phone."].forEach(t => ol2.appendChild(el("li", "", t)));
+  how2.appendChild(ol2); b.appendChild(how2);
+  const how3 = el("details", "fold"); how3.appendChild(el("summary", "", "Create “Focus Done” to tick reminders off from Focus"));
+  const ol3 = el("ol", "steps"); ["New shortcut named “Focus Done”. Turn on Receive Text input.", "Add “Find Reminders”: Title is Shortcut Input, Is Not Completed, Limit 1.", "Add the action that marks reminders complete (search “complete” or “Edit Reminder”) and set Is Completed on for the found reminder.", "Done. Ticking a 📲 item in Focus now also ticks it in Reminders."].forEach(t => ol3.appendChild(el("li", "", t)));
+  how3.appendChild(ol3); b.appendChild(how3);
+  const tg = el("button", "btn sm", (s.tickIOS ? "✓ " : "") + "Tick off in Reminders when done in Focus"); tg.type = "button"; tg.setAttribute("aria-pressed", String(s.tickIOS)); tg.onclick = () => { setS({ tickIOS:!S().tickIOS }); settings2(); }; b.appendChild(tg);
+  b.appendChild(el("span", "label", "Backup"));
+  const br = el("div", "row"); const ex = el("button", "btn sm", "Copy backup"); ex.type = "button"; ex.onclick = () => { const o = {}; Object.keys(localStorage).filter(k => k.startsWith("fz:") && k !== "fz:pass").forEach(k => o[k] = localStorage.getItem(k)); copy(JSON.stringify(o)); };
+  const im = el("button", "btn sm", "Restore"); im.type = "button"; im.onclick = () => { const t = prompt("Paste your backup"); if (!t) return; try { const o = JSON.parse(t); Object.entries(o).forEach(([k, v]) => { if (k.startsWith("fz:")) localStorage.setItem(k, v); }); toast("Restored"); closeSheet(); render(); } catch(_){ toast("That backup didn't read"); } };
+  br.appendChild(ex); br.appendChild(im); b.appendChild(br);
+  const cl = el("button", "btn", "Done"); cl.type = "button"; cl.onclick = closeSheet; b.appendChild(cl);
+}
+function settings2(){ openSheet(settings); render(); }
+$("#setBtn").onclick = () => openSheet(settings);
+
+/* ---------- shell ---------- */
+let tab = store.get("tab", "today");
+function go(t){ tab = t; store.set("tab", t); render(); window.scrollTo({ top:0 }); }
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.tab));
+function render(){
+  const ae = document.activeElement; if (ae && ae.matches && ae.matches("#main input:not([type=password])") && ae.value){ pending = true; return; }
+  pending = false; _bc = null;
+  if (tab === "ideas") tab = "inbox"; document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
+  header();
+  const m = $("#main"); m.textContent = "";
+  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs() : viewToday()).forEach(n => n && m.appendChild(n));
+  tick();
+}
+let pending = false;
+document.addEventListener("focusout", () => { if (pending) setTimeout(() => { const a = document.activeElement; if (!(a && a.matches && a.matches("#main input"))) render(); }, 60); });
+function tick(){
+  const sp = store.get("sprint", null), t = document.getElementById("timer"); if (!sp){ if (t) t.textContent = "--:--"; return; }
+  const left = Math.round((sp.end - Date.now()) / 1000);
+  if (left <= 0){ store.del("sprint"); try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch(_){} toast("Sprint done. 5-minute reset: stand, water, walk or wudu."); render(); return; }
+  if (t) t.textContent = pad(Math.floor(left / 60)) + ":" + pad(left % 60);
+}
+setInterval(tick, 1000);
+setInterval(() => { if (document.visibilityState === "visible") render(); }, 60000);
+setInterval(() => { if (document.visibilityState === "visible") loadAll(); }, 10 * 60000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadAll(); });
+hashImport(); render(); loadAll();
+if (navigator.serviceWorker) navigator.serviceWorker.register("../sw.js", { scope:"../" }).catch(() => {});
+</script>
+</body>
+</html>
