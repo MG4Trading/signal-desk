@@ -155,37 +155,6 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .menu-row .label{padding-top:2px}
 .serv{display:flex;align-items:center;gap:8px;padding:0 16px 10px;font-size:13px;color:var(--muted)}
 .serv button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;line-height:1}
-.ftop{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:center;padding:8px 16px;border-top:1px solid var(--line)}
-.ftop input[type=checkbox],.fchk input{width:22px;height:22px;accent-color:var(--accent)}
-.finput{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:9px 11px;font:inherit;font-size:15px;min-height:42px}
-.ftop.done .finput{text-decoration:line-through;color:var(--muted)}
-.fblk{display:grid;grid-template-columns:78px 1fr;gap:10px;padding:10px 16px;border-top:1px solid var(--line);font-size:14px}
-.fblk .when{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
-.fblk.now{background:var(--accent-soft)} .fblk.now .when{color:var(--accent);font-weight:600}
-.fblk b{display:block;font-size:14px} .fblk span{font-size:13px;color:var(--muted)}
-.fadd{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 16px 6px}
-.fchips{display:flex;flex-wrap:wrap;gap:6px;padding:4px 16px 10px}
-.fchips .chip{min-height:32px;padding:5px 11px;font-size:12px}
-.fidea{display:flex;flex-direction:column;gap:6px;padding:10px 16px;border-top:1px solid var(--line)}
-.fidea .row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.fidea .mini{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 9px;font-size:12px;font-weight:600;min-height:30px;color:var(--ink)}
-.fidea .mini[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.fmap{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 16px 14px}
-.fmap .box{border:1px solid var(--line);border-radius:12px;padding:8px 10px;min-height:64px;font-size:13px;background:var(--bg)}
-.fmap .box .label{display:block;margin-bottom:4px}
-.fmap .box div{padding:3px 0;border-top:1px dashed var(--line)}
-.fmap .box div:first-of-type{border-top:0}
-.fchk{display:grid;grid-template-columns:30px 1fr auto;gap:8px;align-items:center;padding:8px 16px;border-top:1px solid var(--line);font-size:14px}
-.fchk.done span{color:var(--muted);text-decoration:line-through}
-.fscore{display:flex;gap:6px;align-items:flex-end;padding:10px 16px 14px}
-.fscore div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
-.fscore i{display:block;width:100%;border-radius:6px;background:var(--accent);min-height:3px}
-.ftimer{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px}
-.ftimer strong{font-family:var(--mono);font-size:34px;font-weight:600;letter-spacing:.02em}
-.fbtns{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
-.fdays{display:flex;gap:4px;padding:6px 16px 12px}
-.fdays button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:8px;min-height:36px;font-weight:600;font-size:13px;color:var(--ink)}
-.fdays button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .film{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line)}
 .film img{width:52px;height:78px;object-fit:cover;border-radius:6px;background:var(--surface-2)}
 .film .links{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;font-weight:600}
@@ -275,7 +244,7 @@ let angle = "all", wxTab = store.get("wxTab", "today");
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
-function sections(){ const s = [{ id: "focus", name: "Focus" }, { id: "weather", name: "Weather" }, { id: "faith", name: "Prayer & Quran" }]; (D ? D.topics : []).filter(t => !t.in_markets).forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer & Quran" }]; (D ? D.topics : []).filter(t => !t.in_markets).forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
 
 function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
@@ -881,165 +850,6 @@ function kitchenView(){
   return wrap;
 }
 
-/* ---------- focus ---------- */
-const FAREAS = [["work", "Work"], ["biz", "Business"], ["family", "Family"], ["health", "Health"], ["faith", "Faith"]];
-const FQUAD = [["now", "Do now"], ["plan", "Schedule"], ["hand", "Hand off"], ["drop", "Drop"]];
-let fMap = store.get("fMap", "area"), fArea = store.get("fArea", "work"), fTick = null;
-function fKey(off){ const d = new Date(Date.now() + (off || 0) * 864e5); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
-function fDay(off){ const o = store.get("f:" + fKey(off), null) || {}; return Object.assign({ top: ["", "", ""], done: [false, false, false], chk: {}, rv: ["", "", ""] }, o); }
-function fSave(o, off){ store.set("f:" + fKey(off), o); }
-const fMin = t => { const [a, b] = t.split(":").map(Number); return a * 60 + b; };
-const fClock = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; return fmt12(String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0")).replace(" a.m.", "a").replace(" p.m.", "p"); };
-const fGym = () => store.get("gymDays", [1, 3, 5]).includes(new Date().getDay());
-const fNow = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
-function fBlocks(){
-  const P = X && X.prayer; if (!P) return [];
-  const t = (P.days.find(d => d.date === fKey()) || P.days[0]).times, f = fDay(), gym = fGym(), wird = store.get("wird", 4);
-  const top = i => f.top[i] ? "“" + f.top[i] + "”" : "Top " + (i + 1);
-  const fa = fMin(t.Fajr), dh = fMin(t.Dhuhr), as = fMin(t.Asr), mg = fMin(t.Maghrib), is = fMin(t.Isha);
-  const wake = Math.min(300, fa - 20), bed = Math.max(wake - 450 + 1440, is + 40), g0 = Math.max(fa + 30, wake + 50), g1 = g0 + (gym ? 80 : 30);
-  return [
-    [wake, g0, "Quiet start + Fajr", "Water, morning adhkar, " + wird + " pages of Quran, glance at Top 3"],
-    [g0, g1, gym ? "Gym, then Meal 1" : "20-min walk or mobility, then Meal 1", gym ? "Train, then a high-protein breakfast within the hour" : "Move a little, then a high-protein breakfast"],
-    [g1, dh, "Deep work", top(0) + ", then " + top(1) + " · 90-min sprints · phone in another room"],
-    [dh, as, "Dhuhr · people time", "Calls, meetings and messages in one batch"],
-    [as, mg, "Asr · finish strong", top(2) + " and admin · protein snack · 10-min walk"],
-    [mg, is, "Maghrib · family", "Meal 2, family time, phone on Do Not Disturb"],
-    [is, bed, "Isha · shut down", "Evening adhkar, 2-min review, tomorrow's #1, lights out " + fClock(bed)],
-  ];
-}
-function fCurBlock(B){ const n = fNow(); return B.findIndex(([a, b]) => (a <= n && n < b) || (b > 1440 && n + 1440 < b && n + 1440 >= a)); }
-function fIdeas(){ return store.get("ideas", []); }
-function fPutTop(text){ const f = fDay(); const i = f.top.findIndex(x => !x.trim()); if (i < 0){ toast("Top 3 is full. Finish or clear one first."); return false; } f.top[i] = text; fSave(f); return true; }
-function fTop3(){
-  const f = fDay(), g = grp("Today's Top 3", new Date().toLocaleDateString("en-CA", { weekday: "long", month: "short", day: "numeric" }));
-  f.top.forEach((v, i) => { const r = el("div", "ftop" + (f.done[i] ? " done" : "")); const cb = el("input"); cb.type = "checkbox"; cb.checked = !!f.done[i]; cb.setAttribute("aria-label", "Done " + (i + 1));
-    cb.onchange = () => { const o = fDay(); o.done[i] = cb.checked; fSave(o); if (cb.checked && o.done.every(Boolean)) toast("All 3 done. Alhamdulillah, great day."); render(); };
-    const inp = el("input", "finput"); inp.value = v; inp.placeholder = ["#1: the one thing that moves the needle", "#2", "#3"][i]; inp.onchange = () => { const o = fDay(); o.top[i] = inp.value.trim(); fSave(o); };
-    r.appendChild(cb); r.appendChild(inp); g.appendChild(r); });
-  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Only 3. Everything else goes to the parking lot below.")); g.appendChild(n);
-  return g;
-}
-function fPlan(){
-  const B = fBlocks(); if (!B.length) return null; const cur = fCurBlock(B);
-  const g = grp("Today's plan · anchored to prayer", fGym() ? "gym day" : "rest day");
-  B.forEach(([a, b, t, s], i) => { const r = el("div", "fblk" + (i === cur ? " now" : "")); r.appendChild(el("div", "when", fClock(a))); const c = el("div", ""); c.appendChild(el("b", "", t + (i === cur ? "  ← now" : ""))); c.appendChild(el("span", "", s)); r.appendChild(c); g.appendChild(r); });
-  return g;
-}
-function fTimer(){
-  const g = grp("Focus sprint", "one task, no switching"), sp = store.get("sprint", null);
-  const row = el("div", "ftimer"), clock = el("strong", "", "--:--"), lab = el("span", "hl-snip", sp ? "Stay on it. Park any new idea." : "Pick a length and start.");
-  row.appendChild(clock); row.appendChild(lab); g.appendChild(row);
-  const tick = () => { const s = store.get("sprint", null); if (!s){ clock.textContent = "--:--"; return; } const left = Math.round((s.end - Date.now()) / 1000);
-    if (left <= 0){ store.set("sprint", null); clearInterval(fTick); fTick = null; clock.textContent = "00:00"; try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch(_){} toast("Sprint done. 5-minute reset: stand, water, walk or wudu."); setTimeout(render, 1200); return; }
-    clock.textContent = String(Math.floor(left / 60)).padStart(2, "0") + ":" + String(left % 60).padStart(2, "0"); };
-  if (fTick) clearInterval(fTick); fTick = null; if (sp){ tick(); fTick = setInterval(() => { if (!document.body.contains(clock)){ clearInterval(fTick); fTick = null; return; } tick(); }, 1000); }
-  const bt = el("div", "fbtns");
-  if (sp){ const s = el("button", "ghostbtn", "Stop"); s.type = "button"; s.onclick = () => { store.set("sprint", null); render(); }; bt.appendChild(s); }
-  else [25, 50, 90].forEach(m => { const b = el("button", m === 50 ? "primary" : "ghostbtn", m + " min"); b.type = "button"; b.onclick = () => { store.set("sprint", { end: Date.now() + m * 6e4, len: m }); render(); }; bt.appendChild(b); });
-  g.appendChild(bt); return g;
-}
-function fParking(){
-  const g = grp("Idea parking lot", "capture fast, decide later"), I = fIdeas();
-  const add = el("div", "fadd"), inp = el("input", "finput"); inp.placeholder = "New idea? Type it and keep going…"; inp.enterKeyHint = "done";
-  const btn = el("button", "primary", "Park it"); btn.type = "button";
-  const save = () => { const v = inp.value.trim(); if (!v) return; const L = fIdeas(); L.unshift({ id: Date.now(), t: v, a: fArea, q: "", d: fKey() }); store.set("ideas", L.slice(0, 200)); toast("Parked. Back to your task."); render(); };
-  btn.onclick = save; inp.onkeydown = e => { if (e.key === "Enter") save(); };
-  add.appendChild(inp); add.appendChild(btn); g.appendChild(add);
-  const ch = el("div", "fchips"); FAREAS.forEach(([k, n]) => { const b = el("button", "chip", n); b.type = "button"; b.setAttribute("aria-pressed", String(fArea === k)); b.onclick = () => { fArea = k; store.set("fArea", k); render(); }; ch.appendChild(b); }); g.appendChild(ch);
-  const open = I.filter(x => x.q !== "drop");
-  if (open.length){
-    const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr 1fr";
-    [["list", "List"], ["area", "Map by area"], ["prio", "Sort by priority"]].forEach(([k, n]) => { const b = el("button", "", n); b.type = "button"; b.setAttribute("aria-pressed", String(fMap === k)); b.onclick = () => { fMap = k; store.set("fMap", k); render(); }; seg.appendChild(b); });
-    g.appendChild(seg);
-    const nm = k => (FAREAS.find(a => a[0] === k) || ["", ""])[1];
-    if (fMap === "area" || fMap === "prio"){
-      const grid = el("div", "fmap"), cols = fMap === "area" ? FAREAS : FQUAD;
-      cols.forEach(([k, n]) => { const items = open.filter(x => (fMap === "area" ? x.a : (x.q || "plan")) === k); if (fMap === "area" && !items.length) return;
-        const bx = el("div", "box"); bx.appendChild(el("span", "label", n + " · " + items.length)); items.slice(0, 8).forEach(x => bx.appendChild(el("div", "", x.t))); grid.appendChild(bx); });
-      g.appendChild(grid);
-      if (fMap === "prio"){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Unsorted ideas sit in Schedule. Use List view to tag each one.")); g.appendChild(n); }
-    } else {
-      open.slice(0, 30).forEach(x => { const r = el("div", "fidea"); r.appendChild(el("span", "hl-title", x.t));
-        const row = el("div", "row"); row.appendChild(el("span", "pill-sig", nm(x.a)));
-        FQUAD.forEach(([k, n]) => { const b = el("button", "mini", n); b.type = "button"; b.setAttribute("aria-pressed", String(x.q === k)); b.onclick = () => { const L = fIdeas(); const it = L.find(z => z.id === x.id); if (it) it.q = k; store.set("ideas", L); render(); }; row.appendChild(b); });
-        const tp = el("button", "mini", "→ Top 3"); tp.type = "button"; tp.onclick = () => { if (fPutTop(x.t)){ store.set("ideas", fIdeas().filter(z => z.id !== x.id)); toast("Moved to Top 3."); render(); window.scrollTo({ top: 0 }); } }; row.appendChild(tp);
-        const del = el("button", "mini", "✕"); del.type = "button"; del.setAttribute("aria-label", "Delete idea"); del.onclick = () => { store.set("ideas", fIdeas().filter(z => z.id !== x.id)); render(); }; row.appendChild(del);
-        r.appendChild(row); g.appendChild(r); });
-    }
-    const dropped = I.filter(x => x.q === "drop").length;
-    if (dropped){ const c = el("button", "hl"); c.type = "button"; c.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer"; c.appendChild(el("span", "hl-snip", "Clear " + dropped + " dropped idea" + (dropped > 1 ? "s" : "") + " ✕")); c.onclick = () => { store.set("ideas", fIdeas().filter(z => z.q !== "drop")); render(); }; g.appendChild(c); }
-    if ([5, 0].includes(new Date().getDay())){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Weekly review: keep 3 ideas, schedule them, and drop the rest without guilt.")); g.appendChild(n); }
-  }
-  return g;
-}
-function fChecklist(){
-  const f = fDay(), gym = fGym(), wird = store.get("wird", 4);
-  const items = [["Fajr", "Fajr on time"], ["Dhuhr", "Dhuhr"], ["Asr", "Asr"], ["Maghrib", "Maghrib"], ["Isha", "Isha"],
-    ["am", "Morning adhkar"], ["wird", "Quran: " + wird + " pages"], ["read", "Read 10 minutes"], ["gym", gym ? "Gym session" : "20-min walk"],
-    ["m1", "Meal 1: protein breakfast"], ["snack", "Protein snack"], ["m2", "Meal 2 before Isha"], ["water", "Water: a glass with every prayer"],
-    ["pm", "Evening adhkar"], ["phone", "Phone away at family time"], ["sleep", "Lights out on time"]];
-  const done = items.filter(([k]) => f.chk[k]).length, pct = Math.round(done * 100 / items.length);
-  const g = grp("Daily anchors · faith + body", done + "/" + items.length + " · " + pct + "%");
-  items.forEach(([k, n]) => { const r = el("label", "fchk" + (f.chk[k] ? " done" : "")); const cb = el("input"); cb.type = "checkbox"; cb.checked = !!f.chk[k];
-    cb.onchange = () => { const o = fDay(); o.chk[k] = cb.checked; o.score = Math.round(items.filter(([kk]) => o.chk[kk]).length * 100 / items.length); fSave(o); render(); };
-    r.appendChild(cb); r.appendChild(el("span", "", n)); r.appendChild(el("span", "", "")); g.appendChild(r); });
-  const A = kc().adhkar;
-  if (A){ ["morning", "evening"].forEach(w => { const d = el("details", "fold"); d.appendChild(el("summary", "", w === "morning" ? "أذكار الصباح · Morning adhkar" : "أذكار المساء · Evening adhkar"));
-    const inn = el("div", "inner"); (A[w] || []).forEach(([ar, en, n]) => { const row = el("div", ""); row.style.cssText = "padding:6px 0;border-bottom:1px dashed var(--line)"; const a = el("div", "ar", ar); a.style.fontSize = "18px"; row.appendChild(a); row.appendChild(el("span", "hl-snip", en + " · ×" + n)); inn.appendChild(row); });
-    d.appendChild(inn); g.appendChild(d); }); }
-  const sc = el("div", "fscore"); for (let i = 6; i >= 0; i--){ const o = store.get("f:" + fKey(-i), null), s = o ? (o.score || 0) : 0; const c = el("div", ""); const bar = el("i"); bar.style.height = Math.max(3, s * 0.5) + "px"; bar.style.opacity = i === 0 ? "1" : ".55"; c.appendChild(bar);
-    c.appendChild(el("span", "", new Date(Date.now() - i * 864e5).toLocaleDateString("en-CA", { weekday: "narrow" }))); sc.appendChild(c); }
-  g.appendChild(sc); return g;
-}
-function fBody(){
-  const g = grp("Fat-loss rhythm · 2 meals + 1 snack", fGym() ? "gym day" : "rest day"), r = (typeof todayRecipe === "function") ? todayRecipe() : null;
-  [["Meal 1", "After the gym, 8–9 am. Eggs, ful or Greek yogurt with oats; aim for about 40 g of protein."],
-   ["Snack", "3–4 pm. Greek yogurt, tuna, boiled eggs or labneh, plus one fruit or a handful of nuts."],
-   ["Meal 2", "Early evening, around Maghrib: " + (r ? r.en : "lean protein") + ". Half the plate vegetables, a palm of protein, a fist of carbs" + (fGym() ? "." : ", or skip the carbs on rest days.")],
-   ["After Isha", "Kitchen closed. Herbal tea or water only."],
-   ["Rules", "Protein at every meal, whole foods (no whey), no sugary drinks, and 7+ hours of sleep. Belly fat follows sleep and stress, not just food."]]
-   .forEach(([k, v]) => { const row = el("div", "menu-row"); row.appendChild(el("span", "label", k)); row.appendChild(el("span", "", v)); g.appendChild(row); });
-  const a = el("a", "hl"); a.href = "https://claude.ai/artifact/2tiWrhpbff69yR939V7oVx"; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", "Open my private Life OS: diet plan and training ↗")); a.appendChild(el("span", "hl-snip", "Weight and body details stay there, never on this page.")); g.appendChild(a);
-  return g;
-}
-function fReview(){
-  const f = fDay(), g = grp("Evening shutdown · 2 minutes", "after Isha");
-  const Q = ["What went well today?", "What drained my energy?", "Tomorrow's #1 is…"];
-  Q.forEach((q, i) => { const r = el("div", "ftop"); r.style.gridTemplateColumns = "1fr"; const inp = el("input", "finput"); inp.placeholder = q; inp.value = f.rv[i] || "";
-    inp.onchange = () => { const o = fDay(); o.rv[i] = inp.value.trim(); fSave(o); if (i === 2 && inp.value.trim()){ const t = fDay(1); t.top[0] = inp.value.trim(); fSave(t, 1); toast("Saved as tomorrow's #1."); } };
-    r.appendChild(inp); g.appendChild(r); });
-  return g;
-}
-function fSettings(){
-  const d = el("details", "group"); d.appendChild(el("summary", "group-head", "Settings · gym days and Quran target")).style.cursor = "pointer";
-  const days = el("div", "fdays"), gd = store.get("gymDays", [1, 3, 5]);
-  ["S", "M", "T", "W", "T", "F", "S"].forEach((n, i) => { const b = el("button", "", n); b.type = "button"; b.setAttribute("aria-pressed", String(gd.includes(i))); b.onclick = () => { const s = new Set(store.get("gymDays", [1, 3, 5])); s.has(i) ? s.delete(i) : s.add(i); store.set("gymDays", [...s].sort()); render(); }; days.appendChild(b); });
-  d.appendChild(el("div", "label", "Gym days")).style.padding = "10px 16px 0"; d.appendChild(days);
-  const sv = el("div", "serv"), w = store.get("wird", 4), mi = el("button", "", "−"), pl = el("button", "", "+"); mi.type = pl.type = "button";
-  mi.onclick = () => { store.set("wird", Math.max(1, w - 1)); render(); }; pl.onclick = () => { store.set("wird", Math.min(40, w + 1)); render(); };
-  sv.appendChild(mi); sv.appendChild(el("span", "", "Quran: " + w + " pages a day (about " + Math.ceil(604 / w / 30) + " months a khatma)")); sv.appendChild(pl); d.appendChild(sv);
-  d.appendChild(el("div", "hl-snip", "Everything on this tab is saved only on this phone.")).style.padding = "0 16px 14px";
-  return d;
-}
-function fTip(){
-  const T = kc().focus_tips || []; if (!T.length) return null; const dn = (X && X.day_no) || 0;
-  const g = grp("Focus tip of the day", ""); const n = el("div", "hl"); n.appendChild(el("span", "hl-title", T[dn % T.length])); g.appendChild(n); return g;
-}
-function focusView(){
-  if (!X) return [el("div", "empty", "Loading…")];
-  return [fTop3(), fPlan(), fTimer(), fParking(), fTip(), fChecklist(), fBody(), fReview(), fSettings()];
-}
-function focusMini(){
-  const f = fDay(), B = fBlocks(), cur = fCurBlock(B);
-  const g = grp("Today's focus", cur >= 0 ? "now: " + B[cur][2] : "");
-  const any = f.top.some(x => x.trim());
-  if (any) f.top.forEach((v, i) => { if (!v.trim()) return; const r = el("div", "fchk" + (f.done[i] ? " done" : "")); r.appendChild(el("span", "", f.done[i] ? "✓" : String(i + 1))); r.appendChild(el("span", "", v)); r.appendChild(el("span", "", "")); g.appendChild(r); });
-  const b = el("button", "hl"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;font:inherit;color:inherit;cursor:pointer";
-  b.appendChild(el("span", "hl-title", any ? "Open Focus ›" : "Set today's Top 3 ›")); if (cur >= 0) b.appendChild(el("span", "hl-snip", B[cur][3])); b.onclick = () => go("focus"); g.appendChild(b);
-  return g;
-}
-
 /* ---------- watch & listen ---------- */
 const jw = t => "https://www.justwatch.com/ca/search?q=" + encodeURIComponent(t), imdb = t => "https://www.imdb.com/find/?q=" + encodeURIComponent(t);
 function filmRow(title, sub, links, img){
@@ -1162,6 +972,11 @@ function myLinksRow(){
   if (!myLinks.length) return null;
   const r = el("div", "mylinks"); myLinks.forEach(([lab, href]) => { const a = el("a", "", lab + " ↗"); a.href = href; a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); return r;
 }
+function privateFocusLink(){
+  const a = el("a", "group"); a.href = "https://claude.ai/artifact/2tiWrhpbff69yR939V7oVx"; a.target = "_blank"; a.rel = "noopener"; a.style.cssText = "text-decoration:none;color:var(--ink)";
+  const h = el("div", "group-head"); h.appendChild(el("strong", "", "🧭 My Focus")); h.appendChild(el("span", "stamp", "private ↗")); a.appendChild(h);
+  const b = el("div", "hl"); b.appendChild(el("span", "hl-snip", "Opens your private Life OS: Top 3, today's plan and calendar.")); a.appendChild(b); return a;
+}
 function go(id){ view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }
 
 /* ---------- headlines ---------- */
@@ -1188,7 +1003,7 @@ function render(){
   const topic = id => D.topics.find(x => x.id === id);
   if (view === "all"){
     add(myLinksRow());
-    if (visible("focus") && X) add(focusMini());
+    add(privateFocusLink());
     if (visible("weather")) add(weatherCard(false));
     if (visible("faith")) add(faithMini());
     if (visible("kitchen")) add(kitchenMini());
@@ -1202,7 +1017,6 @@ function render(){
     });
   } else if (view === "weather") add(weatherCard(true));
   else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); add(hadithCard()); add(surahCard()); }
-  else if (view === "focus"){ focusView().forEach(add); }
   else if (view === "kitchen"){ add(kitchenView()); }
   else if (view === "fun"){ funView().forEach(add); }
   else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
