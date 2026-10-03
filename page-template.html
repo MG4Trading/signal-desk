@@ -972,11 +972,6 @@ function myLinksRow(){
   if (!myLinks.length) return null;
   const r = el("div", "mylinks"); myLinks.forEach(([lab, href]) => { const a = el("a", "", lab + " ↗"); a.href = href; a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); return r;
 }
-function privateFocusLink(){
-  const a = el("a", "group"); a.href = "focus/"; a.style.cssText = "text-decoration:none;color:var(--ink)";
-  const h = el("div", "group-head"); h.appendChild(el("strong", "", "🧭 Focus")); h.appendChild(el("span", "stamp", "passcode ›")); a.appendChild(h);
-  const b = el("div", "hl"); b.appendChild(el("span", "hl-snip", "Your day plan, ideas and target jobs.")); a.appendChild(b); return a;
-}
 function go(id){ view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }
 
 /* ---------- headlines ---------- */
@@ -1003,7 +998,6 @@ function render(){
   const topic = id => D.topics.find(x => x.id === id);
   if (view === "all"){
     add(myLinksRow());
-    add(privateFocusLink());
     if (visible("weather")) add(weatherCard(false));
     if (visible("faith")) add(faithMini());
     if (visible("kitchen")) add(kitchenMini());
