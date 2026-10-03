@@ -890,12 +890,14 @@ function jit(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 
 function podPicks(){
   const L = X.inspire || [], T = taste(), R = rates(), day0 = X.date || "";
   const sc = e => 3 * (T.p[e.topic] || 0) + 2 * (T.s[e.sid] || 0) + (e.age <= 2 ? 2 : e.age <= 7 ? 1 : 0) + 2 * jit(e.id + day0);
-  const pool = L.filter(e => R["p:" + e.id] !== -1 && (T.s[e.sid] || 0) > -3 && (T.p[e.topic] || 0) > -4 && (podTopic === "all" || e.topic === podTopic)).map(e => Object.assign({ sc:sc(e) }, e)).sort((a, b) => b.sc - a.sc);
+  const pool = L.filter(e => R["p:" + e.id] !== -1 && (T.s[e.sid] || 0) > -3 && (T.p[e.topic] || 0) > -4 && (podTopic === "all" || (podTopic === "ar" ? e.ar : e.topic === podTopic))).map(e => Object.assign({ sc:sc(e) }, e)).sort((a, b) => b.sc - a.sc);
   const out = [], shows = new Set();
-  if (podTopic === "all") PTOP.forEach(([k]) => { const e = pool.find(x => x.topic === k && !shows.has(x.sid)); if (e && (T.p[k] || 0) > -2){ out.push(e); shows.add(e.sid); } });
+  if (podTopic === "all"){ PTOP.forEach(([k]) => { const e = pool.find(x => x.topic === k && !x.ar && !shows.has(x.sid)); if (e && (T.p[k] || 0) > -2){ out.push(e); shows.add(e.sid); } });
+    const ar = pool.find(x => x.ar && !shows.has(x.sid)); if (ar){ out.push(ar); shows.add(ar.sid); } }
+  const nSeed = out.length;
   pool.forEach(e => { if (out.length < 15 && !shows.has(e.sid) && !out.includes(e)){ out.push(e); shows.add(e.sid); } });
   pool.forEach(e => { if (out.length < 15 && !out.includes(e)) out.push(e); });
-  return out.sort((a, b) => b.sc - a.sc);
+  const by = (a, b) => b.sc - a.sc; return out.slice(0, nSeed).sort(by).concat(out.slice(nSeed).sort(by));
 }
 function ratePod(e, v){
   const id = "p:" + e.id, R = rates(), T = taste(), old = R[id] || 0; if (old === v) v = 0;
@@ -908,7 +910,7 @@ function inspireGroup(){
   if (!(X.inspire || []).length) return null;
   const P = podPicks(), g = grp("🎧 Daily inspiration", "4–15 min · fresh picks every day");
   const ch = el("div", "chips"); ch.style.cssText = "display:flex;gap:6px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none";
-  [["all", "All"], ...PTOP].forEach(([k, l]) => { const b = el("button", "ghostbtn", l); b.type = "button"; b.style.cssText = "flex:0 0 auto;min-height:34px;padding:5px 12px"; b.setAttribute("aria-pressed", String(podTopic === k)); if (podTopic === k){ b.style.background = "var(--ink)"; b.style.color = "var(--bg)"; } b.onclick = () => { podTopic = k; store.set("podTopic", k); podMore = false; render(); }; ch.appendChild(b); });
+  [["all", "All"], ...PTOP, ["ar", "🇪🇬 عربي"]].forEach(([k, l]) => { const b = el("button", "ghostbtn", l); b.type = "button"; b.style.cssText = "flex:0 0 auto;min-height:34px;padding:5px 12px"; b.setAttribute("aria-pressed", String(podTopic === k)); if (podTopic === k){ b.style.background = "var(--ink)"; b.style.color = "var(--bg)"; } b.onclick = () => { podTopic = k; store.set("podTopic", k); podMore = false; render(); }; ch.appendChild(b); });
   g.appendChild(ch);
   if (!P.length) g.appendChild(el("div", "empty", "Nothing left here today. Try another topic."));
   P.slice(0, podMore ? 15 : 8).forEach(e => { const r = el("div", "pod"); const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = e.img; r.appendChild(im);

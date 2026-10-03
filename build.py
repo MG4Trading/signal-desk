@@ -480,59 +480,80 @@ INSPIRE = {
     "sales": ["sales", "sales tips", "b2b sales", "negotiation", "entrepreneurship", "startup founder", "ecommerce", "small business", "business motivation"],
     "tech": ["artificial intelligence", "ai news daily", "automation", "tech news", "innovation", "digital marketing", "productivity tools"],
     "sport": ["athlete mindset", "sports psychology", "mental toughness", "endurance", "adventure", "running", "triathlon", "fitness motivation", "soccer daily"],
-    "mind": ["motivation", "daily motivation", "mindset", "leadership", "habits", "stoic", "personal development", "islam", "islamic reminder", "quran reflection", "تحفيز", "ريادة الأعمال", "تطوير الذات"],
+    "mind": ["motivation", "daily motivation", "mindset", "leadership", "habits", "stoic", "personal development", "islam", "islamic reminder", "quran reflection"],
 }
-INSPIRE_SKIP = re.compile(r"\b(mom|mommy|moms|mama|christian|church|jesus|bible|gospel|sermon|catholic|kids|dating|sex|true crime|horoscope|astrology|tarot|pourquoi|vos|votre|vous|les|des|und|der|die|dein|el|los|para|femme|she thrives|law of attraction|manifest\w*)\b", re.I)
+INSPIRE_SKIP = re.compile(r"\b(mom|mommy|moms|mama|christian|church|jesus|bible|gospel|sermon|catholic|kids|dating|sex|true crime|horoscope|astrology|tarot|pourquoi|vos|votre|vous|les|des|und|der|die|dein|los|para|femme|she thrives|law of attraction|manifest\w*)\b", re.I)
+
+
+INSPIRE_AR = {"ريادة الأعمال": "sales", "مبيعات": "sales", "بزنس": "sales", "تسويق": "sales", "إدارة": "sales",
+              "قيادة": "mind", "تحفيز": "mind", "تطوير الذات": "mind", "نجاح": "mind",
+              "ذكاء اصطناعي": "tech", "تكنولوجيا": "tech"}
+
+
+def _inspire_pass(pairs, country, days, per_show, min_m, max_m, seen, arabic=False):
+    """pairs: [(search term, topic)]. Returns short, fresh episodes from shows found by those searches."""
+    from urllib.parse import urlencode
+    now = datetime.now(TZ)
+    topic_of = {}
+    for q, topic in pairs:
+        try:
+            r = json.loads(get("https://itunes.apple.com/search?" + urlencode({"term": q, "entity": "podcast", "limit": 15, "country": country})))["results"]
+            for x in r:
+                if x.get("collectionId") and not INSPIRE_SKIP.search(x.get("collectionName", "")) and x.get("collectionExplicitness") != "explicit":
+                    topic_of.setdefault(str(x["collectionId"]), topic)
+        except Exception as e:
+            log("inspire search", q, e)
+    ids = list(topic_of)
+    eps = []
+    for i in range(0, len(ids), 20):
+        try:
+            r = json.loads(get("https://itunes.apple.com/lookup?" + urlencode({"id": ",".join(ids[i:i + 20]), "entity": "podcastEpisode", "limit": 10, "country": country}), timeout=30))["results"]
+            eps += [x for x in r if x.get("wrapperType") == "podcastEpisode"]
+        except Exception as e:
+            log("inspire lookup", e)
+    out, per = [], {}
+    for x in sorted(eps, key=lambda x: x.get("releaseDate", ""), reverse=True):
+        mins = (x.get("trackTimeMillis") or 0) / 60000
+        if not (min_m <= mins <= max_m) or x.get("trackId") in seen:
+            continue
+        try:
+            age = (now - datetime.fromisoformat(x["releaseDate"].replace("Z", "+00:00"))).days
+        except Exception:
+            continue
+        text = x.get("trackName", "") + " " + x.get("collectionName", "")
+        is_ar = bool(re.search(r"[\u0600-\u06FF]", text))
+        if age > days or x.get("contentAdvisoryRating") == "Explicit" or INSPIRE_SKIP.search(text) or re.search(r"[äöüßéèêàç]", text):
+            continue
+        if arabic and not is_ar:
+            continue
+        cid = x.get("collectionId")
+        dup = (cid, x.get("trackName", "").strip().lower())
+        if per.get(cid, 0) >= per_show or dup in seen:
+            continue
+        per[cid] = per.get(cid, 0) + 1
+        seen.add(x.get("trackId")); seen.add(dup)
+        out.append({"id": str(x.get("trackId")), "t": x.get("trackName", ""), "show": x.get("collectionName", ""), "sid": str(cid),
+                    "min": round(mins), "date": x["releaseDate"][:10], "age": age, "topic": topic_of.get(str(cid), "mind"),
+                    "url": x.get("trackViewUrl") or x.get("collectionViewUrl", ""), "img": x.get("artworkUrl160") or x.get("artworkUrl60", ""),
+                    "sum": re.sub(r"\s+", " ", x.get("shortDescription") or re.sub(r"<[^>]+>", " ", x.get("description") or ""))[:170].strip(),
+                    "ar": is_ar})
+    return out
 
 
 def gather_inspire(min_m=4, max_m=15, days=45, per_show=3):
-    """Short, fresh episodes (4-15 min) from shows that match each topic. Ranked on the phone by the viewer's own ratings."""
-    from urllib.parse import urlencode
-    now = datetime.now(TZ)
-    out, seen = [], set()
+    """Short, fresh episodes (4-15 min) from shows that match each topic, plus a few Arabic business and motivation shows.
+    Ranked on the phone by the viewer's own ratings."""
+    seen, out = set(), []
     for topic, terms in INSPIRE.items():
-        ids = []
-        for q in terms:
-            try:
-                r = json.loads(get("https://itunes.apple.com/search?" + urlencode({"term": q, "entity": "podcast", "limit": 15, "country": "ca"})))["results"]
-                ids += [str(x["collectionId"]) for x in r if x.get("collectionId") and not INSPIRE_SKIP.search(x.get("collectionName", "")) and x.get("collectionExplicitness") != "explicit"]
-            except Exception as e:
-                log("inspire search", q, e)
-        ids = list(dict.fromkeys(ids))
-        eps = []
-        for i in range(0, len(ids), 20):
-            try:
-                r = json.loads(get("https://itunes.apple.com/lookup?" + urlencode({"id": ",".join(ids[i:i + 20]), "entity": "podcastEpisode", "limit": 10, "country": "ca"}), timeout=30))["results"]
-                eps += [x for x in r if x.get("wrapperType") == "podcastEpisode"]
-            except Exception as e:
-                log("inspire lookup", e)
-        per = {}
-        for x in sorted(eps, key=lambda x: x.get("releaseDate", ""), reverse=True):
-            ms = x.get("trackTimeMillis") or 0
-            mins = ms / 60000
-            if not (min_m <= mins <= max_m) or x.get("trackId") in seen:
-                continue
-            try:
-                age = (now - datetime.fromisoformat(x["releaseDate"].replace("Z", "+00:00"))).days
-            except Exception:
-                continue
-            text = x.get("trackName", "") + " " + x.get("collectionName", "")
-            if age > days or x.get("contentAdvisoryRating") == "Explicit" or INSPIRE_SKIP.search(text) or re.search(r"[äöüßéèêàç]", text):
-                continue
-            cid = x.get("collectionId")
-            if per.get(cid, 0) >= per_show:
-                continue
-            per[cid] = per.get(cid, 0) + 1
-            seen.add(x.get("trackId"))
-            out.append({"id": str(x.get("trackId")), "t": x.get("trackName", ""), "show": x.get("collectionName", ""), "sid": str(cid),
-                        "min": round(mins), "date": x["releaseDate"][:10], "age": age, "topic": topic,
-                        "url": x.get("trackViewUrl") or x.get("collectionViewUrl", ""), "img": x.get("artworkUrl160") or x.get("artworkUrl60", ""),
-                        "sum": re.sub(r"\s+", " ", x.get("shortDescription") or re.sub(r"<[^>]+>", " ", x.get("description") or ""))[:170].strip(),
-                        "ar": bool(re.search(r"[؀-ۿ]", text))})
+        out += _inspire_pass([(q, topic) for q in terms], "ca", days, per_show, min_m, max_m, seen)
+    try:
+        # Arabic short episodes are rarer, so allow older ones and fewer per show
+        out += _inspire_pass(list(INSPIRE_AR.items()), "eg", 90, 2, min_m, max_m, seen, arabic=True)
+    except Exception as e:
+        log("inspire arabic", e)
     if len(out) < 8:
         raise ValueError("too few episodes")
     return out
-
 
 def gather_movies(genre, n=15):
     d = json.loads(get(f"https://itunes.apple.com/ca/rss/topmovies/limit={n}/genre={genre}/json"))["feed"].get("entry", [])
