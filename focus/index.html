@@ -382,13 +382,12 @@ function viewJobs(){
     p.appendChild(el("div", "note", lockErr || "Enter your passcode to unlock your calendar and target jobs. It stays on this phone."));
     lockForm(p); g.appendChild(p); out.push(g); return out; }
   const acts = jobActions(), ag = grp("Today's actions", acts.length ? acts.filter(a => store.get("ja:" + a.id, false)).length + "/" + acts.length + " done" : "from your 8 a.m. briefs"), ap = el("div", "pad");
-  if (!acts.length) ap.appendChild(el("div", "note", new Date().getDay() % 6 === 0 ? "No briefs on weekends. Enjoy the day." : "Your 8 a.m. briefs haven't posted today's actions yet. They appear here and in your calendar."));
   acts.forEach(a => { const on = store.get("ja:" + a.id, false), c = el("div", "act" + (on ? " on" : ""));
     const top = el("div", "row"); top.style.justifyContent = "space-between"; top.style.flexWrap = "nowrap"; const tt = el("strong", "", a.t.replace(/^🎯\s*/, "")); tt.style.fontSize = "14px"; top.appendChild(tt);
     const ck = el("button", "chk" + (on ? " on" : ""), on ? "✓" : ""); ck.type = "button"; ck.setAttribute("aria-label", "Done"); ck.onclick = () => { store.set("ja:" + a.id, !on); render(); }; top.appendChild(ck); c.appendChild(top);
     if (a.text){ c.appendChild(el("pre", "", a.text)); const r = el("div", "row"); const cp = el("button", "btn sm", "Copy all"); cp.type = "button"; cp.onclick = () => copy(a.text); r.appendChild(cp); const rm = el("a", "btn sm", "⏰ Remind me"); rm.href = remLink(a.t.replace(/^🎯\s*/, ""), null); r.appendChild(rm); c.appendChild(r); }
     ap.appendChild(c); });
-  ag.appendChild(ap); out.push(ag);
+  ag.appendChild(ap); if (acts.length) out.push(ag);
   const nNew = P.jobs.reduce((s, c) => s + c.roles.filter(r => r.new).length, 0);
   const cg = grp("Companies", nNew ? nNew + " new role" + (nNew > 1 ? "s" : "") : "roles checked " + (P.jobs_at ? hmS(isoMin(new Date(P.jobs_at * 1000))) : ""));
   P.jobs.forEach(c => {
