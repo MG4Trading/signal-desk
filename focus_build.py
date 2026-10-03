@@ -145,7 +145,7 @@ def scan(src, get):
     return []
 
 
-def jobs(cfg, prev, cal, get, log):
+def jobs(cfg, prev, cal, get, log, drops=None):
     now = time.time()
     prev_jobs = {c["key"]: c for c in (prev.get("jobs") or [])}
     fresh = not (prev.get("jobs_at") and now - prev["jobs_at"] < 55 * 60)
@@ -167,10 +167,35 @@ def jobs(cfg, prev, cal, get, log):
         first = {k: v for k, v in first.items() if now - v < 120 * 86400}
         acts = [{"d": e.get("d") or (e.get("s") or "")[:10], "t": e["t"], "text": e.get("desc", "")}
                 for e in briefs if c["name"].lower() in e["t"].lower()]
+        acts += [{"d": x["d"], "t": x["t"], "text": x["text"]} for x in (drops or []) if x["co"].lower() == c["name"].lower()]
         out.append({"key": c["key"], "name": c["name"], "goal": c.get("goal", ""), "careers": c.get("careers", ""),
                     "roles": roles[:12], "first": first, "people": c.get("people", []), "search": c.get("search", []),
                     "actions": acts[-3:], "err": err})
     return out, (now if fresh else prev.get("jobs_at", now))
+
+
+# ------------------------------------------------------------------ brief inbox
+def inbox(root, log):
+    """Daily briefs drop their 3 actions here, sealed with the inbox public key.
+    Only the build (holding FOCUS_INBOX_SK) can open them."""
+    sk = (os.environ.get("FOCUS_INBOX_SK") or "").strip()
+    d = os.path.join(root, "focus_inbox")
+    out = []
+    if not sk or not os.path.isdir(d):
+        return out
+    from nacl.public import PrivateKey, SealedBox
+    box = SealedBox(PrivateKey(base64.b64decode(sk)))
+    for f in sorted(os.listdir(d)):
+        if not f.endswith(".json"):
+            continue
+        try:
+            j = json.load(open(os.path.join(d, f), encoding="utf-8"))
+            text = box.decrypt(base64.b64decode(j["box"])).decode("utf-8")
+            co = j.get("co", "")
+            out.append({"co": co, "d": j.get("d", ""), "t": "🎯 " + co + " · today's 3 actions", "text": text[:6000]})
+        except Exception as e:
+            log("focus inbox", f, e)
+    return out
 
 
 # ------------------------------------------------------------------ main hook
@@ -206,7 +231,7 @@ def run(root, site, prev_dir, get, log):
         data["cal"] = prev.get("cal", [])
         status["cal_ok"] = False
     try:
-        data["jobs"], data["jobs_at"] = jobs(cfg, prev, data["cal"], get, log)
+        data["jobs"], data["jobs_at"] = jobs(cfg, prev, data["cal"], get, log, inbox(root, log))
     except Exception as e:
         log("focus jobs", e)
         data["jobs"], data["jobs_at"] = prev.get("jobs", []), prev.get("jobs_at")
