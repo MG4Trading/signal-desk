@@ -244,7 +244,7 @@ let angle = "all", wxTab = store.get("wxTab", "today");
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
-function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer & Quran" }]; (D ? D.topics : []).filter(t => !t.in_markets).forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer" }]; (D ? D.topics : []).filter(t => !t.in_markets && t.id !== "homes").forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
 
 function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
@@ -973,9 +973,9 @@ function myLinksRow(){
   const r = el("div", "mylinks"); myLinks.forEach(([lab, href]) => { const a = el("a", "", lab + " ↗"); a.href = href; a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); return r;
 }
 function privateFocusLink(){
-  const a = el("a", "group"); a.href = "https://claude.ai/artifact/2tiWrhpbff69yR939V7oVx"; a.target = "_blank"; a.rel = "noopener"; a.style.cssText = "text-decoration:none;color:var(--ink)";
-  const h = el("div", "group-head"); h.appendChild(el("strong", "", "🧭 My Focus")); h.appendChild(el("span", "stamp", "private ↗")); a.appendChild(h);
-  const b = el("div", "hl"); b.appendChild(el("span", "hl-snip", "Opens your private Life OS: Top 3, today's plan and calendar.")); a.appendChild(b); return a;
+  const a = el("a", "group"); a.href = "focus/"; a.style.cssText = "text-decoration:none;color:var(--ink)";
+  const h = el("div", "group-head"); h.appendChild(el("strong", "", "🧭 Focus")); h.appendChild(el("span", "stamp", "passcode ›")); a.appendChild(h);
+  const b = el("div", "hl"); b.appendChild(el("span", "hl-snip", "Your day plan, ideas and target jobs.")); a.appendChild(b); return a;
 }
 function go(id){ view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }
 
@@ -1016,7 +1016,7 @@ function render(){
       else add(topicGroup(t, 5));
     });
   } else if (view === "weather") add(weatherCard(true));
-  else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); add(hadithCard()); add(surahCard()); }
+  else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); }
   else if (view === "kitchen"){ add(kitchenView()); }
   else if (view === "fun"){ funView().forEach(add); }
   else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
@@ -1036,6 +1036,7 @@ function render(){
     add(topicGroup(t, 0));
     if (t.id === "events") add(linksGroup(t, "Event calendars"));
     else if (t.id !== "homes") add(linksGroup(t, "Links"));
+    if (t.id === "oakville" && angle === "all"){ const hm = topic("homes"); if (hm && D.rentals){ add(homesCard(false)); add(linksGroup(hm, "Search home listings")); } }
   }
 }
 

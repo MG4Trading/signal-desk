@@ -1221,6 +1221,11 @@ def main():
         if os.path.exists(src):
             shutil.copy(src, os.path.join(SITE, name))
     open(os.path.join(SITE, ".nojekyll"), "w").close()
+    try:
+        import focus_build
+        focus_build.run(ROOT, SITE, PREV, get, log)
+    except Exception as e:
+        log("focus failed", e)
     log(f"done in {time.time() - t0:.1f}s, data.json {os.path.getsize(os.path.join(SITE, 'data.json')) // 1024} KB")
 
 
