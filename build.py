@@ -476,6 +476,64 @@ def gather_podcasts(country, n=40, max_min=30):
     return out
 
 
+INSPIRE = {
+    "sales": ["sales", "sales tips", "b2b sales", "negotiation", "entrepreneurship", "startup founder", "ecommerce", "small business", "business motivation"],
+    "tech": ["artificial intelligence", "ai news daily", "automation", "tech news", "innovation", "digital marketing", "productivity tools"],
+    "sport": ["athlete mindset", "sports psychology", "mental toughness", "endurance", "adventure", "running", "triathlon", "fitness motivation", "soccer daily"],
+    "mind": ["motivation", "daily motivation", "mindset", "leadership", "habits", "stoic", "personal development", "islam", "islamic reminder", "quran reflection", "تحفيز", "ريادة الأعمال", "تطوير الذات"],
+}
+INSPIRE_SKIP = re.compile(r"\b(mom|mommy|moms|mama|christian|church|jesus|bible|gospel|sermon|catholic|kids|dating|sex|true crime|horoscope|astrology|tarot|pourquoi|vos|votre|vous|les|des|und|der|die|dein|el|los|para|femme|she thrives|law of attraction|manifest\w*)\b", re.I)
+
+
+def gather_inspire(min_m=4, max_m=15, days=45, per_show=3):
+    """Short, fresh episodes (4-15 min) from shows that match each topic. Ranked on the phone by the viewer's own ratings."""
+    from urllib.parse import urlencode
+    now = datetime.now(TZ)
+    out, seen = [], set()
+    for topic, terms in INSPIRE.items():
+        ids = []
+        for q in terms:
+            try:
+                r = json.loads(get("https://itunes.apple.com/search?" + urlencode({"term": q, "entity": "podcast", "limit": 15, "country": "ca"})))["results"]
+                ids += [str(x["collectionId"]) for x in r if x.get("collectionId") and not INSPIRE_SKIP.search(x.get("collectionName", "")) and x.get("collectionExplicitness") != "explicit"]
+            except Exception as e:
+                log("inspire search", q, e)
+        ids = list(dict.fromkeys(ids))
+        eps = []
+        for i in range(0, len(ids), 20):
+            try:
+                r = json.loads(get("https://itunes.apple.com/lookup?" + urlencode({"id": ",".join(ids[i:i + 20]), "entity": "podcastEpisode", "limit": 10, "country": "ca"}), timeout=30))["results"]
+                eps += [x for x in r if x.get("wrapperType") == "podcastEpisode"]
+            except Exception as e:
+                log("inspire lookup", e)
+        per = {}
+        for x in sorted(eps, key=lambda x: x.get("releaseDate", ""), reverse=True):
+            ms = x.get("trackTimeMillis") or 0
+            mins = ms / 60000
+            if not (min_m <= mins <= max_m) or x.get("trackId") in seen:
+                continue
+            try:
+                age = (now - datetime.fromisoformat(x["releaseDate"].replace("Z", "+00:00"))).days
+            except Exception:
+                continue
+            text = x.get("trackName", "") + " " + x.get("collectionName", "")
+            if age > days or x.get("contentAdvisoryRating") == "Explicit" or INSPIRE_SKIP.search(text) or re.search(r"[äöüßéèêàç]", text):
+                continue
+            cid = x.get("collectionId")
+            if per.get(cid, 0) >= per_show:
+                continue
+            per[cid] = per.get(cid, 0) + 1
+            seen.add(x.get("trackId"))
+            out.append({"id": str(x.get("trackId")), "t": x.get("trackName", ""), "show": x.get("collectionName", ""), "sid": str(cid),
+                        "min": round(mins), "date": x["releaseDate"][:10], "age": age, "topic": topic,
+                        "url": x.get("trackViewUrl") or x.get("collectionViewUrl", ""), "img": x.get("artworkUrl160") or x.get("artworkUrl60", ""),
+                        "sum": re.sub(r"\s+", " ", x.get("shortDescription") or re.sub(r"<[^>]+>", " ", x.get("description") or ""))[:170].strip(),
+                        "ar": bool(re.search(r"[؀-ۿ]", text))})
+    if len(out) < 8:
+        raise ValueError("too few episodes")
+    return out
+
+
 def gather_movies(genre, n=15):
     d = json.loads(get(f"https://itunes.apple.com/ca/rss/topmovies/limit={n}/genre={genre}/json"))["feed"].get("entry", [])
     out = []
@@ -535,7 +593,7 @@ def json_movies(country, genre, n=25):
 def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
-    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5:
+    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5 and prev.get("inspire"):
         prev["content"] = load_json(os.path.join(ROOT, "extras-content.json"), prev.get("content") or {})
         return prev
     content = load_json(os.path.join(ROOT, "extras-content.json"), {})
@@ -543,7 +601,8 @@ def gather_extras():
     out = {"date": today, "generated": int(time.time()), "day_no": day_no}
     for key, fn in (("prayer", gather_prayer), ("faith", lambda: gather_faith(day_no, content)),
                     ("podcasts_ca", lambda: gather_podcasts("ca")), ("podcasts_eg", lambda: gather_podcasts("eg")),
-                    ("movies_action", lambda: gather_movies(4401)), ("movies_thriller", lambda: gather_movies(4416))):
+                    ("movies_action", lambda: gather_movies(4401)), ("movies_thriller", lambda: gather_movies(4416)),
+                    ("inspire", gather_inspire)):
         try:
             out[key] = fn()
         except Exception as e:

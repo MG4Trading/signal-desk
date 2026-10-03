@@ -160,6 +160,9 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .film .links{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;font-weight:600}
 .film .links a{color:var(--accent);text-decoration:none}
 .pod{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.raterow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.ratebtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;min-height:32px;font-size:12px;font-weight:600;color:var(--muted)}
+.ratebtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .pod img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--surface-2)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.2);max-width:calc(100% - 32px);text-align:center}
 </style>
@@ -858,17 +861,80 @@ function filmRow(title, sub, links, img){
   const ls = el("div", "links"); links.forEach(([t, u]) => { const a = el("a", "", t + " ↗"); a.href = u; a.target = "_blank"; a.rel = "noopener"; ls.appendChild(a); }); b.appendChild(ls); r.appendChild(b); return r;
 }
 function grp(title, stamp){ const g = el("div", "group"); const h = el("div", "group-head"); h.appendChild(el("strong", "", title)); if (stamp) h.appendChild(el("span", "stamp", stamp)); g.appendChild(h); return g; }
+/* ---------- taste: your ratings rank films and podcasts (kept on this device only) ---------- */
+const taste = () => Object.assign({ f:{}, p:{}, s:{} }, store.get("taste", {}));
+const rates = () => store.get("rate", {});
+const FILM_KW = [["Crime", /crime|heist|detective|murder|cartel|gang|mafia|cop|police|killer|robber/i], ["Spy", /spy|agent|cia|mi6|espionage|assassin/i], ["War", /war\b|soldier|military|battle/i], ["Sci-fi", /sci-?fi|future|space|alien|robot|science fiction/i], ["Comedy", /comed|funny|hilarious/i], ["Drama", /drama|family|love|life/i], ["Horror", /horror|haunt|demon|terrif/i], ["True story", /true story|based on|real[- ]life/i], ["Martial arts", /martial|kung fu|fighter|boxing|mma/i]];
+function filmTags(m){ const s = new Set((m.tags || []).filter(t => !/chart|New release/.test(t)).map(t => t.replace(/ · .*/, ""))); if (m.genre) s.add(m.genre === "Action & Adventure" ? "Action & adventure" : m.genre); FILM_KW.forEach(([t, r]) => { if (r.test((m.sum || "") + " " + (m.t || ""))) s.add(t); }); return [...s]; }
+const filmId = m => m.id || (String(m.url || "").match(/\/id(\d+)/) || [])[1] || m.t;
+const filmScore = m => filmTags(m).reduce((a, t) => a + (taste().f[t] || 0), 0);
+function rateFilm(m, v){
+  const id = "f:" + filmId(m), R = rates(), T = taste(), old = R[id] || 0; if (old === v) v = 0;
+  filmTags(m).forEach(t => { T.f[t] = (T.f[t] || 0) - old + v; if (!T.f[t]) delete T.f[t]; });
+  if (v) R[id] = v; else delete R[id]; store.set("rate", R); store.set("taste", T); render();
+}
+function rateRow(id, onRate){
+  const v = rates()[id] || 0, r = el("div", "raterow");
+  [[1, "👍", "More like this"], [-1, "👎", "Not for me"]].forEach(([k, ic, lab]) => { const b = el("button", "ratebtn", ic + " " + lab); b.type = "button"; b.setAttribute("aria-pressed", String(v === k)); b.onclick = e => { e.preventDefault(); e.stopPropagation(); onRate(k); }; r.appendChild(b); });
+  return r;
+}
+function tasteLine(map, names){
+  const e = Object.entries(map).filter(([, w]) => w).sort((a, b) => b[1] - a[1]); if (!e.length) return null;
+  const n = el("div", "hl"); const sp = el("span", "hl-snip", "Your taste: " + e.slice(0, 6).map(([k, w]) => (w > 0 ? "👍 " : "👎 ") + ((names && names[k]) || k) + (Math.abs(w) > 1 ? " ×" + Math.abs(w) : "")).join(" · ")); n.appendChild(sp); return n;
+}
+/* daily inspiration: short podcast episodes */
+const PTOP = [["sales", "💼 Sales & business"], ["tech", "🤖 Tech & digital"], ["sport", "🏃 Sport & adventure"], ["mind", "🧠 Mindset & faith"]];
+const PNAME = Object.fromEntries(PTOP);
+let podTopic = store.get("podTopic", "all"), podMore = false;
+function jit(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return ((h >>> 0) % 1000) / 1000; }
+function podPicks(){
+  const L = X.inspire || [], T = taste(), R = rates(), day0 = X.date || "";
+  const sc = e => 3 * (T.p[e.topic] || 0) + 2 * (T.s[e.sid] || 0) + (e.age <= 2 ? 2 : e.age <= 7 ? 1 : 0) + 2 * jit(e.id + day0);
+  const pool = L.filter(e => R["p:" + e.id] !== -1 && (T.s[e.sid] || 0) > -3 && (T.p[e.topic] || 0) > -4 && (podTopic === "all" || e.topic === podTopic)).map(e => Object.assign({ sc:sc(e) }, e)).sort((a, b) => b.sc - a.sc);
+  const out = [], shows = new Set();
+  if (podTopic === "all") PTOP.forEach(([k]) => { const e = pool.find(x => x.topic === k && !shows.has(x.sid)); if (e && (T.p[k] || 0) > -2){ out.push(e); shows.add(e.sid); } });
+  pool.forEach(e => { if (out.length < 15 && !shows.has(e.sid) && !out.includes(e)){ out.push(e); shows.add(e.sid); } });
+  pool.forEach(e => { if (out.length < 15 && !out.includes(e)) out.push(e); });
+  return out.sort((a, b) => b.sc - a.sc);
+}
+function ratePod(e, v){
+  const id = "p:" + e.id, R = rates(), T = taste(), old = R[id] || 0; if (old === v) v = 0;
+  T.p[e.topic] = (T.p[e.topic] || 0) - old + v; T.s[e.sid] = (T.s[e.sid] || 0) + 2 * (v - old);
+  ["p", "s"].forEach(k => Object.keys(T[k]).forEach(x => { if (!T[k][x]) delete T[k][x]; }));
+  if (v) R[id] = v; else delete R[id]; store.set("rate", R); store.set("taste", T);
+  render();
+}
+function inspireGroup(){
+  if (!(X.inspire || []).length) return null;
+  const P = podPicks(), g = grp("🎧 Daily inspiration", "4–15 min · fresh picks every day");
+  const ch = el("div", "chips"); ch.style.cssText = "display:flex;gap:6px;overflow-x:auto;padding:10px 16px 4px;scrollbar-width:none";
+  [["all", "All"], ...PTOP].forEach(([k, l]) => { const b = el("button", "ghostbtn", l); b.type = "button"; b.style.cssText = "flex:0 0 auto;min-height:34px;padding:5px 12px"; b.setAttribute("aria-pressed", String(podTopic === k)); if (podTopic === k){ b.style.background = "var(--ink)"; b.style.color = "var(--bg)"; } b.onclick = () => { podTopic = k; store.set("podTopic", k); podMore = false; render(); }; ch.appendChild(b); });
+  g.appendChild(ch);
+  if (!P.length) g.appendChild(el("div", "empty", "Nothing left here today. Try another topic."));
+  P.slice(0, podMore ? 15 : 8).forEach(e => { const r = el("div", "pod"); const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = e.img; r.appendChild(im);
+    const b = el("div", ""); b.style.cssText = "display:flex;flex-direction:column;gap:3px;min-width:0";
+    const a = el("a", "hl-title", e.t); a.href = e.url; a.target = "_blank"; a.rel = "noopener"; a.dir = "auto"; a.style.cssText = "color:var(--ink);text-decoration:none"; b.appendChild(a);
+    const meta = el("span", "hl-snip", e.show + " · " + e.min + " min · " + (PNAME[e.topic] || "") + (e.age <= 1 ? " · new" : "")); meta.dir = "auto"; b.appendChild(meta);
+    b.appendChild(rateRow("p:" + e.id, v => ratePod(e, v))); r.appendChild(b); g.appendChild(r); });
+  if (!podMore && P.length > 8){ const m = el("button", "hl", "Show " + Math.min(7, P.length - 8) + " more"); m.type = "button"; m.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer;width:100%"; m.onclick = () => { podMore = true; render(); }; g.appendChild(m); }
+  const T = taste(), names = {}; (X.inspire || []).forEach(e => names[e.sid] = e.show); Object.assign(names, PNAME);
+  const tl = tasteLine(Object.assign({}, T.p, T.s), names); if (tl) g.appendChild(tl);
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Rate a few: 👍 brings more from that show and topic, 👎 hides it. Ratings stay on this phone, so each family member gets their own picks.")); g.appendChild(n);
+  return g;
+}
+
 function funView(){
   if (!X) return [el("div", "empty", "Loading…")];
   const C = kc(), dn = X.day_no || 0, out = [];
-  const FY = (X.foryou || {}).picks || [], hid = new Set(store.get("hideFilms", []));
-  const fy = FY.filter(m => !hid.has(m.id));
+  const FY = (X.foryou || {}).picks || [], hid = new Set(store.get("hideFilms", [])), RT = rates();
+  const fy = FY.filter(m => !hid.has(m.id) && RT["f:" + filmId(m)] !== -1).map((m, i) => [m, filmScore(m) * 10 - i]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
   if (fy.length){ const g = grp("Suggested for you today", "new picks every day");
     fy.forEach(m => { const r = filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.tags || []).join(" · ") + (m.sum ? " · " + m.sum.slice(0, 120) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["Trailer", "https://www.youtube.com/results?search_query=" + encodeURIComponent(m.t + " " + (m.year || "") + " trailer")]], m.img);
-      const nb = el("button", "ghostbtn", "Not for me"); nb.type = "button"; nb.style.cssText = "min-height:30px;padding:4px 10px;font-size:12px;justify-self:start"; nb.onclick = () => { hid.add(m.id); store.set("hideFilms", [...hid]); render(); };
-      r.lastChild.appendChild(nb); g.appendChild(r); });
-    const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Picked from today's action, thriller and crime charts in Canada and the U.S. New releases rank higher, and a title is never suggested twice.")); g.appendChild(n);
+      r.lastChild.appendChild(rateRow("f:" + filmId(m), v => rateFilm(m, v))); g.appendChild(r); });
+    const tl = tasteLine(taste().f); if (tl) g.appendChild(tl);
+    const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Picked from today's action, thriller and crime charts in Canada and the U.S. Rate them: your 👍 and 👎 reorder these and the new releases to your taste, on this phone only.")); g.appendChild(n);
     out.push(g); }
+  out.push(inspireGroup());
   if ((X.egypt_cinema || []).length){ const g = grp("أخبار السينما المصرية · Egyptian cinema news", ""); X.egypt_cinema.slice(0, 6).forEach(it => g.appendChild(item(it))); out.push(g); }
   const cl = C.classic || [], eg = C.egyptian || [];
   if (cl.length || eg.length){ const g = grp("Tonight's picks", "changes daily");
@@ -878,13 +944,13 @@ function funView(){
     out.push(g); }
   const nw = [...(X.movies_action || []).slice(0, 8), ...(X.movies_thriller || []).slice(0, 8)];
   if (nw.length){ const g = grp("New and trending", "Apple TV charts, Canada"); const seen = new Set();
-    nw.forEach(m => { if (seen.has(m.t)) return; seen.add(m.t); g.appendChild(filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.genre || "") + (m.sum ? " · " + m.sum.slice(0, 110) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["IMDb", imdb(m.t + " " + m.year)]], m.img)); }); out.push(g); }
+    const RT2 = rates(); nw.map((m, i) => [m, filmScore(m) * 10 - i]).sort((a, b) => b[1] - a[1]).map(x => x[0]).forEach(m => { if (seen.has(m.t) || RT2["f:" + filmId(m)] === -1) return; seen.add(m.t); const r = filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.genre || "") + (m.sum ? " · " + m.sum.slice(0, 110) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["IMDb", imdb(m.t + " " + m.year)]], m.img); r.lastChild.appendChild(rateRow("f:" + filmId(m), v => rateFilm(m, v))); g.appendChild(r); }); out.push(g); }
   if ((C.series || []).length){ const g = grp("Short series, highly rated", "4 to 15 episodes");
     C.series.forEach(([t, y, n, gen]) => g.appendChild(filmRow(t + " (" + y + ")", n + " episodes · " + gen, [["Where to watch", jw(t.replace(/\s*\(.*\)/, ""))], ["IMDb", imdb(t.replace(/\s*\(.*\)/, "") + " " + y)]]))); out.push(g); }
   if (cl.length){ const g = grp("American action, crime and thrillers", "classics and modern"); cl.forEach(([t, y, gen]) => g.appendChild(filmRow(t + " (" + y + ")", gen, [["Where to watch", jw(t)], ["IMDb", imdb(t + " " + y)]]))); out.push(g); }
   if (eg.length){ const g = grp("أفلام مصرية · Egyptian films", "old and new"); eg.forEach(([a, en, y, gen]) => g.appendChild(filmRow(a + " · " + en + " (" + y + ")", gen, [["YouTube", "https://www.youtube.com/results?search_query=" + encodeURIComponent("فيلم " + a)], ["IMDb", imdb(en + " " + y)]]))); out.push(g); }
   const pods = podTab === "ca" ? (X.podcasts_ca || []) : (X.podcasts_eg || []);
-  const g = grp("Short podcasts", "latest episode 30 min or less");
+  const g = grp("Podcast charts", "top shows, latest episode 30 min or less");
   const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["ca", "Top in Canada"], ["eg", "عربي · Egypt"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(podTab === k)); b.onclick = () => { podTab = k; render(); }; seg.appendChild(b); }); g.appendChild(seg);
   if (!pods.length) g.appendChild(el("div", "empty", "No short shows in the chart today."));
   pods.forEach(p => { const a = el("a", "pod"); a.href = p.ep_url || p.url; a.target = "_blank"; a.rel = "noopener"; const im = document.createElement("img"); im.alt = ""; im.loading = "lazy"; im.src = p.img; a.appendChild(im);
