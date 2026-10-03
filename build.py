@@ -527,10 +527,11 @@ def _inspire_pass(pairs, country, days, per_show, min_m, max_m, seen, arabic=Fal
         if arabic and not is_ar:
             continue
         cid = x.get("collectionId")
-        dup = (cid, x.get("trackName", "").strip().lower())
-        if per.get(cid, 0) >= per_show or dup in seen:
+        sname = x.get("collectionName", "").strip().lower()
+        dup = (sname, re.sub(r"\W+", "", x.get("trackName", "").lower())[:60])
+        if per.get(sname, 0) >= per_show or dup in seen:
             continue
-        per[cid] = per.get(cid, 0) + 1
+        per[sname] = per.get(sname, 0) + 1
         seen.add(x.get("trackId")); seen.add(dup)
         out.append({"id": str(x.get("trackId")), "t": x.get("trackName", ""), "show": x.get("collectionName", ""), "sid": str(cid),
                     "min": round(mins), "date": x["releaseDate"][:10], "age": age, "topic": topic_of.get(str(cid), "mind"),
@@ -614,12 +615,12 @@ def json_movies(country, genre, n=25):
 def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
-    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5 and prev.get("inspire") and prev.get("inspire_v") == 2:
+    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5 and prev.get("inspire") and prev.get("inspire_v") == 3:
         prev["content"] = load_json(os.path.join(ROOT, "extras-content.json"), prev.get("content") or {})
         return prev
     content = load_json(os.path.join(ROOT, "extras-content.json"), {})
     day_no = (datetime.now(TZ).date() - datetime(2026, 1, 1).date()).days
-    out = {"date": today, "generated": int(time.time()), "day_no": day_no, "inspire_v": 2}
+    out = {"date": today, "generated": int(time.time()), "day_no": day_no, "inspire_v": 3}
     for key, fn in (("prayer", gather_prayer), ("faith", lambda: gather_faith(day_no, content)),
                     ("podcasts_ca", lambda: gather_podcasts("ca")), ("podcasts_eg", lambda: gather_podcasts("eg")),
                     ("movies_action", lambda: gather_movies(4401)), ("movies_thriller", lambda: gather_movies(4416)),
