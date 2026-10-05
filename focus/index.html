@@ -302,9 +302,9 @@ function viewToday(){
   const bar = el("div", "bar"); bar.style.margin = "0 16px 4px"; const bi = el("i"); bi.style.width = Math.round(done * 100 / tot) + "%"; bar.appendChild(bi); const bw = el("div", "pad"); bw.style.paddingBottom = "4px"; bw.appendChild(bar); pl.appendChild(bw);
   B.list.forEach((b, i) => {
     const its = b.items, dn = its.filter(([k]) => isOn(D, k)).length, past = n >= b.b, isNow = i === cur;
-    const exp = open === b.k || (open == null && isNow);
+    const exp = true; // every block stays open so the whole day is visible
     const box = el("div", "blk" + (isNow ? " now" : "") + (past ? " past" : ""));
-    const h = el("button", "bh"); h.type = "button"; h.onclick = () => { open = exp ? "" : b.k; render(); };
+    const h = el("div", "bh");
     h.appendChild(el("span", "when", hmS(b.a)));
     const tx = el("span", ""); tx.appendChild(el("div", "tt", b.t + (isNow ? " · now" : ""))); if (exp || isNow) tx.appendChild(el("div", "ss", b.s)); h.appendChild(tx);
     h.appendChild(el("span", "prog" + (dn === its.length ? " full" : ""), dn + "/" + its.length)); box.appendChild(h);
