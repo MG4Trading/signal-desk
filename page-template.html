@@ -925,6 +925,69 @@ function inspireGroup(){
   return g;
 }
 
+/* ---------- grow: people-skills playbook + ranked reading (ratings stay on this device) ---------- */
+let growArea = store.get("growArea", "all");
+const growData = () => kc().grow || { areas: [], tips: [] };
+const tried = () => store.get("growTried", {});
+const SRC_TIER = [[/harvard|hbr/i, 3], [/psychology today|greater good|behavio(u)?ral scientist/i, 3], [/fast company|atlantic|big think/i, 2], [/guardian|bbc|new york times/i, 2], [/^inc|forbes/i, 1]];
+const srcTier = s => { for (const [r, w] of SRC_TIER) if (r.test(s || "")) return w; return 0; };
+const areaW = a => (taste().g || {})[a] || 0;
+const tipScore = t => (t[1] === "High" ? 3 : 1) + areaW(t[0]);
+function growNudge(area, d){ const T = taste(); T.g = T.g || {}; T.g[area] = (T.g[area] || 0) + d; if (!T.g[area]) delete T.g[area]; store.set("taste", T); }
+function growToday(){
+  const G = growData(), dn = (X && X.day_no) || 0, T = tried();
+  const ranked = G.tips.map((t, i) => [t, tipScore(t) * 100 + ((i * 37 + dn * 53) % 97)]).filter(x => !T[x[0][2]]).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  const out = [], seen = new Set();
+  ranked.forEach(t => { if (out.length < 3 && !seen.has(t[0])){ out.push(t); seen.add(t[0]); } });
+  return out;
+}
+function tipRow(t, compact){
+  const T = tried(), done = !!T[t[2]], R = rates(), useful = R["gt:" + t[2]] === 1;
+  const r = el("div", "hl"); if (done) r.style.opacity = ".55";
+  const m = el("div", "hl-meta"); m.appendChild(el("span", "tag", t[0])); const imp = el("span", "", t[1] === "High" ? "● High impact" : "○ Medium impact"); m.appendChild(imp); r.appendChild(m);
+  r.appendChild(el("span", "hl-title", t[2]));
+  if (!compact) r.appendChild(el("span", "hl-snip", t[3]));
+  const tr = el("span", "hl-snip", "Try today: " + t[4]); tr.style.cssText = "color:var(--accent);font-weight:600"; r.appendChild(tr);
+  const row = el("div", "raterow");
+  const u = el("button", "ratebtn", "👍 Useful"); u.type = "button"; u.setAttribute("aria-pressed", String(useful));
+  u.onclick = () => { const R2 = rates(); if (useful){ delete R2["gt:" + t[2]]; growNudge(t[0], -1); } else { R2["gt:" + t[2]] = 1; growNudge(t[0], 1); } store.set("rate", R2); render(); };
+  const d = el("button", "ratebtn", done ? "✓ Tried · undo" : "✓ Tried it"); d.type = "button"; d.setAttribute("aria-pressed", String(done));
+  d.onclick = () => { const T2 = tried(); if (done) delete T2[t[2]]; else T2[t[2]] = Date.now(); store.set("growTried", T2); render(); };
+  row.appendChild(u); row.appendChild(d); r.appendChild(row);
+  return r;
+}
+function growReads(){
+  const R = rates(), now = Date.now() / 1000;
+  return ((D.headlines || {}).grow || []).filter(it => R["gr:" + it.l] !== -1 && (growArea === "all" || it.a === growArea)).map(it => {
+    const age = (now - it.ts) / 86400, rec = age <= 3 ? 3 : age <= 7 ? 2 : age <= 14 ? 1 : 0;
+    return Object.assign({ sc: srcTier(it.s) * 2 + areaW(it.a) * 2 + rec + (R["gr:" + it.l] === 1 ? 2 : 0) }, it);
+  }).sort((a, b) => b.sc - a.sc || b.ts - a.ts);
+}
+function growMini(){
+  const t = growToday()[0]; if (!t) return null;
+  const g = grp("🌱 Grow · today's tip", t[0]); g.appendChild(tipRow(t, true));
+  const more = el("button", "hl", "Open Grow: 3 tips and fresh reads"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer;width:100%"; more.onclick = () => go("grow"); g.appendChild(more);
+  return g;
+}
+function growView(){
+  const G = growData(), out = [];
+  const td = grp("Today's 3", "one per area · new mix daily"); growToday().forEach(t => td.appendChild(tipRow(t, false))); out.push(td);
+  const sub = el("div", "subrail"); [["all", "All areas"], ...G.areas].forEach(([k, l]) => { const b = el("button", "chip", l); b.type = "button"; b.setAttribute("aria-pressed", String(growArea === k)); b.onclick = () => { growArea = k; store.set("growArea", k); render(); }; sub.appendChild(b); }); out.push(sub);
+  const T = tried(), tips = G.tips.filter(t => growArea === "all" || t[0] === growArea).sort((a, b) => (T[a[2]] ? 1 : 0) - (T[b[2]] ? 1 : 0) || tipScore(b) - tipScore(a));
+  const pb = grp("Playbook", tips.filter(t => T[t[2]]).length + "/" + tips.length + " tried · ranked by impact"); tips.slice(0, growArea === "all" ? 10 : 20).forEach(t => pb.appendChild(tipRow(t, false)));
+  if (growArea === "all" && tips.length > 10){ const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Pick an area above to see all " + tips.length + " tips.")); pb.appendChild(n); }
+  out.push(pb);
+  const reads = growReads(), rg = grp("Fresh reads", reads.length ? "ranked by importance · last 30 days" : "");
+  if (!reads.length) rg.appendChild(el("div", "empty", "New articles arrive with the next refresh."));
+  reads.slice(0, 15).forEach(it => { const w = el("div", ""); w.style.borderTop = "1px solid var(--line)"; const a = item(it); a.style.borderTop = "0"; w.appendChild(a);
+    const lvl = it.sc >= 9 ? "●●●" : it.sc >= 5 ? "●●○" : "●○○"; const imp = el("span", "", "Importance " + lvl); imp.style.cssText = "font-size:12px;color:var(--muted);padding:0 16px"; w.appendChild(imp);
+    const rr = rateRow("gr:" + it.l, v => { const R2 = rates(), old = R2["gr:" + it.l] || 0; if (old === v) v = 0; growNudge(it.a, v - old); if (v) R2["gr:" + it.l] = v; else delete R2["gr:" + it.l]; store.set("rate", R2); render(); }); rr.style.padding = "4px 16px 10px"; w.appendChild(rr); rg.appendChild(w); });
+  out.push(rg);
+  const tl = tasteLine(taste().g || {}); if (tl){ const tg = grp("Your focus", "from your 👍 and 👎"); tg.appendChild(tl); out.push(tg); }
+  const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Tips are ranked by impact; reads by source quality, freshness and the areas you mark useful. Your marks stay on this phone.")); const ng = grp("How this works", ""); ng.appendChild(n); out.push(ng);
+  return out;
+}
+
 function funView(){
   if (!X) return [el("div", "empty", "Loading…")];
   const C = kc(), dn = X.day_no || 0, out = [];
@@ -1075,12 +1138,14 @@ function render(){
     D.topics.filter(t => visible(t.id) && !t.in_markets).forEach(t => {
       if (t.id === "homes" && D.rentals) add(homesCard(true));
       else if (t.id === "events" && D.events) add(eventsCard(5));
+      else if (t.id === "grow") add(growMini());
       else add(topicGroup(t, 5));
     });
   } else if (view === "weather") add(weatherCard(true));
   else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); }
   else if (view === "kitchen"){ add(kitchenView()); }
   else if (view === "fun"){ funView().forEach(add); }
+  else if (view === "grow"){ growView().forEach(add); }
   else if (view === "markets"){ add(mkTabs()); if (mkTab === "biz") bizView().forEach(add); else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); } }
   else {
     const t = topic(view);

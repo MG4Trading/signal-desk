@@ -2207,5 +2207,241 @@
    "Qatayef with walnuts",
    "قطايف بالمكسرات"
   ]
- ]
+ ],
+ "grow": {
+  "areas": [
+   [
+    "Strangers",
+    "🤝 Connect with strangers"
+   ],
+   [
+    "Networking",
+    "✨ Leave a positive impact"
+   ],
+   [
+    "Elevator pitch",
+    "🎤 Master your pitch"
+   ],
+   [
+    "Personal brand",
+    "🧭 Build your personal brand"
+   ],
+   [
+    "Human motives",
+    "🧠 Understand human motives"
+   ]
+  ],
+  "tips": [
+   [
+    "Strangers",
+    "High",
+    "Open with the shared moment",
+    "Comment on something you both see right now: the event, the line, the speaker. It feels natural and gives them an easy reply.",
+    "Use one shared-moment opener today."
+   ],
+   [
+    "Strangers",
+    "High",
+    "Ask a follow-up question",
+    "Harvard research on conversation found that people who ask more follow-up questions are liked more. A second question proves you listened.",
+    "In your next chat, ask two follow-ups before you share your own story."
+   ],
+   [
+    "Strangers",
+    "Medium",
+    "They liked it more than you think",
+    "Studies on the \"liking gap\" show we underestimate how much a new person enjoyed talking with us. Assume warmth and keep going.",
+    "Send a short \"great meeting you\" note instead of second-guessing."
+   ],
+   [
+    "Strangers",
+    "Medium",
+    "Use their name, twice",
+    "Repeat the name when you hear it, and once more when you part. You remember it, and they feel noticed.",
+    "Say the next new name you hear out loud."
+   ],
+   [
+    "Strangers",
+    "Medium",
+    "Find something in common outside work",
+    "Shared ground builds trust fast. Look for hometown, sport, travel, food or kids, not only job titles.",
+    "Find one non-work thing in common with someone new this week."
+   ],
+   [
+    "Strangers",
+    "Medium",
+    "Leave while the energy is high",
+    "A clean exit makes the whole chat feel better: \"I've really enjoyed this. I'll let you meet others. Can we connect on LinkedIn?\"",
+    "Practise one exit line until it feels natural."
+   ],
+   [
+    "Networking",
+    "High",
+    "Give before you ask",
+    "Offer an introduction, an article or a useful contact first. Reciprocity makes people remember you and want to help back.",
+    "Send one useful link or intro today, with no ask attached."
+   ],
+   [
+    "Networking",
+    "High",
+    "Follow up within 24 hours",
+    "Mention one specific thing they said and suggest one next step. Most people never follow up, so you stand out.",
+    "Follow up with the last person you met."
+   ],
+   [
+    "Networking",
+    "High",
+    "Be the connector",
+    "Introduce two people who should know each other, with one line on why. You become the person others come to.",
+    "Make one double opt-in introduction this week."
+   ],
+   [
+    "Networking",
+    "Medium",
+    "Listen more than you talk",
+    "People remember how you made them feel. Let them talk about their goals and challenges, and aim for about 70% listening.",
+    "In your next chat, count your questions versus your statements."
+   ],
+   [
+    "Networking",
+    "Medium",
+    "Remember one personal detail",
+    "Note one detail after a meeting, like a marathon or a child's first year at university, and ask about it next time.",
+    "Add a one-line note to the contact after your next meeting."
+   ],
+   [
+    "Networking",
+    "Medium",
+    "End with a clear next step",
+    "\"Coffee next Thursday at 9?\" works far better than \"let's keep in touch.\"",
+    "Propose one specific date to a new contact."
+   ],
+   [
+    "Elevator pitch",
+    "High",
+    "Lead with the problem you solve",
+    "Start with the outcome, not your title: \"I help growing tech companies enter new markets without losing a year.\"",
+    "Write your one-line problem and outcome sentence."
+   ],
+   [
+    "Elevator pitch",
+    "High",
+    "Who, problem, proof: 30 seconds",
+    "Say who you help, the problem you fix and one result with a number. About 75 words is 30 seconds.",
+    "Time yourself saying it out loud."
+   ],
+   [
+    "Elevator pitch",
+    "High",
+    "One number beats five adjectives",
+    "\"Grew partner revenue 35% in a year\" sticks. \"Strategic, results-driven leader\" does not.",
+    "Pick your single strongest number."
+   ],
+   [
+    "Elevator pitch",
+    "Medium",
+    "End with a question",
+    "Turn the pitch into a conversation: \"What's the biggest challenge you're seeing in your market right now?\"",
+    "Add a closing question to your pitch."
+   ],
+   [
+    "Elevator pitch",
+    "Medium",
+    "Keep three versions",
+    "One for hiring managers, one for peers, one for business owners. Same core, different proof point.",
+    "Write the hiring-manager version."
+   ],
+   [
+    "Elevator pitch",
+    "Medium",
+    "Practise out loud, not in your head",
+    "Record a voice memo, listen once, then cut 20% of the words. Speaking it builds the flow that reading never does.",
+    "Record one take on your phone today."
+   ],
+   [
+    "Personal brand",
+    "High",
+    "Own two or three themes",
+    "People remember you for a few things. Choose themes like market entry, revenue operations and digital sales, then repeat them.",
+    "Write your three themes in your phone notes."
+   ],
+   [
+    "Personal brand",
+    "High",
+    "Headline: who you help and how",
+    "Your LinkedIn headline is your pitch in one line. Use outcome words, not only a job title.",
+    "Rewrite your headline with one outcome."
+   ],
+   [
+    "Personal brand",
+    "High",
+    "Show the work, not the title",
+    "Share lessons from real projects: a launch, a mistake, a number. Stories carry more weight than claims.",
+    "Draft a five-line post from one real project."
+   ],
+   [
+    "Personal brand",
+    "Medium",
+    "Comment before you post",
+    "Thoughtful comments on other people's posts build visibility with far less effort than writing your own.",
+    "Leave three useful comments this week."
+   ],
+   [
+    "Personal brand",
+    "Medium",
+    "Consistent beats constant",
+    "One good post a week does more than daily noise. Protect a small, regular slot.",
+    "Book a weekly 20-minute brand block in your calendar."
+   ],
+   [
+    "Personal brand",
+    "Medium",
+    "Let others vouch for you",
+    "Recommendations from colleagues carry more weight than anything you write about yourself.",
+    "Ask one past colleague for a LinkedIn recommendation."
+   ],
+   [
+    "Human motives",
+    "High",
+    "Losses weigh more than gains",
+    "People work harder to avoid a loss than to get an equal gain. Show what waiting costs, not only what acting earns.",
+    "Reframe one pitch around the cost of doing nothing."
+   ],
+   [
+    "Human motives",
+    "High",
+    "Find the why behind the why",
+    "Ask \"What would that change for you?\" to move from the surface request to the real motive: security, status, time or recognition.",
+    "Use that question in your next sales or job conversation."
+   ],
+   [
+    "Human motives",
+    "Medium",
+    "Autonomy, mastery, purpose",
+    "People commit when they choose, when they grow and when the work means something. Offer choices, not orders.",
+    "Give someone two options instead of one this week."
+   ],
+   [
+    "Human motives",
+    "Medium",
+    "People follow people like them",
+    "Social proof works best when it's close: \"Teams like yours did this\" beats a generic claim.",
+    "Add one \"people like you\" example to your pitch."
+   ],
+   [
+    "Human motives",
+    "Medium",
+    "Start with a small yes",
+    "Once people agree to a small step, they tend to stay consistent. Ask for 15 minutes before you ask for a meeting.",
+    "Ask for a small first step instead of a big one."
+   ],
+   [
+    "Human motives",
+    "Medium",
+    "Listen for motive words",
+    "\"Secure\" and \"stable\" point to safety. \"First\" and \"best\" point to status. \"Simple\" and \"fast\" point to time. Mirror their words back.",
+    "Note the motive words a contact uses, and use them in your reply."
+   ]
+  ]
+ }
 }

@@ -415,6 +415,59 @@
    "in_person_only": true
   },
   {
+   "id": "grow",
+   "name": "Grow",
+   "gl": "US",
+   "hl": "en",
+   "feeds": [
+    [
+     "Strangers",
+     "(\"talking to strangers\" OR \"small talk\" OR rapport OR \"conversation skills\" OR \"make new friends\") (site:hbr.org OR site:psychologytoday.com OR site:fastcompany.com OR site:greatergood.berkeley.edu OR site:inc.com OR site:bigthink.com OR site:behavioralscientist.org OR site:theguardian.com OR site:bbc.com OR site:theatlantic.com OR site:nytimes.com OR site:forbes.com)",
+     "",
+     "",
+     "30d",
+     "stranger|small talk|rapport|conversation|friend|connect|lonel|social|likab|introvert|charism|talk to",
+     "quiz|find a therapist|ideas and advice for leaders|\\bIES\\d|autism|subscribe|newsletter|sponsored|webinar|\\btest\\b|\\^|must reads|hypnotherap"
+    ],
+    [
+     "Networking",
+     "(networking OR \"follow up\" OR \"first impression\" OR \"professional relationships\" OR \"be memorable\") (site:hbr.org OR site:psychologytoday.com OR site:fastcompany.com OR site:greatergood.berkeley.edu OR site:inc.com OR site:bigthink.com OR site:behavioralscientist.org OR site:theguardian.com OR site:bbc.com OR site:theatlantic.com OR site:nytimes.com OR site:forbes.com)",
+     "",
+     "",
+     "30d",
+     "network|follow.?up|first impression|relationship|connection|mentor|referral|reputation|memorable|introduc|career",
+     "quiz|find a therapist|ideas and advice for leaders|\\bIES\\d|autism|subscribe|newsletter|sponsored|webinar|\\btest\\b|\\^|must reads|hypnotherap"
+    ],
+    [
+     "Elevator pitch",
+     "(\"elevator pitch\" OR \"introduce yourself\" OR storytelling OR \"public speaking\" OR \"presentation skills\") (site:hbr.org OR site:psychologytoday.com OR site:fastcompany.com OR site:greatergood.berkeley.edu OR site:inc.com OR site:bigthink.com OR site:behavioralscientist.org OR site:theguardian.com OR site:bbc.com OR site:theatlantic.com OR site:nytimes.com OR site:forbes.com)",
+     "",
+     "",
+     "30d",
+     "pitch|introduc|storytell|speak|presentation|present your|story|communicat|interview|persuasive",
+     "quiz|find a therapist|ideas and advice for leaders|\\bIES\\d|autism|subscribe|newsletter|sponsored|webinar|\\btest\\b|\\^|must reads|hypnotherap"
+    ],
+    [
+     "Personal brand",
+     "(\"personal brand\" OR \"personal branding\" OR \"LinkedIn profile\" OR \"thought leadership\") (site:hbr.org OR site:psychologytoday.com OR site:fastcompany.com OR site:greatergood.berkeley.edu OR site:inc.com OR site:bigthink.com OR site:behavioralscientist.org OR site:theguardian.com OR site:bbc.com OR site:theatlantic.com OR site:nytimes.com OR site:forbes.com)",
+     "",
+     "",
+     "30d",
+     "brand|linkedin|reputation|thought leader|visibility|audience|influence|online presence|stand out",
+     "quiz|find a therapist|ideas and advice for leaders|\\bIES\\d|autism|subscribe|newsletter|sponsored|webinar|\\btest\\b|\\^|must reads|hypnotherap"
+    ],
+    [
+     "Human motives",
+     "(persuasion OR \"behavioral science\" OR \"behavioural science\" OR \"human motivation\" OR \"why people\" OR \"decision making\") (site:hbr.org OR site:psychologytoday.com OR site:fastcompany.com OR site:greatergood.berkeley.edu OR site:inc.com OR site:bigthink.com OR site:behavioralscientist.org OR site:theguardian.com OR site:bbc.com OR site:theatlantic.com OR site:nytimes.com OR site:forbes.com)",
+     "",
+     "",
+     "30d",
+     "persua|motiv|behavio|decision|bias|influenc|why (we|people)|psycholog|nudge|habit|trust|emotion",
+     "quiz|find a therapist|ideas and advice for leaders|\\bIES\\d|autism|subscribe|newsletter|sponsored|webinar|\\btest\\b|\\^|must reads|hypnotherap"
+    ]
+   ]
+  },
+  {
    "id": "ontario",
    "name": "Ontario",
    "gl": "CA",
@@ -824,36 +877,6 @@
     [
      "Egypt & Gulf",
      "EGX30 OR Tadawul OR \"Egyptian pound\"",
-     "",
-     "",
-     "7d"
-    ]
-   ]
-  },
-  {
-   "id": "networking-and-human-behaviour",
-   "name": "Networking and human behaviour",
-   "gl": "CA",
-   "hl": "en",
-   "feeds": [
-    [
-     "Consumer behaviour, ne…",
-     "Consumer behaviour, networking, meeting tips and tricks, building relations",
-     "",
-     "",
-     "7d"
-    ]
-   ]
-  },
-  {
-   "id": "articles-studies",
-   "name": "Articles, studies",
-   "gl": "CA",
-   "hl": "en",
-   "feeds": [
-    [
-     "Networking, building r…",
-     "Networking, building rapport, elevator pitch, consumer behaviour, psychology, human interest, human, sales, marketing, t",
      "",
      "",
      "7d"
