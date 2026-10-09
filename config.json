@@ -844,6 +844,21 @@
      "7d"
     ]
    ]
+  },
+  {
+   "id": "articles-studies",
+   "name": "Articles, studies",
+   "gl": "CA",
+   "hl": "en",
+   "feeds": [
+    [
+     "Networking, building r…",
+     "Networking, building rapport, elevator pitch, consumer behaviour, psychology, human interest, human, sales, marketing, t",
+     "",
+     "",
+     "7d"
+    ]
+   ]
   }
  ],
  "deep": {
