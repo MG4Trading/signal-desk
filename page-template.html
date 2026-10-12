@@ -357,13 +357,27 @@ function goTrips(dir, dow){
     .map(([dep, arr, bus]) => ({ dep, arr, bus: bus === "B", dur: ((toMin(arr) - toMin(dep)) + 1440) % 1440 }));
 }
 function fmt12(t){ let [h, m] = t.split(":").map(Number); h = h % 24; const ap = h >= 12 ? "p.m." : "a.m."; h = h % 12 || 12; return h + ":" + String(m).padStart(2, "0") + " " + ap; }
+function shareItem(it){
+  const data = { title: it.t, text: it.t + (it.s ? " · " + it.s : ""), url: it.l };
+  if (navigator.share){ navigator.share(data).catch(() => {}); return; }
+  navigator.clipboard.writeText(it.l).then(() => toast("Link copied")).catch(() => toast(it.l));
+}
 function item(it){
-  const a = el("a", "hl"); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
+  const w = el("div", ""), a = el("a", "hl"); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
   const m = el("div", "hl-meta"); m.appendChild(el("span", "tag", it.a));
   if (Date.now() / 1000 - it.ts < 6 * 3600) m.appendChild(el("span", "new", "New"));
   m.appendChild(el("span", "", (it.s || "") + " · " + ago(it.ts)));
   a.appendChild(m); const tt = el("span", "hl-title", it.t); tt.dir = "auto"; a.appendChild(tt);
-  return a;
+  w.appendChild(a);
+  const det = el("div", "hl-snip", it.d || "No summary in the feed. Open the source to read the full story."); det.style.cssText = "display:none;padding:0 16px 8px";
+  const bar = el("div", "row"); bar.style.cssText = "padding:0 16px 10px;gap:8px";
+  const more = el("button", "ratebtn", "Read more"); more.type = "button"; more.setAttribute("aria-expanded", "false");
+  more.onclick = () => { const open = det.style.display === "none"; det.style.display = open ? "block" : "none"; more.textContent = open ? "Show less" : "Read more"; more.setAttribute("aria-expanded", String(open)); };
+  const sh = el("button", "ratebtn", "Share"); sh.type = "button"; sh.onclick = () => shareItem(it);
+  const src = el("a", "ratebtn", "Open source"); src.href = it.l; src.target = "_blank"; src.rel = "noopener";
+  bar.appendChild(more); bar.appendChild(sh); bar.appendChild(src);
+  w.appendChild(det); w.appendChild(bar);
+  return w;
 }
 function goCard(){
   const g = el("div", "group");

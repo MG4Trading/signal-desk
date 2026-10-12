@@ -105,7 +105,11 @@ def fetch_feed(topic, f):
             continue
         if topic_not and topic_not.search(hay):
             continue
-        out.append({"a": f[0], "t": title, "l": link, "s": source, "ts": int(ts)})
+        desc = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", tag(block, "description"))).strip()
+        desc = desc.replace(title, "").replace(source, "").strip(" -|·")
+        if len(desc) < 40:
+            desc = ""
+        out.append({"a": f[0], "t": title, "l": link, "s": source, "ts": int(ts), "d": desc[:300]})
     return out
 
 

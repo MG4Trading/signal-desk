@@ -612,14 +612,26 @@ function toggleSave(it, kind){
   if (i >= 0) s.splice(i, 1); else s.unshift({ t: it.t, l: it.l, s: it.s || "", a: it.a || "", k: kind, ts: Date.now() });
   store.set("saved", s.slice(0, 200)); render();
 }
+function shareItem(it){
+  const data = { title: it.t, text: it.t + (it.s ? " · " + it.s : ""), url: it.l };
+  if (navigator.share){ navigator.share(data).catch(() => {}); return; }
+  navigator.clipboard.writeText(it.l).then(() => toast("Link copied")).catch(() => toast(it.l));
+}
 function newsRow(it, kind){
   const r = el("div", "pad"); r.style.cssText = "padding:8px 16px;border-top:1px solid var(--line)";
   r.appendChild(el("div", "label", (it.a || "News") + " · " + (it.s || "")));
   const a = el("a", "", it.t); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
   a.style.cssText = "font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;line-height:1.35;display:block;margin-top:4px"; r.appendChild(a);
+  const det = el("div", "note", it.d || "No summary in the feed. Open the source to read the full story."); det.style.cssText = "display:none;padding-top:6px";
+  r.appendChild(det);
+  const bar = el("div", "row"); bar.style.cssText = "flex-wrap:wrap;gap:8px;margin-top:6px";
   const sv = savedAll().some(x => x.l === it.l);
-  const b = el("button", "btn sm", sv ? "✓ Saved · tap to remove" : "🔖 Save for later"); b.type = "button"; b.style.marginTop = "6px";
-  b.onclick = () => toggleSave(it, kind); r.appendChild(b);
+  const more = el("button", "btn sm", "Read more"); more.type = "button";
+  more.onclick = () => { const open = det.style.display === "none"; det.style.display = open ? "block" : "none"; more.textContent = open ? "Show less" : "Read more"; };
+  const sb = el("button", "btn sm", sv ? "✓ Saved · remove" : "🔖 Save for later"); sb.type = "button"; sb.onclick = () => toggleSave(it, kind);
+  const sh = el("button", "btn sm", "Share"); sh.type = "button"; sh.onclick = () => shareItem(it);
+  const src = el("a", "btn sm", "Open source"); src.href = it.l; src.target = "_blank"; src.rel = "noopener";
+  bar.appendChild(more); bar.appendChild(sb); bar.appendChild(sh); bar.appendChild(src); r.appendChild(bar);
   return r;
 }
 function newsGroup(title, stamp, list, kind){
