@@ -605,32 +605,53 @@ function motivationBar(){
   return b;
 }
 
-/* ---------- news for health and jobs (general reading, refreshed with the site) ---------- */
-function newsRow(it){
+/* ---------- news for health and jobs: save for later (kept on this phone) ---------- */
+const savedAll = () => store.get("saved", []);
+function toggleSave(it, kind){
+  const s = savedAll(), i = s.findIndex(x => x.l === it.l);
+  if (i >= 0) s.splice(i, 1); else s.unshift({ t: it.t, l: it.l, s: it.s || "", a: it.a || "", k: kind, ts: Date.now() });
+  store.set("saved", s.slice(0, 200)); render();
+}
+function newsRow(it, kind){
   const r = el("div", "pad"); r.style.cssText = "padding:8px 16px;border-top:1px solid var(--line)";
   r.appendChild(el("div", "label", (it.a || "News") + " · " + (it.s || "")));
   const a = el("a", "", it.t); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
   a.style.cssText = "font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;line-height:1.35;display:block;margin-top:4px"; r.appendChild(a);
+  const sv = savedAll().some(x => x.l === it.l);
+  const b = el("button", "btn sm", sv ? "✓ Saved · tap to remove" : "🔖 Save for later"); b.type = "button"; b.style.marginTop = "6px";
+  b.onclick = () => toggleSave(it, kind); r.appendChild(b);
   return r;
 }
-function newsGroup(title, stamp, list){
+function newsGroup(title, stamp, list, kind){
   const g = grp(title, stamp), p = el("div", "pad"); p.style.gap = "0"; p.style.padding = "0";
   if (!list || !list.length) p.appendChild(el("div", "empty", "Fresh stories arrive with the next update."));
-  list && list.slice(0, 15).forEach(it => p.appendChild(newsRow(it)));
+  list && list.slice(0, 15).forEach(it => p.appendChild(newsRow(it, kind)));
   g.appendChild(p); return g;
 }
-function healthNews(){ return [newsGroup("Latest health news", "medicine, sinus, CPAP, AFib, gym, diet, stress", (X && X.health_news) || [])]; }
+function savedGroup(kind){
+  const items = savedAll().filter(x => x.k === kind);
+  if (!items.length) return null;
+  const g = grp("Read later", items.length + " saved"), p = el("div", "pad"); p.style.gap = "0"; p.style.padding = "0";
+  items.forEach(it => p.appendChild(newsRow(it, kind))); g.appendChild(p); return g;
+}
+function healthNews(){
+  const out = [], sg = savedGroup("health");
+  if (sg) out.push(sg);
+  out.push(newsGroup("Latest health news", "medicine, sinus, CPAP, AFib, gym, diet, stress", (X && X.health_news) || [], "health"));
+  return out;
+}
 function careersNews(){
-  return [
-    healthCard("Job search best practices", "recruiter tips", [
-      "Tailor each application to three keywords from the posting, and quantify results with numbers.",
-      "Follow up within 3 to 5 business days, with one specific point from your conversation.",
-      "Referrals get more attention. Ask two people in your network for an introduction each week.",
-      "Prepare three stories with measurable results: a win, a hard problem, and a mistake you learned from.",
-      "Track applications weekly: role, date, contact, next step. Review the numbers every Friday.",
-      "Keep your LinkedIn headline current with the outcomes you deliver, not only your title."]),
-    newsGroup("Job market news", "Canada and North America", (X && X.careers_news) || [])
-  ];
+  const out = [], sg = savedGroup("jobs");
+  if (sg) out.push(sg);
+  out.push(healthCard("Job search best practices", "recruiter tips", [
+    "Tailor each application to three keywords from the posting, and quantify results with numbers.",
+    "Follow up within 3 to 5 business days, with one specific point from your conversation.",
+    "Referrals get more attention. Ask two people in your network for an introduction each week.",
+    "Prepare three stories with measurable results: a win, a hard problem, and a mistake you learned from.",
+    "Track applications weekly: role, date, contact, next step. Review the numbers every Friday.",
+    "Keep your LinkedIn headline current with the outcomes you deliver, not only your title."]));
+  out.push(newsGroup("Job market news", "Canada and North America", (X && X.careers_news) || [], "jobs"));
+  return out;
 }
 
 /* ---------- HEALTH habits: daily advice with the reason behind it, streaks and motivation ---------- */
