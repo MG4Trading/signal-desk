@@ -326,9 +326,9 @@ function viewToday(){
   const wg = grp("This week", "daily score"), wp = el("div", "pad"), wkb = el("div", "week");
   for (let i = 6; i >= 0; i--){ const o = store.get("d:" + dkey(-i), null), s = o ? (i === 0 ? score(D) : (o.score || 0)) : 0, c = el("div"); const bb = el("i"); bb.style.height = Math.max(3, s * 0.36) + "px"; bb.style.opacity = i ? ".55" : "1"; c.appendChild(bb); c.appendChild(document.createTextNode(new Date(Date.now() - i * 864e5).toLocaleDateString("en-CA", { weekday:"narrow" }))); wkb.appendChild(c); }
   wp.appendChild(wkb);
-  const fold = el("details", "fold"); fold.appendChild(el("summary", "", "🥗 Fat-loss rhythm · 2 meals + 1 snack"));
-  [["Meal 1", "After the gym: eggs, ful or Greek yogurt with oats. About 40 g protein."], ["Snack", "3–4 p.m.: Greek yogurt, tuna, boiled eggs or labneh, plus fruit or a few nuts."], ["Meal 2", "Around Maghrib: half the plate vegetables, a palm of protein, a fist of carbs (fewer on rest days)."], ["Rules", "Protein at every meal, whole foods, no whey, kitchen closed after Isha, 7+ hours of sleep."]]
-    .forEach(([k, v]) => { const r = el("div", "note"); r.style.padding = "4px 0"; const bb = el("b", "", k + ": "); bb.style.color = "var(--ink)"; r.appendChild(bb); r.appendChild(document.createTextNode(v)); fold.appendChild(r); });
+  const fold = el("details", "fold"); fold.appendChild(el("summary", "", "🥗 Fuel rhythm"));
+  const fuel = (S().fuel || "").split("\n").map(x => x.trim()).filter(Boolean);
+  (fuel.length ? fuel : ["Protein at every meal, whole foods, vegetables first. Sleep 7 or more hours.", "Add your own meal rhythm in Settings. It stays on this phone."]).forEach(v => { const r = el("div", "note"); r.style.padding = "4px 0"; r.textContent = v; fold.appendChild(r); });
   const adh = el("details", "fold"); adh.appendChild(el("summary", "", "🕋 Morning and evening adhkar"));
   [["آية الكرسي", "Ayat al-Kursi · ×1"], ["قل هو الله أحد، والمعوذتين", "Al-Ikhlas, Al-Falaq, An-Nas · ×3"], ["سبحان الله وبحمده", "SubhanAllah wa bihamdih · ×100"], ["لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير", "La ilaha illallah wahdahu... · ×10"], ["أستغفر الله وأتوب إليه", "Astaghfirullah wa atubu ilayh · ×100"], ["أعوذ بكلمات الله التامات من شر ما خلق", "Evening: A'udhu bi kalimatillah... · ×3"]]
     .forEach(([a, e]) => { const r = el("div", ""); r.style.cssText = "padding:6px 0;border-top:1px dashed var(--line)"; r.appendChild(el("div", "ar", a)); r.appendChild(el("div", "note", e)); adh.appendChild(r); });
@@ -564,6 +564,7 @@ function settings(b){
   const st = ST || {}; b.appendChild(el("div", "note", "Passcode secret " + (st.key ? "✓" : "✗ not set") + " · Calendar link " + (st.cal ? (st.cal_ok === false ? "⚠︎ check the link" : "✓") : "✗ not set") + " · Target jobs " + (st.jobs ? "✓" : "✗")));
   b.appendChild(el("span", "label", "iPhone Reminders shortcut name"));
   const sc = el("input", "inp"); sc.value = s.shortcut; sc.onchange = () => setS({ shortcut:sc.value.trim() || "Focus Reminder" }); b.appendChild(sc);
+  b.appendChild(el("span", "label", "My meal rhythm (stays on this phone)")); const fx = el("textarea", "inp"); fx.rows = 4; fx.value = S().fuel || ""; fx.placeholder = "One line per meal"; fx.onchange = () => setS({ fuel: fx.value.trim() }); b.appendChild(fx);
   const how = el("details", "fold"); how.appendChild(el("summary", "", "How to create the Reminders shortcut (2 minutes)"));
   const ol = el("ol", "steps"); ["Open the Shortcuts app and tap + to make a new shortcut. Name it “Focus Reminder”.", "Add “Split Text”. Set it to split the Shortcut Input by Custom: “ | ” (space, bar, space).", "Add “Get Item from List” → First Item. Then add another “Get Item from List” → Last Item.", "Add “Add New Reminder”. Title = the first item. Tap Show More, turn on Remind Me, choose At Time and set it to the last item.", "Tap Done. Now tap ⏰ anywhere in Focus to test it: Top 3 and plan items remind you at their block, ideas at 9 a.m. tomorrow, job actions in an hour."].forEach(t => ol.appendChild(el("li", "", t)));
   how.appendChild(ol); b.appendChild(how);
