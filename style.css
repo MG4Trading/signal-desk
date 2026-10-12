@@ -86,3 +86,38 @@ button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible{o
 
 footer{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;padding-top:4px}
 @media (prefers-reduced-motion:reduce){.refresh.spin svg{animation:none}}
+/* ONE Hub: briefings and economy */
+.lead{background:var(--ink);color:var(--bg);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.lead .label{color:inherit;opacity:.7}
+.lead h2{font-family:var(--display);font-stretch:82%;font-weight:800;font-size:24px;line-height:1.15;margin:0;text-wrap:balance}
+.lead p{margin:0;opacity:.88}
+.lead button{align-self:flex-start;background:transparent;border:1px solid currentColor;border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;color:inherit;min-height:40px;cursor:pointer}
+.bhead{border-radius:14px}
+.bcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.bcard summary{list-style:none;padding:14px 16px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bcard summary::-webkit-details-marker{display:none}
+.bcard h4{font-family:var(--display);font-stretch:85%;font-weight:700;font-size:19px;line-height:1.2;margin:0;text-wrap:balance}
+.bsum{margin:0}
+.bmore{font-size:12px;color:var(--muted)}
+.bcard[open] .bmore{display:none}
+.bbody{padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line)}
+.bblock{display:flex;flex-direction:column;gap:4px}
+.bblock p{margin:0}
+.bblock.angle{background:var(--accent-soft);border-radius:10px;padding:12px}
+.bsrc{color:var(--accent);font-weight:500;text-decoration:none;overflow-wrap:anywhere}
+.players{display:flex;flex-wrap:wrap;gap:6px}
+.players span{font-size:13px;background:var(--surface-2);border-radius:6px;padding:3px 8px}
+.opp{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.dots{display:inline-flex;gap:3px}
+.dots i{width:8px;height:8px;border-radius:2px;background:var(--surface-2)}
+.dots i.on{background:var(--accent)}
+.kcard{display:flex;flex-direction:column;gap:3px;padding:12px 16px;border-top:1px solid var(--line);min-width:0}
+.group-head + .kcard{border-top:0}
+.kname{font-size:13px;color:var(--muted)}
+.kval{font-family:var(--mono);font-size:20px;font-weight:500;font-variant-numeric:tabular-nums}
+.kval.todo{font-family:var(--body);font-size:14px;font-weight:600;color:var(--amber)}
+.ktrend{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.kmeta{font-size:12px;color:var(--muted);margin:0}
+.kmeta a{color:var(--accent);font-weight:500;text-decoration:none}
+.kgo{align-self:flex-start;border:0;background:transparent;color:var(--accent);font:inherit;font-size:13px;font-weight:600;padding:4px 0;cursor:pointer}
+.kval.live{font-family:var(--body);font-size:14px;font-weight:600;color:var(--accent)}

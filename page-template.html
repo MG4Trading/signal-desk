@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Signal Desk</title>
-<meta name="description" content="Oakville weather, GO trains, markets and news for the family.">
+<title>ONE Hub</title>
+<meta name="description" content="ONE Hub: Oakville weather, prayer, GO trains, briefings, economy, markets and news for the family.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Signal Desk">
+<meta name="apple-mobile-web-app-title" content="ONE Hub">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#0B7A84">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -172,7 +172,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
   <header class="bar">
     <div class="bar-row">
       <div>
-        <div class="brand">Signal<span>Desk</span></div>
+        <div class="brand">ONE<span>Hub</span></div>
         <div class="stamp" id="stamp">Loading…</div>
       </div>
       <div class="topbtns">
@@ -244,10 +244,11 @@ const store = { get(k, d){ try { const v = localStorage.getItem("sd:" + k); retu
 const TRAVEL = ["GO alerts", "Accidents", "Traffic", "Road closures", "GO Transit", "Transit"];
 let X = null, faithLang = store.get("faithLang", "both"), kLang = store.get("kLang", "en"), kServ = store.get("kServ", 4), kPick = null, podTab = "ca", surahAll = false;
 let angle = "all", wxTab = store.get("wxTab", "today");
+let B = null, K = null, ecoRegion = store.get("ecoRegion", "canada"), bTopic = "all";
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
-function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer" }]; (D ? D.topics : []).filter(t => !t.in_markets && t.id !== "homes").forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "markets", name: "Markets" }); return s; }
+function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer" }, { id: "briefings", name: "Briefings" }]; (D ? D.topics : []).filter(t => !t.in_markets && t.id !== "homes").forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "economy", name: "Economy" }); s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
 
 function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
@@ -258,6 +259,7 @@ async function load(force){
     const r = await fetch("data.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 60000)), { cache: "no-store" });
     if (!r.ok) throw new Error(r.status);
     D = await r.json();
+    try { const [rb, rk] = await Promise.all([fetch("briefings.json?t=" + Math.floor(Date.now() / 600000), { cache: "no-store" }), fetch("kpis.json?t=" + Math.floor(Date.now() / 600000), { cache: "no-store" })]); if (rb.ok) B = await rb.json(); if (rk.ok) K = await rk.json(); } catch(_) {}
     try { const r2 = await fetch("extras.json?t=" + (force ? Date.now() : Math.floor(Date.now() / 600000)), { cache: "no-store" }); if (r2.ok) X = await r2.json(); } catch(_) {}
     render();
     if (force) toast(before && D.generated === before ? "Already the latest · updated " + ago(D.generated) : "Updated · " + ago(D.generated));
@@ -1145,6 +1147,7 @@ function render(){
     add(myLinksRow());
     if (visible("weather")) add(weatherCard(false));
     if (visible("faith")) add(faithMini());
+    if (visible("briefings")) add(briefingLead());
     if (visible("kitchen")) add(kitchenMini());
     if (visible("oakville")) add(goCard());
     if (visible("oakville")) add(gasCard(true));
@@ -1157,6 +1160,8 @@ function render(){
     });
   } else if (view === "weather") add(weatherCard(true));
   else if (view === "faith"){ add(prayerCard(true)); add(ayahCard()); }
+  else if (view === "briefings"){ briefingsView().forEach(add); }
+  else if (view === "economy"){ economyView().forEach(add); }
   else if (view === "kitchen"){ add(kitchenView()); }
   else if (view === "fun"){ funView().forEach(add); }
   else if (view === "grow"){ growView().forEach(add); }
@@ -1179,6 +1184,81 @@ function render(){
     else if (t.id !== "homes") add(linksGroup(t, "Links"));
     if (t.id === "oakville" && angle === "all"){ const hm = topic("homes"); if (hm && D.rentals){ add(homesCard(false)); add(linksGroup(hm, "Search home listings")); } }
   }
+}
+
+/* ---------- briefings and economy (deep briefings written by the daily sweep) ---------- */
+function bDate(iso){ if (!iso) return ""; const d = new Date(iso.length === 10 ? iso + "T12:00:00" : iso); return isNaN(d) ? iso : d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }); }
+function bDots(n){ const w = el("span", "opp"); w.title = "Opportunity " + n + " of 5"; const d = el("span", "dots"); for (let i = 1; i <= 5; i++){ const x = el("i"); if (i <= n) x.className = "on"; d.appendChild(x); } w.appendChild(d); w.appendChild(document.createTextNode(n + "/5")); return w; }
+function bItems(){ return (B && Array.isArray(B.items)) ? B.items.slice().sort((a, b) => String(b.publishedDate).localeCompare(String(a.publishedDate)) || String(b.addedAt).localeCompare(String(a.addedAt))) : []; }
+function briefCard(b){
+  const det = el("details", "bcard"); det.id = "brief-" + b.id;
+  const s = el("summary");
+  const m = el("div", "hl-meta");
+  m.appendChild(el("span", "tag", (b.topic || "General") + (b.category ? " · " + b.category : "")));
+  if (b.breaking) m.appendChild(el("span", "new", "Breaking"));
+  m.appendChild(el("span", "", bDate(b.publishedDate)));
+  m.appendChild(bDots(Number(b.opportunity) || 0));
+  s.appendChild(m);
+  s.appendChild(el("h4", "", b.headline));
+  s.appendChild(el("p", "bsum", b.summary));
+  s.appendChild(el("span", "bmore", "Tap for the full briefing"));
+  det.appendChild(s);
+  const body = el("div", "bbody");
+  const blk = (label, text, cls) => { if (!text) return; const d = el("div", "bblock" + (cls ? " " + cls : "")); d.appendChild(el("span", "label", label)); d.appendChild(el("p", "", text)); body.appendChild(d); };
+  blk("Context", b.context); blk("Why it matters", b.whyItMatters); blk("Your move", b.salesAngle, "angle");
+  if (Array.isArray(b.keyPlayers) && b.keyPlayers.length){ const d = el("div", "bblock"); d.appendChild(el("span", "label", "Key players")); const p = el("div", "players"); b.keyPlayers.forEach(k => p.appendChild(el("span", "", k))); d.appendChild(p); body.appendChild(d); }
+  if (Array.isArray(b.sources) && b.sources.length){ const d = el("div", "bblock"); d.appendChild(el("span", "label", "Sources")); b.sources.forEach(src => { if (!src || !/^https:\/\//.test(src.url || "")) return; const a = el("a", "bsrc", (src.title || src.url) + " ↗"); a.href = src.url; a.target = "_blank"; a.rel = "noopener"; d.appendChild(a); }); body.appendChild(d); }
+  det.appendChild(body);
+  return det;
+}
+function briefingLead(){
+  const items = bItems(); if (!items.length) return null;
+  const top = items.slice(0, 12).sort((a, b) => (b.breaking ? 1 : 0) - (a.breaking ? 1 : 0) || (Number(b.opportunity) || 0) - (Number(a.opportunity) || 0) || String(b.publishedDate).localeCompare(String(a.publishedDate)))[0];
+  const box = el("div", "lead");
+  box.appendChild(el("span", "label", "Top signal · " + (top.topic || "") + " · " + bDate(top.publishedDate)));
+  box.appendChild(el("h2", "", top.headline));
+  box.appendChild(el("p", "", top.salesAngle || top.summary));
+  const btn = el("button", "", "All briefings"); btn.type = "button";
+  btn.onclick = () => { view = "briefings"; store.set("view", view); render(); window.scrollTo({ top: 0 }); };
+  box.appendChild(btn);
+  return box;
+}
+function briefingsView(){
+  const out = [], items = bItems();
+  if (!items.length){ out.push(el("div", "empty", "No briefings yet. They arrive with the daily deep sweep.")); return out; }
+  const topics = [...new Set(items.map(b => b.topic || "General"))];
+  const sub = el("div", "subrail");
+  ["all", ...topics].forEach(t => { const b = el("button", "chip", t === "all" ? "Everything" : t); b.type = "button"; b.setAttribute("aria-pressed", String(bTopic === t)); b.onclick = () => { bTopic = t; render(); }; sub.appendChild(b); });
+  if (bTopic !== "all" && !topics.includes(bTopic)) bTopic = "all";
+  out.push(sub);
+  const lead = bTopic === "all" ? briefingLead() : null; if (lead){ lead.querySelector("button").remove(); out.push(lead); }
+  const head = el("div", "group-head bhead"); head.appendChild(el("strong", "", bTopic === "all" ? "Deep briefings" : bTopic)); head.appendChild(el("span", "stamp", (B && B.updated ? "Updated " + bDate(B.updated) : "")));
+  out.push(head);
+  items.filter(b => bTopic === "all" || (b.topic || "General") === bTopic).forEach(b => out.push(briefCard(b)));
+  return out;
+}
+function economyView(){
+  const out = [];
+  if (!K || !Array.isArray(K.regions)){ out.push(el("div", "empty", "Economic indicators load with the next update.")); return out; }
+  const sub = el("div", "subrail");
+  K.regions.forEach(r => { const b = el("button", "chip", r.name); b.type = "button"; b.setAttribute("aria-pressed", String(ecoRegion === r.id)); b.onclick = () => { ecoRegion = r.id; store.set("ecoRegion", r.id); render(); }; sub.appendChild(b); });
+  out.push(sub);
+  const r = K.regions.find(x => x.id === ecoRegion) || K.regions[0];
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", r.name + " economic KPIs")); head.appendChild(el("span", "stamp", K.updated ? "Checked " + bDate(K.updated) : "")); g.appendChild(head);
+  r.kpis.forEach(k => {
+    const c = el("div", "kcard");
+    c.appendChild(el("span", "kname", k.name));
+    c.appendChild(el("span", k.value ? "kval" : (k.link ? "kval live" : "kval todo"), k.value || (k.link ? "Live" : "To source")));
+    if (k.trend) c.appendChild(el("span", "ktrend", k.trend));
+    if (k.url){ const m = el("p", "kmeta"); m.appendChild(document.createTextNode("Source: ")); const a = el("a", "", k.source || "Link"); a.href = k.url; a.target = "_blank"; a.rel = "noopener"; m.appendChild(a); if (k.asof) m.appendChild(document.createTextNode(" · " + k.asof)); c.appendChild(m); }
+    if (k.note) c.appendChild(el("p", "kmeta", k.note));
+    if (k.link && sections().some(s => s.id === k.link)){ const b = el("button", "kgo", "Open " + (sections().find(s => s.id === k.link) || {}).name + " →"); b.type = "button"; b.onclick = () => { view = k.link; store.set("view", view); render(); window.scrollTo({ top: 0 }); }; c.appendChild(b); }
+    g.appendChild(c);
+  });
+  out.push(g);
+  if (K.note) out.push(el("p", "gonote", K.note));
+  return out;
 }
 
 /* ---------- settings ---------- */

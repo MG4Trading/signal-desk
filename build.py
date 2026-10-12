@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Signal Desk updater.
+"""ONE Hub (formerly Signal Desk) updater.
 
 Runs about every 10 minutes on GitHub Actions (see loop.sh). Gathers news, markets, weather and
 Environment Canada warnings, writes site/data.json, and sends push alerts
@@ -1337,7 +1337,7 @@ def main():
                 .replace("__TOPIC__", cfg["alerts"].get("ntfy_topic", "")))
     with open(os.path.join(SITE, "index.html"), "w", encoding="utf-8") as f:
         f.write(page)
-    for name in ("manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png", "apple-touch-icon.png"):
+    for name in ("manifest.webmanifest", "sw.js", "icon-192.png", "icon-512.png", "apple-touch-icon.png", "briefings.json", "kpis.json"):
         src = os.path.join(ROOT, name)
         if os.path.exists(src):
             shutil.copy(src, os.path.join(SITE, name))

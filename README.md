@@ -1,8 +1,8 @@
-# Signal Desk
+# ONE Hub (formerly Signal Desk)
 
 Family dashboard for Oakville, Ontario: weather (today and 7 days) with what to wear, Environment Canada
 warnings, the GO Lakeshore West schedule, markets, 3-bed homes for rent with a daily price trend,
-upcoming events in Oakville, Mississauga and the GTA, and headlines for Oakville, Ontario, Canada,
+upcoming events in Oakville, Mississauga and the GTA, deep briefings (briefings.json), an economy board (kpis.json), and headlines for Oakville, Ontario, Canada,
 Egypt, the Gulf, the USA and the world.
 
 - It refreshes itself about every 10 minutes (`loop.sh`, started by `.github/workflows/update.yml`).
