@@ -565,6 +565,8 @@ function settings(b){
   b.appendChild(el("span", "label", "iPhone Reminders shortcut name"));
   const sc = el("input", "inp"); sc.value = s.shortcut; sc.onchange = () => setS({ shortcut:sc.value.trim() || "Focus Reminder" }); b.appendChild(sc);
   b.appendChild(el("span", "label", "My meal rhythm (stays on this phone)")); const fx = el("textarea", "inp"); fx.rows = 4; fx.value = S().fuel || ""; fx.placeholder = "One line per meal"; fx.onchange = () => setS({ fuel: fx.value.trim() }); b.appendChild(fx);
+  b.appendChild(el("span", "label", "Daily health reminder time")); const ht = el("input", "inp"); ht.type = "time"; ht.value = pad(Math.floor(healthAt() / 60)) + ":" + pad(healthAt() % 60);
+  ht.onchange = () => { const p2 = ht.value.split(":").map(Number); setS({ healthAt: p2[0] * 60 + p2[1] }); }; b.appendChild(ht);
   const how = el("details", "fold"); how.appendChild(el("summary", "", "How to create the Reminders shortcut (2 minutes)"));
   const ol = el("ol", "steps"); ["Open the Shortcuts app and tap + to make a new shortcut. Name it “Focus Reminder”.", "Add “Split Text”. Set it to split the Shortcut Input by Custom: “ | ” (space, bar, space).", "Add “Get Item from List” → First Item. Then add another “Get Item from List” → Last Item.", "Add “Add New Reminder”. Title = the first item. Tap Show More, turn on Remind Me, choose At Time and set it to the last item.", "Tap Done. Now tap ⏰ anywhere in Focus to test it: Top 3 and plan items remind you at their block, ideas at 9 a.m. tomorrow, job actions in an hour."].forEach(t => ol.appendChild(el("li", "", t)));
   how.appendChild(ol); b.appendChild(how);
@@ -589,6 +591,20 @@ $("#setBtn").onclick = () => openSheet(settings);
 function healthDay(off){ return store.get("h:" + dkey(off || 0), {}); }
 function healthSave(off, o){ store.set("h:" + dkey(off || 0), o); }
 function healthCard(title, stamp, lines){ const g = grp(title, stamp), p = el("div", "pad"); lines.forEach(x => p.appendChild(el("div", "note", x))); g.appendChild(p); return g; }
+/* ---------- daily motivation + in-app health reminder ---------- */
+function healthAt(){ const v = S().healthAt; return v == null ? 450 : v; }
+function motivationBar(){
+  const b = el("div", "pad"); b.style.paddingBottom = "0";
+  b.appendChild(el("div", "note", "🌱 " + HMOT[hDayNo() % HMOT.length]));
+  const ad = HADV[hDayNo() % HADV.length];
+  if (!healthDay(0).adv && nowMin() >= healthAt()){
+    const r = el("button", "hl", "⏰ Today's health advice is ready: " + ad.t + " · open"); r.type = "button";
+    r.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer;width:100%;padding:0";
+    r.onclick = () => go("health"); b.appendChild(r);
+  }
+  return b;
+}
+
 /* ---------- HEALTH habits: daily advice with the reason behind it, streaks and motivation ---------- */
 const HADV = [
   { t:"Keep a fixed wake time", w:"A steady wake time sets your body clock, which makes sleep easier to start and keeps appetite steadier.", a:"Choose one wake time and keep it for 7 days." },
@@ -628,6 +644,7 @@ function viewHealth(){
   const adone = !!healthDay(0).adv, adb = el("button", "item" + (adone ? " on" : "")); adb.type = "button";
   adb.appendChild(el("span", "chk" + (adone ? " on" : ""), adone ? "✓" : "")); adb.appendChild(el("span", "", "Done today"));
   adb.onclick = () => { const o = healthDay(0); o.adv = !o.adv; healthSave(0, o); render(); }; avp.appendChild(adb);
+  const rl = el("a", "btn sm", "⏰ Add to iPhone Reminders at " + hm(healthAt())); rl.href = remLink(ad.t, healthAt()); avp.appendChild(rl);
   avp.appendChild(el("div", "note", HMOT[hDayNo() % HMOT.length]));
   agv.appendChild(avp); out.push(agv);
   out.push(healthCard("How habits stick", "the logic", [
@@ -693,7 +710,7 @@ function render(){
   pending = false; _bc = null;
   if (tab === "ideas") tab = "inbox"; document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
   header();
-  const m = $("#main"); m.textContent = "";
+  const m = $("#main"); m.textContent = ""; m.appendChild(motivationBar());
   (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs() : tab === "health" ? viewHealth() : viewToday()).forEach(n => n && m.appendChild(n));
   tick();
 }
