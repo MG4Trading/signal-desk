@@ -589,14 +589,56 @@ $("#setBtn").onclick = () => openSheet(settings);
 function healthDay(off){ return store.get("h:" + dkey(off || 0), {}); }
 function healthSave(off, o){ store.set("h:" + dkey(off || 0), o); }
 function healthCard(title, stamp, lines){ const g = grp(title, stamp), p = el("div", "pad"); lines.forEach(x => p.appendChild(el("div", "note", x))); g.appendChild(p); return g; }
+/* ---------- HEALTH habits: daily advice with the reason behind it, streaks and motivation ---------- */
+const HADV = [
+  { t:"Keep a fixed wake time", w:"A steady wake time sets your body clock, which makes sleep easier to start and keeps appetite steadier.", a:"Choose one wake time and keep it for 7 days." },
+  { t:"Drink a glass of water on waking", w:"You lose fluid overnight. Dehydration makes the throat drier and can make the heart feel fast.", a:"Fill a 1 litre bottle and finish it by lunch." },
+  { t:"Walk for 10 minutes after your biggest meal", w:"A short walk after eating helps blood sugar settle, which supports fat loss and steadier energy.", a:"Walk after dinner tonight." },
+  { t:"Protein first at each meal", w:"Protein keeps you full for longer and protects muscle while you lose fat.", a:"Eat the protein before the carbs at your next meal." },
+  { t:"Saline rinse at the same time each day", w:"A fixed time makes the habit automatic. The rinse clears mucus and irritants every day, not only when you feel blocked.", a:"Do the rinse right after brushing your teeth." },
+  { t:"Caffeine cut-off by early afternoon", w:"Caffeine stays in the body for hours. It can disturb sleep and push up heart rate at night.", a:"Swap the afternoon coffee for water or herbal tea." },
+  { t:"Two minutes of slow breathing", w:"Breathing slowly, with a longer out-breath, lowers heart rate and stress hormones within minutes.", a:"Breathe in for 4 counts and out for 6, for 2 minutes." },
+  { t:"Move a big muscle group", w:"Large muscles use the most energy, and strength work shapes your body more than cardio alone.", a:"Do 10 squats or a 10-minute strength circuit." },
+  { t:"Phone out of the bedroom", w:"Light and stimulation from screens delay sleep, and sleep is where recovery and appetite control happen.", a:"Charge the phone in another room tonight." },
+  { t:"Finish dinner 2 to 3 hours before bed", w:"Lying down after a meal lets stomach acid rise. That can cause morning phlegm and throat irritation.", a:"Eat dinner earlier tonight." }
+];
+const HMOT = [
+  "Small repeats beat a perfect week you never repeat.",
+  "You do not need more motivation. You need the next small action.",
+  "Missed a day? Make the next choice the right one.",
+  "Consistency is a skill. Practise it on the boring days.",
+  "Your body responds to what you repeat, not to what you intend.",
+  "Track it, do not judge it. The data tells you what to try next.",
+  "Start with the two-minute version. Momentum does the rest.",
+  "Progress shows in the trend, not in one morning.",
+  "Sleep, water and walking first. Everything else gets easier.",
+  "You are building a routine your future self will thank you for."
+];
+const hDayNo = () => Math.floor(Date.now() / 864e5);
+function healthStreak(k){ let s = 0, miss = 0; for (let i = 0; i < 90; i++){ const o = healthDay(-i); if (i === 0 && !o[k]) continue; if (o[k]){ s++; miss = 0; } else { miss++; if (miss > 1) break; } } return s; }
+
 function viewHealth(){
   const out = [], H = healthDay(0);
   const sg = grp("Know when to get help", "general information, not medical advice");
   const sp = el("div", "pad"); sp.appendChild(el("div", "note", "Call 911 or go to the nearest emergency department for chest pain or pressure, fainting, severe trouble breathing, or a racing heartbeat with dizziness, confusion or weakness. Book a visit with your family doctor the same week for new or worsening symptoms. Your doctor's advice comes first.")); sg.appendChild(sp); out.push(sg);
+  const ad = HADV[hDayNo() % HADV.length], agv = grp("Today's advice", "one small thing · changes daily"), avp = el("div", "pad");
+  avp.appendChild(el("strong", "", ad.t));
+  avp.appendChild(el("div", "note", "Why it works: " + ad.w));
+  avp.appendChild(el("div", "note", "Do it today: " + ad.a));
+  const adone = !!healthDay(0).adv, adb = el("button", "item" + (adone ? " on" : "")); adb.type = "button";
+  adb.appendChild(el("span", "chk" + (adone ? " on" : ""), adone ? "✓" : "")); adb.appendChild(el("span", "", "Done today"));
+  adb.onclick = () => { const o = healthDay(0); o.adv = !o.adv; healthSave(0, o); render(); }; avp.appendChild(adb);
+  avp.appendChild(el("div", "note", HMOT[hDayNo() % HMOT.length]));
+  agv.appendChild(avp); out.push(agv);
+  out.push(healthCard("How habits stick", "the logic", [
+    "Cue, action, reward: attach the new habit to something you already do, like the rinse after brushing your teeth.",
+    "Start small: the two-minute version counts. Do it on bad days too.",
+    "Track every day. What gets measured gets repeated.",
+    "One missed day does not break your streak. Two in a row is where the pattern slips, so restart the next morning."]));
   const ck = grp("Today's health check", "saved on this phone only"), cp = el("div", "pad");
   [["cpap", "CPAP used all night"], ["rinse", "Saline sinus rinse"], ["water", "About 2 litres of water"], ["walk", "20+ minute walk"], ["lift", "Strength training"]].forEach(([k, l]) => {
     const on = !!H[k]; const b = el("button", "item" + (on ? " on" : "")); b.type = "button";
-    b.appendChild(el("span", "chk" + (on ? " on" : ""), on ? "✓" : "")); b.appendChild(el("span", "", l));
+    b.appendChild(el("span", "chk" + (on ? " on" : ""), on ? "✓" : "")); b.appendChild(el("span", "", l + (healthStreak(k) > 1 ? "  · 🔥 " + healthStreak(k) : "")));
     b.onclick = () => { const o = healthDay(0); o[k] = !o[k]; healthSave(0, o); render(); }; cp.appendChild(b); });
   const row = el("div", "row"); row.style.flexWrap = "nowrap";
   const hr = el("input", "inp"); hr.type = "number"; hr.inputMode = "numeric"; hr.placeholder = "Resting heart rate (bpm)"; hr.value = H.hr || "";
