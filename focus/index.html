@@ -111,7 +111,7 @@ details summary::-webkit-details-marker{display:none}
 .fold summary{font-size:13px;font-weight:600;color:var(--accent);padding:8px 0;min-height:36px}
 .ar{font-family:"Amiri",serif;direction:rtl;font-size:19px;line-height:1.7}
 nav{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding:6px 0 calc(8px + env(safe-area-inset-bottom,0px))}
-nav .wrap{display:grid;grid-template-columns:repeat(3,1fr)}
+nav .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
 nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:600;color:var(--muted);min-height:50px;position:relative}
 nav button span{font-size:21px;line-height:1.1}
 nav button[aria-pressed="true"]{color:var(--accent)}
@@ -138,6 +138,7 @@ ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;f
   <button type="button" data-tab="today" aria-pressed="true"><span>🧭</span>Today</button>
   <button type="button" data-tab="inbox" aria-pressed="false"><span>📥</span>Inbox<i class="dot" id="ideaDot" hidden></i></button>
   <button type="button" data-tab="jobs" aria-pressed="false"><span>🎯</span>Target jobs<i class="dot" id="jobDot" hidden></i></button>
+  <button type="button" data-tab="health" aria-pressed="false"><span>🫀</span>Health</button>
 </div></nav>
 <div class="sheet" id="sheet" hidden><div id="sheetBody"></div></div>
 
@@ -583,6 +584,63 @@ function settings(b){
 function settings2(){ openSheet(settings); render(); }
 $("#setBtn").onclick = () => openSheet(settings);
 
+/* ---------- HEALTH: general guidance (public-safe) + private daily check kept on this phone only ---------- */
+function healthDay(off){ return store.get("h:" + dkey(off || 0), {}); }
+function healthSave(off, o){ store.set("h:" + dkey(off || 0), o); }
+function healthCard(title, stamp, lines){ const g = grp(title, stamp), p = el("div", "pad"); lines.forEach(x => p.appendChild(el("div", "note", x))); g.appendChild(p); return g; }
+function viewHealth(){
+  const out = [], H = healthDay(0);
+  const sg = grp("Know when to get help", "general information, not medical advice");
+  const sp = el("div", "pad"); sp.appendChild(el("div", "note", "Call 911 or go to the nearest emergency department for chest pain or pressure, fainting, severe trouble breathing, or a racing heartbeat with dizziness, confusion or weakness. Book a visit with your family doctor the same week for new or worsening symptoms. Your doctor's advice comes first.")); sg.appendChild(sp); out.push(sg);
+  const ck = grp("Today's health check", "saved on this phone only"), cp = el("div", "pad");
+  [["cpap", "CPAP used all night"], ["rinse", "Saline sinus rinse"], ["water", "About 2 litres of water"], ["walk", "20+ minute walk"], ["lift", "Strength training"]].forEach(([k, l]) => {
+    const on = !!H[k]; const b = el("button", "item" + (on ? " on" : "")); b.type = "button";
+    b.appendChild(el("span", "chk" + (on ? " on" : ""), on ? "✓" : "")); b.appendChild(el("span", "", l));
+    b.onclick = () => { const o = healthDay(0); o[k] = !o[k]; healthSave(0, o); render(); }; cp.appendChild(b); });
+  const row = el("div", "row"); row.style.flexWrap = "nowrap";
+  const hr = el("input", "inp"); hr.type = "number"; hr.inputMode = "numeric"; hr.placeholder = "Resting heart rate (bpm)"; hr.value = H.hr || "";
+  hr.onchange = () => { const o = healthDay(0); o.hr = hr.value ? Number(hr.value) : null; healthSave(0, o); render(); };
+  const sl = el("input", "inp"); sl.type = "number"; sl.inputMode = "decimal"; sl.placeholder = "Hours of sleep"; sl.value = H.sleep || "";
+  sl.onchange = () => { const o = healthDay(0); o.sleep = sl.value ? Number(sl.value) : null; healthSave(0, o); render(); };
+  row.appendChild(hr); row.appendChild(sl); cp.appendChild(row);
+  const hist = []; for (let i = 6; i >= 0; i--){ const o = healthDay(-i); hist.push(o.hr ? String(o.hr) : "–"); }
+  cp.appendChild(el("div", "note", "Resting heart rate, last 7 days: " + hist.join("  ·  ")));
+  ck.appendChild(cp); out.push(ck);
+  out.push(healthCard("Belly fat and gym", "steady, not extreme", [
+    "Belly fat responds best to a small daily calorie gap, enough protein and regular strength training. Crunches alone do not target belly fat.",
+    "Strength training 2 to 3 times a week using big movements: squat, hinge, push and pull. Add 20 to 30 minutes of brisk walking most days.",
+    "Protein at every meal, mostly whole foods, vegetables first. Keep sugary drinks and alcohol low.",
+    "Sleep 7 to 9 hours. Short sleep raises appetite and makes fat loss harder.",
+    "Measure your waist once a week, same time and place. Watch the trend, not single days."]));
+  out.push(healthCard("CPAP", "every night", [
+    "Use it every night, including naps. Consistent use is what protects your energy and heart.",
+    "Clean the mask cushion and tubing regularly, and replace parts on the schedule your supplier gives.",
+    "Use distilled water in the humidifier. Dry mouth, a stuffy nose or leaks are common and often fixed by a mask refit, humidity changes or a nasal spray. Tell your sleep provider rather than stopping therapy.",
+    "If you still feel tired after a full night, ask for a sleep clinic review."]));
+  out.push(healthCard("Chronic sinus and phlegm", "daily habits", [
+    "A daily saline rinse with distilled, boiled and cooled, or filtered water helps clear mucus and irritants.",
+    "Keep the air moist with a clean humidifier, drink water through the day, and avoid smoke and strong fumes.",
+    "Phlegm that sits in the throat, especially on waking or after meals, can come from reflux as well as the sinuses. Ask your doctor about it.",
+    "See your family doctor and ask for an ENT (ear, nose and throat) referral if symptoms last more than 12 weeks, keep coming back, or come with fever, facial swelling, a severe headache or vision changes."]));
+  out.push(healthCard("Fast or pounding heartbeat", "book a checkup", [
+    "Note your resting heart rate each morning, and when the fast beats happen: at rest, after caffeine, during exercise or at night.",
+    "Common triggers include caffeine, alcohol, nicotine, dehydration, poor sleep, stress and decongestant tablets. Ask a pharmacist before taking decongestants.",
+    "Ask your doctor about an ECG, blood tests (thyroid, electrolytes, blood count), a blood pressure check and, if needed, a heart rhythm monitor.",
+    "Untreated sleep apnea is linked to irregular heart rhythms, so steady CPAP use matters for this too."]));
+  const ask = store.get("h:ask", []), ag = grp("Questions for my next visit", ask.length ? ask.length + " saved" : "saved on this phone only"), ap = el("div", "pad");
+  if (!ask.length) ap.appendChild(el("div", "note", "For example: Do I need an ECG or heart monitor? Is my CPAP working well enough? Do my sinus symptoms need an ENT referral? Could my decongestants affect my heart rate?"));
+  ask.forEach((q, i) => { const r = el("div", "row"); r.style.flexWrap = "nowrap"; const t = el("span", "note", q); t.style.flex = "1"; r.appendChild(t);
+    const x = el("button", "btn sm", "Remove"); x.type = "button"; x.onclick = () => { const a = store.get("h:ask", []); a.splice(i, 1); store.set("h:ask", a); render(); }; r.appendChild(x); ap.appendChild(r); });
+  const add = el("div", "row"); add.style.flexWrap = "nowrap"; const qi = el("input", "inp"); qi.placeholder = "Add a question"; qi.enterKeyHint = "done";
+  const qb = el("button", "btn sm", "Add"); qb.type = "button";
+  qb.onclick = () => { const v = qi.value.trim(); if (!v) return; const a = store.get("h:ask", []); a.push(v); store.set("h:ask", a); render(); };
+  add.appendChild(qi); add.appendChild(qb); ap.appendChild(add); ag.appendChild(ap); out.push(ag);
+  const rg = grp("Trusted sources", "check these before changing treatment"), rp = el("div", "pad");
+  [["Canada.ca health information", "https://www.canada.ca/en/health-canada.html"], ["Heart & Stroke", "https://www.heartandstroke.ca"], ["Canadian Lung Association", "https://www.lung.ca"]].forEach(([l, u]) => { const a = el("a", "btn sm", l); a.href = u; a.target = "_blank"; a.rel = "noopener"; rp.appendChild(a); });
+  rg.appendChild(rp); out.push(rg);
+  return out;
+}
+
 /* ---------- shell ---------- */
 let tab = store.get("tab", "today");
 function go(t){ tab = t; store.set("tab", t); render(); window.scrollTo({ top:0 }); }
@@ -593,7 +651,7 @@ function render(){
   if (tab === "ideas") tab = "inbox"; document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
   header();
   const m = $("#main"); m.textContent = "";
-  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs() : viewToday()).forEach(n => n && m.appendChild(n));
+  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs() : tab === "health" ? viewHealth() : viewToday()).forEach(n => n && m.appendChild(n));
   tick();
 }
 let pending = false;
