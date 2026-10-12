@@ -612,15 +612,46 @@ def json_movies(country, genre, n=25):
     return out
 
 
+HEALTH_NEWS_TOPIC = {"id": "health_news", "gl": "CA", "hl": "en", "feeds": [
+    ["Medicine", "(new medication OR drug approval OR medication recall) (Health Canada OR FDA OR study)", "", "", "7d", "medic|drug|pharm|approv|recall", "quiz|sponsor|subscribe|webinar"],
+    ["Sinus", "(chronic sinusitis OR nasal spray OR sinus) (study OR research OR guideline)", "", "", "14d", "sinus|nasal|rhinit", "quiz|sponsor|subscribe|webinar"],
+    ["CPAP and sleep", "(sleep apnea OR CPAP) (study OR research OR guideline)", "", "", "14d", "sleep|apnea|cpap", "quiz|sponsor|subscribe|webinar"],
+    ["AFib and heart rhythm", "(atrial fibrillation OR AFib OR heart palpitations) (study OR guideline OR research)", "", "", "14d", "fibrillation|afib|heart|rhythm|palpit", "quiz|sponsor|subscribe|webinar"],
+    ["Gym and belly fat", "(strength training OR belly fat OR visceral fat) (study OR research)", "", "", "14d", "strength|fat|muscle|training|exercise|resistance", "quiz|sponsor|subscribe|webinar"],
+    ["Diet and eating", "(protein intake OR nutrition study OR gut health OR eating habits) (research OR study)", "", "", "14d", "protein|nutrition|diet|food|gut|fib|eat", "quiz|sponsor|subscribe|webinar"],
+    ["Stress and meditation", "(stress OR meditation OR mindfulness) (study OR research)", "", "", "14d", "stress|meditat|mindful|anxiety|calm|breath", "quiz|sponsor|subscribe|webinar"]
+]}
+CAREERS_NEWS_TOPIC = {"id": "careers_news", "gl": "CA", "hl": "en", "feeds": [
+    ["Job market", "(job market OR hiring trends OR job creation) (Canada OR Ontario OR \"North America\")", "CA", "en", "7d", "job|hir|employ|labour|labor|workforce|recruit", "layoff|webinar|sponsor"],
+    ["US hiring", "(job market OR hiring trends OR job creation) (United States OR \"North America\")", "US", "en", "7d", "job|hir|employ|labor|workforce|recruit", "layoff|webinar|sponsor"],
+    ["Recruiter tips", "(recruiter tips OR hiring managers OR job search advice) (Canada OR \"North America\")", "CA", "en", "14d", "recruit|hiring|job|interview|resume|application", "webinar|sponsor|subscribe"],
+    ["Motivation", "(job search motivation OR career resilience OR job search mindset)", "CA", "en", "14d", "job|career|search|motiv|resilien", "webinar|sponsor"],
+    ["Hiring companies", "(hiring OR jobs) (Samsara OR Clio OR Geotab OR Teradata OR Manulife OR Shopify OR Telus)", "CA", "en", "7d", "hir|job|expan|roles|recruit", "layoff|sponsor"],
+    ["Sales and revenue ops", "(sales operations OR revenue operations OR go-to-market) (hiring OR jobs OR roles) (Canada OR \"North America\")", "CA", "en", "14d", "sales|revenue|go-to-market|hir|job|role", "webinar|sponsor"],
+    ["Best practices", "(hiring best practices OR interview tips OR resume tips)", "US", "en", "14d", "hir|interview|resume|recruit|candidate", "webinar|sponsor|subscribe"]
+]}
+def gather_topic_news(topic, cap=40):
+    out, seen = [], set()
+    for f in topic["feeds"]:
+        try:
+            for it in fetch_feed(topic, f):
+                if it["l"] in seen:
+                    continue
+                seen.add(it["l"]); out.append(it)
+        except Exception as e:
+            log("news", topic["id"], f[0], e)
+    out.sort(key=lambda x: x["ts"], reverse=True)
+    return out[:cap]
+
 def gather_extras():
     prev = load_json(os.path.join(PREV, "extras.json"), {})
     today = datetime.now(TZ).strftime("%Y-%m-%d")
-    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5 and prev.get("inspire") and prev.get("inspire_v") == 3:
+    if prev.get("date") == today and prev.get("faith") and prev.get("prayer") and len((prev.get("foryou") or {}).get("today_ids") or []) >= 5 and prev.get("inspire") and prev.get("inspire_v") == 3 and prev.get("news_v") == 1:
         prev["content"] = load_json(os.path.join(ROOT, "extras-content.json"), prev.get("content") or {})
         return prev
     content = load_json(os.path.join(ROOT, "extras-content.json"), {})
     day_no = (datetime.now(TZ).date() - datetime(2026, 1, 1).date()).days
-    out = {"date": today, "generated": int(time.time()), "day_no": day_no, "inspire_v": 3}
+    out = {"date": today, "generated": int(time.time()), "day_no": day_no, "inspire_v": 3, "news_v": 1}
     for key, fn in (("prayer", gather_prayer), ("faith", lambda: gather_faith(day_no, content)),
                     ("podcasts_ca", lambda: gather_podcasts("ca")), ("podcasts_eg", lambda: gather_podcasts("eg")),
                     ("movies_action", lambda: gather_movies(4401)), ("movies_thriller", lambda: gather_movies(4416)),
@@ -640,6 +671,11 @@ def gather_extras():
         out["egypt_cinema"] = fetch_feed(feed, ["سينما", "فيلم مصري جديد OR أفلام السينما المصرية OR إيرادات السينما", "EG", "ar", "7d"])[:8]
     except Exception as e:
         log("egypt cinema", e); out["egypt_cinema"] = prev.get("egypt_cinema", [])
+    for key, topic in (("health_news", HEALTH_NEWS_TOPIC), ("careers_news", CAREERS_NEWS_TOPIC)):
+        try:
+            out[key] = gather_topic_news(topic)
+        except Exception as e:
+            log(key, e); out[key] = prev.get(key, [])
     out["content"] = content
     log("extras:", ", ".join(k for k in out if k not in ("date", "generated", "day_no")))
     return out

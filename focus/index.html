@@ -605,6 +605,34 @@ function motivationBar(){
   return b;
 }
 
+/* ---------- news for health and jobs (general reading, refreshed with the site) ---------- */
+function newsRow(it){
+  const r = el("div", "pad"); r.style.cssText = "padding:8px 16px;border-top:1px solid var(--line)";
+  r.appendChild(el("div", "label", (it.a || "News") + " · " + (it.s || "")));
+  const a = el("a", "", it.t); a.href = it.l; a.target = "_blank"; a.rel = "noopener";
+  a.style.cssText = "font-size:15px;font-weight:600;color:var(--ink);text-decoration:none;line-height:1.35;display:block;margin-top:4px"; r.appendChild(a);
+  return r;
+}
+function newsGroup(title, stamp, list){
+  const g = grp(title, stamp), p = el("div", "pad"); p.style.gap = "0"; p.style.padding = "0";
+  if (!list || !list.length) p.appendChild(el("div", "empty", "Fresh stories arrive with the next update."));
+  list && list.slice(0, 15).forEach(it => p.appendChild(newsRow(it)));
+  g.appendChild(p); return g;
+}
+function healthNews(){ return [newsGroup("Latest health news", "medicine, sinus, CPAP, AFib, gym, diet, stress", (X && X.health_news) || [])]; }
+function careersNews(){
+  return [
+    healthCard("Job search best practices", "recruiter tips", [
+      "Tailor each application to three keywords from the posting, and quantify results with numbers.",
+      "Follow up within 3 to 5 business days, with one specific point from your conversation.",
+      "Referrals get more attention. Ask two people in your network for an introduction each week.",
+      "Prepare three stories with measurable results: a win, a hard problem, and a mistake you learned from.",
+      "Track applications weekly: role, date, contact, next step. Review the numbers every Friday.",
+      "Keep your LinkedIn headline current with the outcomes you deliver, not only your title."]),
+    newsGroup("Job market news", "Canada and North America", (X && X.careers_news) || [])
+  ];
+}
+
 /* ---------- HEALTH habits: daily advice with the reason behind it, streaks and motivation ---------- */
 const HADV = [
   { t:"Keep a fixed wake time", w:"A steady wake time sets your body clock, which makes sleep easier to start and keeps appetite steadier.", a:"Choose one wake time and keep it for 7 days." },
@@ -687,6 +715,30 @@ function viewHealth(){
     "Common triggers include caffeine, alcohol, nicotine, dehydration, poor sleep, stress and decongestant tablets. Ask a pharmacist before taking decongestants.",
     "Ask your doctor about an ECG, blood tests (thyroid, electrolytes, blood count), a blood pressure check and, if needed, a heart rhythm monitor.",
     "Untreated sleep apnea is linked to irregular heart rhythms, so steady CPAP use matters for this too."]));
+  out.push(healthCard("AFib (irregular heartbeat)", "rhythm, not a daily tweak", [
+    "AFib is an irregular, often fast heartbeat. It can come and go, and some people feel nothing at all.",
+    "The main concern is stroke, because blood can clot in the upper heart chambers. Your doctor estimates your stroke risk and decides on blood thinners. Do not start or stop one on your own.",
+    "What tends to help: treat sleep apnea with CPAP, keep alcohol low, cut caffeine if it sets off episodes, control blood pressure, and build up regular moderate exercise.",
+    "Call 911 for stroke signs: face drooping, arm weakness or speech trouble. Get urgent care for chest pain, fainting or severe breathlessness."]));
+  out.push(healthCard("Medicines and supplements", "bring the full list", [
+    "Take medicines exactly as prescribed. Do not stop heart, blood pressure or blood-thinning medicines suddenly.",
+    "Use a weekly pill organizer and phone reminders for doses.",
+    "Ask a pharmacist before using decongestants, cold remedies or supplements. Some raise heart rate or blood pressure.",
+    "Keep one list of every medicine and supplement with doses, and bring it to each visit.",
+    "Ask your pharmacist to check interactions whenever a new medicine is added."]));
+  out.push(healthCard("Eating well and enjoying food", "Canada's Food Guide", [
+    "Build plates around vegetables, protein and whole grains, as Canada's Food Guide suggests.",
+    "Eat slowly, about 20 minutes a meal. Stop when you feel comfortably full.",
+    "Do not skip meals. Long gaps often lead to overeating later in the day.",
+    "Keep favourite foods in the week, in measured portions. Strict bans tend to backfire.",
+    "Eat with people when you can. Shared meals support mood and steady habits."]));
+  out.push(healthCard("Stress release and meditation", "10 minutes a day", [
+    "Start with 10 minutes of guided meditation or slow breathing. Daily practice matters more than length.",
+    "Try a body scan at bedtime: relax one part of the body at a time, from the feet up.",
+    "Walk outside without your phone for 15 to 20 minutes.",
+    "Write three lines at night: what went well, what drained you, and what tomorrow needs.",
+    "Set a limit on news and social media. Late scrolling keeps stress high.",
+    "If stress lasts for weeks, or you feel unsafe, talk to your doctor. In Canada you can call or text 988 at any time."]));
   const ask = store.get("h:ask", []), ag = grp("Questions for my next visit", ask.length ? ask.length + " saved" : "saved on this phone only"), ap = el("div", "pad");
   if (!ask.length) ap.appendChild(el("div", "note", "For example: Do I need an ECG or heart monitor? Is my CPAP working well enough? Do my sinus symptoms need an ENT referral? Could my decongestants affect my heart rate?"));
   ask.forEach((q, i) => { const r = el("div", "row"); r.style.flexWrap = "nowrap"; const t = el("span", "note", q); t.style.flex = "1"; r.appendChild(t);
@@ -711,7 +763,7 @@ function render(){
   if (tab === "ideas") tab = "inbox"; document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
   header();
   const m = $("#main"); m.textContent = ""; m.appendChild(motivationBar());
-  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs() : tab === "health" ? viewHealth() : viewToday()).forEach(n => n && m.appendChild(n));
+  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs().concat(careersNews()) : tab === "health" ? viewHealth().concat(healthNews()) : viewToday()).forEach(n => n && m.appendChild(n));
   tick();
 }
 let pending = false;
