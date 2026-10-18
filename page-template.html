@@ -1004,7 +1004,36 @@ function growView(){
   return out;
 }
 
-function funView(){
+const TALKS = [
+  ["North America", [
+    ["Jimmy Kimmel Live! · ABC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 2.73M viewers, 319K aged 18–49", "Satire and free speech: what late-night can say now", "https://abc.com"],
+    ["The Tonight Show Starring Jimmy Fallon · NBC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 1.39M viewers, 211K aged 18–49", "Celebrity and music guests: who draws the biggest audience", "https://www.nbc.com"],
+    ["Gutfeld! · Fox News, USA", "Usual time 10:00 p.m. ET · Q2 2026: 3.09M viewers, 213K aged 18–49", "Commentary on this week's top culture and news stories", "https://www.foxnews.com"],
+    ["The Daily Show · Comedy Central, USA", "Usual time 11:00 p.m. ET · Q2 2026: 1.18M viewers, 246K aged 18–49", "Politics and the economy through satire", "https://www.cc.com"],
+    ["Late Night with Seth Meyers · NBC, USA", "Usual time 12:37 a.m. ET · Q2 2026: 974K viewers, 148K aged 18–49", "Pop culture and sports highlights of the week", "https://www.nbc.com"],
+    ["Watch What Happens Live with Andy Cohen · Bravo, USA", "Usual time 10:00 p.m. ET · Q2 2026: 330K viewers, 102K aged 18–49", "Reality TV and celebrity news", "https://www.bravotv.com"]
+  ]],
+  ["Canada", [
+    ["The Morning Show · Global, Canada", "Weekday mornings (check listing) · Global's claim: No. 1 Canadian morning show", "Cost of living and local news across Canada", "https://globalnews.ca"],
+    ["Breakfast Television · Citytv, Ontario", "Weekday mornings (check listing) · Rogers' claim: No. 1 in Ontario", "Toronto and GTA news, transit and weekend events", "https://citynews.ca"]
+  ]]
+];
+function talkShowsGroup(){
+  const now = new Date().toLocaleString("en-CA", { timeZone: "America/Toronto", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  const g = grp("Watch and listen · talk shows", "Now in Toronto: " + now);
+  TALKS.forEach(([region, shows]) => {
+    g.appendChild(el("div", "hl-meta", region));
+    shows.forEach(([t, meta, topic, url]) => {
+      const a = el("a", "hl"); a.href = url; a.target = "_blank"; a.rel = "noopener";
+      a.appendChild(el("span", "hl-meta", meta));
+      a.appendChild(el("span", "hl-title", t));
+      a.appendChild(el("span", "hl-snip", "Topic to discuss: " + topic));
+      g.appendChild(a);
+    });
+  });
+  return g;
+}
+  function funView(){
   if (!X) return [el("div", "empty", "Loading…")];
   const C = kc(), dn = X.day_no || 0, out = [];
 out.push(inspireGroup());
@@ -1013,7 +1042,8 @@ out.push(inspireGroup());
     const RT2 = rates(); nw.map((m, i) => [m, filmScore(m) * 10 - i]).sort((a, b) => b[1] - a[1]).map(x => x[0]).forEach(m => { if (seen.has(m.t) || RT2["f:" + filmId(m)] === -1) return; seen.add(m.t); const r = filmRow(m.t + (m.year ? " (" + m.year + ")" : ""), (m.genre || "") + (m.sum ? " · " + m.sum.slice(0, 110) + "…" : ""), [["Apple TV", m.url], ["Where to watch", jw(m.t)], ["IMDb", imdb(m.t + " " + m.year)]], m.img); r.lastChild.appendChild(rateRow("f:" + filmId(m), v => rateFilm(m, v))); g.appendChild(r); }); out.push(g); }
   if ((C.series || []).length){ const g = grp("Short series, highly rated", "4 to 15 episodes");
     C.series.forEach(([t, y, n, gen]) => g.appendChild(filmRow(t + " (" + y + ")", n + " episodes · " + gen, [["Where to watch", jw(t.replace(/\s*\(.*\)/, ""))], ["IMDb", imdb(t.replace(/\s*\(.*\)/, "") + " " + y)]]))); out.push(g); }
-      const pods = podTab === "ca" ? (X.podcasts_ca || []) : (X.podcasts_eg || []);
+      out.push(talkShowsGroup());  
+    const pods = podTab === "ca" ? (X.podcasts_ca || []) : (X.podcasts_eg || []);
   const g = grp("Podcast charts", "top shows, latest episode 30 min or less");
   const seg = el("div", "langseg"); seg.style.gridTemplateColumns = "1fr 1fr"; [["ca", "Top in Canada"], ["eg", "عربي · Egypt"]].forEach(([k, lab]) => { const b = el("button", "", lab); b.type = "button"; b.setAttribute("aria-pressed", String(podTab === k)); b.onclick = () => { podTab = k; render(); }; seg.appendChild(b); }); g.appendChild(seg);
   if (!pods.length) g.appendChild(el("div", "empty", "No short shows in the chart today."));
