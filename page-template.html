@@ -1061,19 +1061,21 @@ function growView(){
 const TALKS = [
   // Opens YouTube search limited to uploads from the last 24 hours
 const ytRecent = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '&sp=EgIIAg%253D%253D';
+
+const TALKS = [
   ["North America (USA), top 5 · Q2 2026 ratings", [
-    ["Gutfeld! · Fox News, USA", "Usual time 10:00 p.m. ET · Q2 2026: 3.09M viewers, 213K aged 18–49 · Watch free: foxnews.com (full episodes)", "Commentary on this week's top culture and news stories", "https:ytRecent('Gutfeld highlights')"],
-    ["Jimmy Kimmel Live! · ABC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 2.73M viewers, 319K aged 18–49 · Watch free: abc.com clips (US, ads); full episodes may need Hulu", "Satire and free speech: what late-night can say now", "https:ytRecent('Jimmy Kimmel Live monologue')],
-    ["The Tonight Show Starring Jimmy Fallon · NBC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 1.39M viewers, 211K aged 18–49 · Watch free: nbc.com clips (US); full episodes on Peacock", "Celebrity and music guests: who draws the biggest audience", "https://ytRecent('Jimmy Fallon Tonight Show highlights')],
-    ["The Daily Show · Comedy Central, USA", "Usual time 11:00 p.m. ET · Q2 2026: 1.18M viewers, 246K aged 18–49 · Watch free: cc.com clips (US)", "Politics and the economy through satire", "https:ytRecent('The Daily Show clips')],
-    ["Late Night with Seth Meyers · NBC, USA", "Usual time 12:37 a.m. ET · Q2 2026: 974K viewers, 148K aged 18–49 · Watch free: nbc.com clips (US)", "Pop culture and sports highlights of the week", "https://ytRecent('Seth Meyers Late Night highlights')"]
+    ["Gutfeld! · Fox News, USA", "Usual time 10:00 p.m. ET · Q2 2026: 3.09M viewers, 213K aged 18–49 · Watch free: foxnews.com (full episodes)", "Commentary on this week's top culture and news stories", ytRecent('Gutfeld highlights')],
+    ["Jimmy Kimmel Live! · ABC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 2.73M viewers, 319K aged 18–49 · Watch free: abc.com clips (US, ads); full episodes may need Hulu", "Satire and free speech: what late-night can say now", ytRecent('Jimmy Kimmel Live monologue')],
+    ["The Tonight Show Starring Jimmy Fallon · NBC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 1.39M viewers, 211K aged 18–49 · Watch free: nbc.com clips (US); full episodes on Peacock", "Celebrity and music guests: who draws the biggest audience", ytRecent('Jimmy Fallon Tonight Show highlights')],
+    ["The Daily Show · Comedy Central, USA", "Usual time 11:00 p.m. ET · Q2 2026: 1.18M viewers, 246K aged 18–49 · Watch free: cc.com clips (US)", "Politics and the economy through satire", ytRecent('The Daily Show clips')],
+    ["Late Night with Seth Meyers · NBC, USA", "Usual time 12:37 a.m. ET · Q2 2026: 974K viewers, 148K aged 18–49 · Watch free: nbc.com clips (US)", "Pop culture and sports highlights of the week", ytRecent('Seth Meyers Late Night highlights')]
   ]],
   ["Canada, top 5 · best available figures (not verified)", [
-    ["The Morning Show · Global, Canada", "Weekday mornings (check listing) · Corus claim: about 1.2M adults weekly, 17% growth (2025) · Watch free: Global TV app (with ads)", "Cost of living and local news across Canada", "https://ytRecent('[The Morning Show · Global, Canada] highlights')"],
-    ["Your Morning · CTV, Canada", "Weekday mornings (check listing) · No verified ratings found · Watch free: CTV app (with ads)", "Canadian news, health and lifestyle for the morning", "https://ytRecent('[ctvnews] highlights')"],
-    ["Breakfast Television · Citytv, Ontario", "Weekday mornings (check listing) · No verified ratings found · Watch free: CityNews website", "Toronto and GTA news, transit and weekend events", "https://ytRecent('[citynews] highlights')],
-    ["Late Night with Seth Meyers · CTV, Canada", "Usual time 12:34 a.m. · Overnight estimate: 188K viewers 2+ (May 2025) · Watch free: CTV app (with ads)", "Pop culture and sports highlights of the week", "https://ytRecent('[ctvnews] highlights"],
-    ["Jimmy Kimmel Live! · City, Canada", "Usual time 11:35 p.m. · Overnight estimate: 174K viewers (May 2025) · Watch free: City TV app (with ads)", "Satire and free speech: what late-night can say now", "https://ytRecent('[citynews] highlights')],
+    ["The Morning Show · Global, Canada", "Weekday mornings (check listing) · Corus claim: about 1.2M adults weekly, 17% growth (2025) · Watch free: Global TV app (with ads)", "Cost of living and local news across Canada", ytRecent('The Morning Show Global Canada highlights')],
+    ["Your Morning · CTV, Canada", "Weekday mornings (check listing) · No verified ratings found · Watch free: CTV app (with ads)", "Canadian news, health and lifestyle for the morning", ytRecent('Your Morning CTV highlights')],
+    ["Breakfast Television · Citytv, Ontario", "Weekday mornings (check listing) · No verified ratings found · Watch free: CityNews website", "Toronto and GTA news, transit and weekend events", ytRecent('Breakfast Television Citytv highlights')],
+    ["Late Night with Seth Meyers · CTV, Canada", "Usual time 12:34 a.m. · Overnight estimate: 188K viewers 2+ (May 2025) · Watch free: CTV app (with ads)", "Pop culture and sports highlights of the week", ytRecent('Seth Meyers Late Night CTV highlights')],
+    ["Jimmy Kimmel Live! · City, Canada", "Usual time 11:35 p.m. · Overnight estimate: 174K viewers (May 2025) · Watch free: City TV app (with ads)", "Satire and free speech: what late-night can say now", ytRecent('Jimmy Kimmel Live City Canada highlights')]
   ]]
 ];
 function talkShowsGroup(){
