@@ -866,9 +866,63 @@ function kitchenView(){
   for (let i = 1; i <= 6; i++){ const rr = recipeFor(i), d = new Date(Date.now() + i * 864e5); const row = el("button", "menu-row"); row.type = "button"; row.style.cssText = "width:100%;border-left:0;border-right:0;border-bottom:0;background:transparent;text-align:inherit;font:inherit;color:inherit;cursor:pointer";
     row.appendChild(el("span", "label", d.toLocaleDateString(ar ? "ar-EG" : "en-CA", { weekday: "short" }))); row.appendChild(el("span", ar ? "ar" : "", ar ? rr.ar : rr.en)); row.onclick = () => { kPick = R.indexOf(rr); render(); window.scrollTo({ top: 0 }); }; w.appendChild(row); }
   wrap.appendChild(w);
+    wrap.appendChild(kitchenMyRecipes());
   return wrap;
 }
-
+function kitchenMyRecipes(){
+  const g = el("div", "group");
+  const head = el("div", "group-head"); head.appendChild(el("strong", "", "Find & save recipes")); head.appendChild(el("span", "stamp", "saved on this device")); g.appendChild(head);
+  const box = el("div", "alertbox form"); box.style.margin = "0 16px 12px";
+  const q = el("input"); q.type = "search"; q.placeholder = "Search food or drink, e.g. kofta, mint lemonade"; q.autocomplete = "off"; q.setAttribute("aria-label", "Search food or drink recipes");
+  const web = el("a", "ghostbtn", "Search the web for recipes ↗"); web.target = "_blank"; web.rel = "noopener"; web.style.textDecoration = "none"; web.style.color = "var(--ink)";
+  const res = el("div", "mylist");
+  box.appendChild(q); box.appendChild(web); box.appendChild(res);
+  g.appendChild(box);
+  const f = el("div", "alertbox form"); f.style.margin = "0 16px 12px";
+  f.appendChild(el("span", "", "Add a recipe or drink you like"));
+  const nm = el("input"); nm.placeholder = "Name, e.g. Mom's koshari"; nm.autocomplete = "off";
+  const lk = el("input"); lk.type = "url"; lk.placeholder = "Link (optional) https://…"; lk.inputMode = "url"; lk.autocomplete = "off";
+  const add = el("button", "ghostbtn", "Save recipe"); add.type = "button";
+  const saved = el("div", "mylist");
+  f.appendChild(nm); f.appendChild(lk); f.appendChild(add); f.appendChild(saved);
+  g.appendChild(f);
+  const RC = kc().recipes || [];
+  const drawSaved = () => {
+    saved.textContent = "";
+    const list = store.get("likedRecipes", []);
+    if (!list.length){ saved.appendChild(el("div", "hl-snip", "No saved recipes yet.")); return; }
+    list.forEach((it, i) => {
+      const row = el("div", "");
+      const t = el(it.url ? "a" : "span", "", it.name);
+      if (it.url){ t.href = it.url; t.target = "_blank"; t.rel = "noopener"; t.style.color = "var(--accent)"; }
+      row.appendChild(t);
+      const rm = el("button", "", "✕"); rm.type = "button"; rm.setAttribute("aria-label", "Remove " + it.name);
+      rm.onclick = () => { store.set("likedRecipes", store.get("likedRecipes", []).filter((_, j) => j !== i)); drawSaved(); };
+      row.appendChild(rm); saved.appendChild(row);
+    });
+  };
+  const drawRes = () => {
+    res.textContent = "";
+    const raw = q.value.trim(), s = raw.toLowerCase();
+    web.href = "https://www.google.com/search?q=" + encodeURIComponent((raw || "food") + " recipe");
+    web.textContent = raw ? "Search the web for “" + raw + "” ↗" : "Search the web for recipes ↗";
+    if (!s) return;
+    const hits = RC.filter(r => ((r.en || "") + " " + (r.ar || "")).toLowerCase().includes(s)).slice(0, 8);
+    if (!hits.length){ res.appendChild(el("div", "hl-snip", "No match in the family menu. Use the web search above.")); return; }
+    hits.forEach(r => res.appendChild(el("div", "", r.en + " · " + r.mins + " min")));
+  };
+  add.onclick = () => {
+    const name = nm.value.trim(); if (!name) return toast("Type a name first");
+    const url = lk.value.trim();
+    const list = store.get("likedRecipes", []);
+    list.unshift({ name, url: /^https?:\/\//.test(url) ? url : "" });
+    store.set("likedRecipes", list.slice(0, 50));
+    nm.value = ""; lk.value = ""; drawSaved();
+  };
+  q.addEventListener("input", drawRes);
+  drawSaved(); drawRes();
+  return g;
+}
 /* ---------- watch & listen ---------- */
 const jw = t => "https://www.justwatch.com/ca/search?q=" + encodeURIComponent(t), imdb = t => "https://www.imdb.com/find/?q=" + encodeURIComponent(t);
 function filmRow(title, sub, links, img){
@@ -1005,17 +1059,19 @@ function growView(){
 }
 
 const TALKS = [
-  ["North America", [
-    ["Jimmy Kimmel Live! · ABC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 2.73M viewers, 319K aged 18–49", "Satire and free speech: what late-night can say now", "https://abc.com"],
-    ["The Tonight Show Starring Jimmy Fallon · NBC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 1.39M viewers, 211K aged 18–49", "Celebrity and music guests: who draws the biggest audience", "https://www.nbc.com"],
-    ["Gutfeld! · Fox News, USA", "Usual time 10:00 p.m. ET · Q2 2026: 3.09M viewers, 213K aged 18–49", "Commentary on this week's top culture and news stories", "https://www.foxnews.com"],
-    ["The Daily Show · Comedy Central, USA", "Usual time 11:00 p.m. ET · Q2 2026: 1.18M viewers, 246K aged 18–49", "Politics and the economy through satire", "https://www.cc.com"],
-    ["Late Night with Seth Meyers · NBC, USA", "Usual time 12:37 a.m. ET · Q2 2026: 974K viewers, 148K aged 18–49", "Pop culture and sports highlights of the week", "https://www.nbc.com"],
-    ["Watch What Happens Live with Andy Cohen · Bravo, USA", "Usual time 10:00 p.m. ET · Q2 2026: 330K viewers, 102K aged 18–49", "Reality TV and celebrity news", "https://www.bravotv.com"]
+  ["North America (USA), top 5 · Q2 2026 ratings", [
+    ["Gutfeld! · Fox News, USA", "Usual time 10:00 p.m. ET · Q2 2026: 3.09M viewers, 213K aged 18–49 · Watch free: foxnews.com (full episodes)", "Commentary on this week's top culture and news stories", "https://foxnews.com/video/shows/gutfeld"],
+    ["Jimmy Kimmel Live! · ABC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 2.73M viewers, 319K aged 18–49 · Watch free: abc.com clips (US, ads); full episodes may need Hulu", "Satire and free speech: what late-night can say now", "https://abc.com"],
+    ["The Tonight Show Starring Jimmy Fallon · NBC, USA", "Usual time 11:35 p.m. ET · Q2 2026: 1.39M viewers, 211K aged 18–49 · Watch free: nbc.com clips (US); full episodes on Peacock", "Celebrity and music guests: who draws the biggest audience", "https://www.peacocktv.com/watch-online/tv/the-tonight-show-starring-jimmy-fallon/4759351141290148112/seasons/12"],
+    ["The Daily Show · Comedy Central, USA", "Usual time 11:00 p.m. ET · Q2 2026: 1.18M viewers, 246K aged 18–49 · Watch free: cc.com clips (US)", "Politics and the economy through satire", "https://www.cc.com"],
+    ["Late Night with Seth Meyers · NBC, USA", "Usual time 12:37 a.m. ET · Q2 2026: 974K viewers, 148K aged 18–49 · Watch free: nbc.com clips (US)", "Pop culture and sports highlights of the week", "https://www.nbc.com"]
   ]],
-  ["Canada", [
-    ["The Morning Show · Global, Canada", "Weekday mornings (check listing) · Global's claim: No. 1 Canadian morning show", "Cost of living and local news across Canada", "https://globalnews.ca"],
-    ["Breakfast Television · Citytv, Ontario", "Weekday mornings (check listing) · Rogers' claim: No. 1 in Ontario", "Toronto and GTA news, transit and weekend events", "https://citynews.ca"]
+  ["Canada, top 5 · best available figures (not verified)", [
+    ["The Morning Show · Global, Canada", "Weekday mornings (check listing) · Corus claim: about 1.2M adults weekly, 17% growth (2025) · Watch free: Global TV app (with ads)", "Cost of living and local news across Canada", "https://apps.apple.com/ca/app/global-tv/id404050595"],
+    ["Your Morning · CTV, Canada", "Weekday mornings (check listing) · No verified ratings found · Watch free: CTV app (with ads)", "Canadian news, health and lifestyle for the morning", "https://www.ctvnews.ca"],
+    ["Breakfast Television · Citytv, Ontario", "Weekday mornings (check listing) · No verified ratings found · Watch free: CityNews website", "Toronto and GTA news, transit and weekend events", "https://citynews.ca"],
+    ["Late Night with Seth Meyers · CTV, Canada", "Usual time 12:34 a.m. · Overnight estimate: 188K viewers 2+ (May 2025) · Watch free: CTV app (with ads)", "Pop culture and sports highlights of the week", "https://www.ctvnews.ca"],
+    ["Jimmy Kimmel Live! · City, Canada", "Usual time 11:35 p.m. · Overnight estimate: 174K viewers (May 2025) · Watch free: City TV app (with ads)", "Satire and free speech: what late-night can say now", "https://citynews.ca"]
   ]]
 ];
 function talkShowsGroup(){
