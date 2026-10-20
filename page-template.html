@@ -1,3 +1,6 @@
+
+
+Page template · HTML
 <!doctype html>
 <html lang="en-CA">
 <head>
@@ -25,13 +28,13 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .ghostbtn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 12px;font-size:13px;font-weight:600;min-height:40px}
 .stale{color:var(--amber)}
 .stack{display:flex;flex-direction:column;gap:14px}
-
+ 
 /* warnings */
 .warn{border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;background:var(--amber-soft);border:1px solid color-mix(in srgb, var(--amber) 35%, transparent);color:var(--ink);text-decoration:none}
 .warn.warning{background:color-mix(in srgb, var(--danger) 14%, var(--surface));border-color:color-mix(in srgb, var(--danger) 45%, transparent)}
 .warn strong{font-size:15px}
 .warn span{font-size:13px;color:var(--muted)}
-
+ 
 /* weather */
 .wx{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .wx-now{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:16px}
@@ -58,7 +61,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
 .range .fill{position:absolute;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,#4F9BD9,#E3A33B)}
 .day .dp{font-family:var(--mono);font-size:12px;color:var(--accent);min-width:34px;text-align:right}
 .daywear{grid-column:1/-1;font-size:13px;color:var(--muted);padding-top:2px;display:none}
-
+ 
 /* sheet */
 .sheet{position:fixed;inset:0;z-index:20;background:rgba(10,20,30,.45);display:flex;align-items:flex-end;justify-content:center}
 .sheet-card{background:var(--surface);color:var(--ink);width:100%;max-width:560px;max-height:85vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px}
@@ -185,16 +188,16 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
     </div>
     <nav class="rail" id="rail" aria-label="Sections"></nav>
   </header>
-
+ 
   <main class="stack" id="main">
     <div class="empty">Loading the latest…</div>
   </main>
-
+ 
   <footer>
     <span>Updates about every 10 minutes. Weather from Open-Meteo, warnings from Environment Canada, headlines from Google News, rentals from Kijiji, events from Meetup, markets from CNBC and Google Finance, GO times from the Sept. 2026 Lakeshore West timetable.</span>
   </footer>
 </div>
-
+ 
 <div class="sheet" id="sheet" hidden>
   <div class="sheet-card" role="dialog" aria-label="Settings">
     <h3>Settings</h3>
@@ -235,7 +238,7 @@ body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(24px 
     <button class="primary" id="closeSheet" type="button">Done</button>
   </div>
 </div>
-
+ 
 <script>
 const GO = __GO__;
 const $ = s => document.querySelector(s);
@@ -246,11 +249,11 @@ let X = null, faithLang = store.get("faithLang", "both"), kLang = store.get("kLa
 let angle = "all", wxTab = store.get("wxTab", "today");
 let B = null, K = null, ecoRegion = store.get("ecoRegion", "canada"), bTopic = "all";
 let D = null, view = store.get("view", "all"), goDir = store.get("goDir", "east"), hidden = new Set(store.get("hidden", []));
-
+ 
 function ago(sec){ const m = Math.round((Date.now() / 1000 - sec) / 60); if (m < 60) return Math.max(m, 1) + " min ago"; const h = Math.round(m / 60); if (h < 48) return h + " h ago"; return Math.round(h / 24) + " days ago"; }
 function sections(){ const s = [{ id: "weather", name: "Weather" }, { id: "faith", name: "Prayer" }, { id: "briefings", name: "Briefings" }]; (D ? D.topics : []).filter(t => !t.in_markets && t.id !== "homes").forEach(t => { s.push(t); if (t.id === "events"){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } }); if (!s.some(x => x.id === "kitchen")){ s.push({ id: "kitchen", name: "Kitchen" }); s.push({ id: "fun", name: "Watch & listen" }); } s.push({ id: "economy", name: "Economy" }); s.push({ id: "markets", name: "Markets" }); return s; }
 function visible(id){ return !hidden.has(id); }
-
+ 
 function toast(msg){ const t = el("div", "toast", msg); document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 async function load(force){
   $("#refreshBtn").classList.add("spin");
@@ -269,7 +272,7 @@ async function load(force){
   }
   $("#refreshBtn").classList.remove("spin");
 }
-
+ 
 function renderStamp(){
   if (!D) return;
   const age = Date.now() / 1000 - D.generated, iv = D.interval || 600;
@@ -278,14 +281,14 @@ function renderStamp(){
   s.textContent = "Updated " + ago(D.generated) + (age < iv ? " · next in ~" + next + " min" : age > iv * 3 ? " · updates delayed" : " · next any minute");
   s.classList.toggle("stale", age > iv * 3);
 }
-
+ 
 function renderRail(){
   const rail = $("#rail"); rail.textContent = "";
   const mk = (id, label) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(view === id)); b.onclick = () => { view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }; rail.appendChild(b); };
   mk("all", "All");
   sections().filter(s => visible(s.id)).forEach(s => mk(s.id, s.name));
 }
-
+ 
 /* ---------- weather ---------- */
 function dayName(iso, i){ if (i === 0) return "Today"; if (i === 1) return "Tmrw"; return new Date(iso + "T12:00:00").toLocaleDateString("en-CA", { weekday: "short" }); }
 function fmtHour(t){ let h = Number(t.slice(0, 2)); const ap = h >= 12 ? "p" : "a"; h = h % 12 || 12; return h + ap; }
@@ -343,7 +346,7 @@ function warningsBlock(){
   w.forEach(a => { const x = el("a", "warn " + a.type); x.href = "https://weather.gc.ca/en/location/index.html?coords=43.467,-79.688"; x.target = "_blank"; x.rel = "noopener"; x.appendChild(el("strong", "", "⚠️ " + a.name)); x.appendChild(el("span", "", a.summary)); s.appendChild(x); });
   return s;
 }
-
+ 
 /* ---------- GO ---------- */
 const toMin = t => { const [h, m] = t.split(":").map(Number); const v = h * 60 + m; return v < 180 ? v + 1440 : v; };
 function torontoNow(){
@@ -415,7 +418,7 @@ function goCard(){
   alerts.forEach(it => g.appendChild(item(it)));
   return g;
 }
-
+ 
 /* ---------- markets ---------- */
 function spark(points){
   const ns = "http://www.w3.org/2000/svg"; const svg = document.createElementNS(ns, "svg"); svg.setAttribute("viewBox", "0 0 100 26"); svg.setAttribute("preserveAspectRatio", "none");
@@ -459,7 +462,7 @@ function marketsTable(){
   const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Prices can be delayed 15 minutes or more. Currency rates are mid-market.")); g.appendChild(n);
   return g;
 }
-
+ 
 /* ---------- gas ---------- */
 function gasCard(compact){
   const G = D.gas; if (!G || !(G.days || []).length) return null;
@@ -494,7 +497,7 @@ function gasCard(compact){
   if (compact){ const b = el("button", "hl", "7-day gas outlook →"); b.type = "button"; b.style.cssText = "border:0;border-top:1px solid var(--line);background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; b.onclick = () => go("oakville"); g.appendChild(b); }
   return g;
 }
-
+ 
 /* ---------- watchlist ---------- */
 function allQuotes(){ return [...(D.quotes || []), ...(((D.watch || {}).items) || []).map(w => ({ label: w.label, price: w.price, pct: w.pct, asof: w.asof, url: w.url, source: w.source, stale: w.stale }))]; }
 function allDeep(){ const o = Object.assign({}, (D.deep || {}).items || {}); (((D.watch || {}).items) || []).forEach(w => { if (w.deep) o[w.label] = w.deep; }); return o; }
@@ -546,7 +549,7 @@ function watchCard(){
   return g;
 }
 let wForm = { sym: "", name: "", above: "", below: "", note: "" };
-
+ 
 /* ---------- businesses for sale ---------- */
 let mkTab = store.get("mkTab", "mk"), bizArea = "all", bizSort = "new";
 function mkTabs(){
@@ -592,7 +595,7 @@ function bizView(){
   out.push(links);
   return out;
 }
-
+ 
 /* ---------- market deep dive ---------- */
 let mkSel = store.get("mkSel", "S&P/TSX"), mkRange = store.get("mkRange", "1Y"), mkAngle = "all";
 const pctTxt = v => v == null ? "—" : (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(v != null && Math.abs(v) >= 100 ? 0 : 1) + "%";
@@ -724,7 +727,7 @@ function marketNews(){
   wrap.appendChild(g);
   return wrap;
 }
-
+ 
 /* ---------- faith ---------- */
 const PR = [["Fajr","الفجر"],["Sunrise","الشروق"],["Dhuhr","الظهر"],["Asr","العصر"],["Maghrib","المغرب"],["Isha","العشاء"]];
 function hm(t){ const [h, m] = t.split(":").map(Number); return h * 60 + m; }
@@ -800,7 +803,7 @@ function surahCard(){
   [["Background and reasons of revelation (Quran.com) ↗", S.info_url], ["Read and listen to the full surah ↗", S.read_url]].forEach(([t, u]) => { const a = el("a", "hl"); a.href = u; a.target = "_blank"; a.rel = "noopener"; a.appendChild(el("span", "hl-title", t)); g.appendChild(a); });
   return g;
 }
-
+ 
 /* ---------- kitchen ---------- */
 function kc(){ return (X && X.content) || {}; }
 function egR(){ return (kc().recipes || []).filter(r => r.cuisine === "Egyptian"); }
@@ -994,7 +997,7 @@ function inspireGroup(){
   const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Rate a few: 👍 brings more from that show and topic, 👎 hides it. Ratings stay on this phone, so each family member gets their own picks.")); g.appendChild(n);
   return g;
 }
-
+ 
 /* ---------- grow: people-skills playbook + ranked reading (ratings stay on this device) ---------- */
 let growArea = store.get("growArea", "all");
 const growData = () => kc().grow || { areas: [], tips: [] };
@@ -1057,9 +1060,9 @@ function growView(){
   const n = el("div", "hl"); n.appendChild(el("span", "hl-snip", "Tips are ranked by impact; reads by source quality, freshness and the areas you mark useful. Your marks stay on this phone.")); const ng = grp("How this works", ""); ng.appendChild(n); out.push(ng);
   return out;
 }
-
+ 
 const ytRecent = q => 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q) + '&sp=EgIIAg%253D%253D';
-
+ 
 const TALKS = [
   ["North America (USA), top 5 · Q2 2026 ratings", [
     ["Gutfeld! · Fox News, USA", "Usual time 10:00 p.m. ET · Q2 2026: 3.09M viewers, 213K aged 18–49 · Watch free: foxnews.com (full episodes)", "Commentary on this week's top culture and news stories", ytRecent('Gutfeld highlights')],
@@ -1111,7 +1114,7 @@ out.push(inspireGroup());
   out.push(g);
   return out;
 }
-
+ 
 /* ---------- homes ---------- */
 const money = n => "$" + Math.round(n).toLocaleString("en-CA");
 function linksGroup(t, title){
@@ -1154,7 +1157,7 @@ function homesCard(compact){
   if (compact && L.length > 3){ const more = el("button", "hl", "See all " + L.length + " homes and price trend"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => go("homes"); g.appendChild(more); }
   return g;
 }
-
+ 
 /* ---------- events ---------- */
 const EV_CATS = ["Business", "Jobs", "Gatherings", "Music"];
 function evTime(sec){ return new Date(sec * 1000).toLocaleTimeString("en-CA", { timeZone: "America/Toronto", hour: "numeric", minute: "2-digit" }).replace(":00", ""); }
@@ -1183,7 +1186,7 @@ function eventsCard(limit){
   if (limit && L.length > limit){ const more = el("button", "hl", "See all " + L.length + " events"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => go("events"); g.appendChild(more); }
   return g;
 }
-
+ 
 /* ---------- my links (this device only) ---------- */
 let myLinks = store.get("myLinks", []);
 function myLinksRow(){
@@ -1191,7 +1194,7 @@ function myLinksRow(){
   const r = el("div", "mylinks"); myLinks.forEach(([lab, href]) => { const a = el("a", "", lab + " ↗"); a.href = href; a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); return r;
 }
 function go(id){ view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }
-
+ 
 /* ---------- headlines ---------- */
 function topicGroup(t, limit){
   const items = (D.headlines || {})[t.id] || [];
@@ -1205,7 +1208,7 @@ function topicGroup(t, limit){
   if (limit && list.length > limit){ const more = el("button", "hl", "See all " + items.length + " " + t.name + " stories"); more.type = "button"; more.style.cssText = "border:0;background:transparent;text-align:left;color:var(--accent);font-weight:600;font:inherit;cursor:pointer"; more.onclick = () => { view = t.id; store.set("view", view); render(); window.scrollTo({ top: 0 }); }; g.appendChild(more); }
   return g;
 }
-
+ 
 function render(){
   if (!D) return;
   if (view !== "all" && !sections().some(s => s.id === view)) view = "all";
@@ -1256,7 +1259,7 @@ function render(){
     if (t.id === "oakville" && angle === "all"){ const hm = topic("homes"); if (hm && D.rentals){ add(homesCard(false)); add(linksGroup(hm, "Search home listings")); } }
   }
 }
-
+ 
 /* ---------- briefings and economy (deep briefings written by the daily sweep) ---------- */
 function bDate(iso){ if (!iso) return ""; const d = new Date(iso.length === 10 ? iso + "T12:00:00" : iso); return isNaN(d) ? iso : d.toLocaleDateString("en-CA", { month: "short", day: "numeric" }); }
 function bDots(n){ const w = el("span", "opp"); w.title = "Opportunity " + n + " of 5"; const d = el("span", "dots"); for (let i = 1; i <= 5; i++){ const x = el("i"); if (i <= n) x.className = "on"; d.appendChild(x); } w.appendChild(d); w.appendChild(document.createTextNode(n + "/5")); return w; }
@@ -1331,7 +1334,7 @@ function economyView(){
   if (K.note) out.push(el("p", "gonote", K.note));
   return out;
 }
-
+ 
 /* ---------- settings ---------- */
 function openSheet(){
   const box = $("#toggles"); box.textContent = "";
@@ -1374,13 +1377,336 @@ $("#closeSheet").onclick = () => { $("#sheet").hidden = true; };
 $("#sheet").onclick = e => { if (e.target.id === "sheet") $("#sheet").hidden = true; };
 $("#copyTopic").onclick = async () => { const b = $("#copyTopic"); try { await navigator.clipboard.writeText($("#topicName").textContent); b.textContent = "Copied"; } catch(_){ const r = document.createRange(); r.selectNodeContents($("#topicName")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected, tap Copy"; } setTimeout(() => b.textContent = "Copy topic name", 2000); };
 $("#refreshBtn").onclick = () => load(true);
-
+ 
 load(false);
 setInterval(() => { if (document.visibilityState === "visible") load(false); }, 5 * 60 * 1000);
 setInterval(() => { if (D && !document.querySelector(".goall[open]") && $("#sheet").hidden) { renderStamp(); if (view === "all" || view === "oakville") render(); } }, 60 * 1000);
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(false); });
 if (navigator.serviceWorker) navigator.serviceWorker.register("sw.js").catch(() => {});
+/* ===== Location-based weather, prayer times, countdown and what to wear ===== */
+(function(){
+  const st = document.createElement("style");
+  st.textContent = ".pcard{padding:14px 16px 6px}.pcount{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:64px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em;margin:4px 0}.pnext{font-size:15px;color:var(--muted)}";
+  document.head.appendChild(st);
+})();
+const pad2 = n => String(n).padStart(2, "0");
+const OAK = { lat: 43.4675, lon: -79.6877, name: "Oakville, ON" };
+let HERE = null, LP = null;
+const WMO = { 0:["☀️","Clear"], 1:["🌤️","Mostly clear"], 2:["⛅","Partly cloudy"], 3:["☁️","Overcast"], 45:["🌫️","Fog"], 48:["🌫️","Fog"], 51:["🌦️","Light drizzle"], 53:["🌦️","Drizzle"], 55:["🌧️","Heavy drizzle"], 61:["🌦️","Light rain"], 63:["🌧️","Rain"], 65:["🌧️","Heavy rain"], 71:["🌨️","Light snow"], 73:["🌨️","Snow"], 75:["❄️","Heavy snow"], 77:["🌨️","Snow grains"], 80:["🌦️","Showers"], 81:["🌧️","Showers"], 82:["⛈️","Heavy showers"], 85:["🌨️","Snow showers"], 86:["🌨️","Heavy snow showers"], 95:["⛈️","Thunderstorm"], 96:["⛈️","Thunderstorm, hail"], 99:["⛈️","Thunderstorm, hail"] };
+const wmo = c => WMO[c] || ["🌡️", "—"];
+ 
+function getHere(){
+  return new Promise(res => {
+    if (!navigator.geolocation) return res(OAK);
+    navigator.geolocation.getCurrentPosition(
+      p => res({ lat: +p.coords.latitude.toFixed(4), lon: +p.coords.longitude.toFixed(4), name: "Your location" }),
+      () => res(OAK),
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 15 * 60 * 1000 });
+  });
+}
+ 
+function wearAdvice(x){
+  const out = [], f = x.lo;
+  if (f <= -15) out.push("Very cold: insulated winter coat, warm hat, gloves, scarf and insulated boots");
+  else if (f <= -5) out.push("Cold: winter coat, hat, gloves and a scarf");
+  else if (f <= 5) out.push("Chilly: warm jacket with a sweater underneath");
+  else if (f <= 14) out.push("Cool: light jacket, or a long-sleeve layer you can take off");
+  else if (f <= 22) out.push("Mild: long sleeves or a light layer for the morning");
+  else out.push("Warm: breathable, light clothing");
+  if (x.hi - x.lo >= 8) out.push("Big temperature swing: " + x.lo + "° in the morning, " + x.hi + "° in the afternoon. Wear layers you can remove.");
+  if (x.hi >= 28) out.push("Hot: drink water often and plan outdoor activity before 11 a.m. or after 6 p.m.");
+  if (x.wind >= 30 || x.gust >= 50) out.push("Windy (gusts " + x.gust + " km/h): add a windbreaker. It will feel colder than the number shown.");
+  if (x.pop >= 40 || x.precip >= 1) out.push("Rain likely (" + x.pop + "%): take an umbrella and a waterproof jacket, and wear water-resistant shoes.");
+  if (x.snow > 0) out.push("Snow expected (" + x.snow + " cm): waterproof boots with good grip, and allow extra travel time.");
+  if (x.uv >= 6) out.push("High UV (" + x.uv + "): SPF 30+ sunscreen, sunglasses and a hat.");
+  else if (x.uv >= 3) out.push("Moderate UV (" + x.uv + "): sunglasses, and sunscreen if you'll be outside for a long time.");
+  if (f <= 5 || x.snow > 0) out.push("Footwear: insulated boots or warm closed shoes with good grip");
+  else if (f <= 14) out.push("Footwear: closed shoes or boots, with socks you can layer");
+  else out.push("Footwear: breathable shoes or sandals, depending on the plan");
+  const acc = [];
+  if (f <= 5) acc.push("hat and gloves"); else if (f <= 14) acc.push("a scarf for the evening");
+  if (x.hi >= 24 || x.uv >= 3) acc.push("sunglasses");
+  if (x.hi >= 24) acc.push("a cap");
+  if (acc.length) out.push("Accessories: " + acc.join(", ") + ".");
+  if (f <= 5 || x.snow > 0) out.push("Cold-weather tip: cover your ears and hands, and warm up before outdoor training.");
+  if (x.sunset) out.push("Sunset " + x.sunset + ": carry a light or reflective item if you walk or run after dark.");
+  return out;
+}
+ 
+async function fetchWx(h){
+  const u = "https://api.open-meteo.com/v1/forecast?latitude=" + h.lat + "&longitude=" + h.lon + "&timezone=auto&forecast_days=7"
+    + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,wind_gusts_10m"
+    + "&hourly=temperature_2m,apparent_temperature,precipitation_probability,weather_code"
+    + "&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,precipitation_sum,snowfall_sum,wind_speed_10m_max,wind_gusts_10m_max,uv_index_max,sunrise,sunset";
+  const j = await (await fetch(u)).json();
+  const c = j.current, dl = j.daily, hr = j.hourly, r = v => Math.round(v);
+  const nd = new Date();
+  const nowKey = nd.getFullYear() + "-" + pad2(nd.getMonth() + 1) + "-" + pad2(nd.getDate()) + "T" + pad2(nd.getHours());
+  let start = hr.time.findIndex(t => t >= nowKey); if (start < 0) start = 0;
+  const days = dl.time.map((date, i) => {
+    const lo = r(dl.temperature_2m_min[i]), hi = r(dl.temperature_2m_max[i]);
+    const fl = r(dl.apparent_temperature_min[i]), fh = r(dl.apparent_temperature_max[i]);
+    const [icon, label] = wmo(dl.weather_code[i]);
+    const pop = dl.precipitation_probability_max[i] || 0;
+    const precip = +((dl.precipitation_sum[i] || 0).toFixed(1)), snow = +((dl.snowfall_sum[i] || 0).toFixed(1));
+    const uv = +((dl.uv_index_max[i] || 0).toFixed(1)), gust = r(dl.wind_gusts_10m_max[i]), wind = r(dl.wind_speed_10m_max[i]);
+    const sunrise = dl.sunrise[i].slice(11, 16), sunset = dl.sunset[i].slice(11, 16);
+    return { date, icon, label, max: hi, min: lo, feels_min: fl, feels_max: fh, pop, precip, snow, uv, wind, gust, sunrise, sunset,
+      wear: wearAdvice({ lo: fl, hi: fh, wind, gust, pop, precip, snow, uv, sunset }) };
+  });
+  const hours = [];
+  for (let i = start; i < start + 24 && i < hr.time.length; i++) hours.push({ t: hr.time[i].slice(11, 16), icon: wmo(hr.weather_code[i])[0], temp: r(hr.temperature_2m[i]), pop: hr.precipitation_probability[i] || 0 });
+  const cw = wmo(c.weather_code);
+  const current = { temp: r(c.temperature_2m), feels: r(c.apparent_temperature), label: cw[1], icon: cw[0], wind: r(c.wind_speed_10m), gust: r(c.wind_gusts_10m), humidity: r(c.relative_humidity_2m) };
+  return { current, days, hours };
+}
+ 
+async function fetchPrayer(h){
+  const days = [];
+  for (let i = 0; i < 2; i++){
+    const d = new Date(); d.setDate(d.getDate() + i);
+    const ds = pad2(d.getDate()) + "-" + pad2(d.getMonth() + 1) + "-" + d.getFullYear();
+    const res = await (await fetch("https://api.aladhan.com/v1/timings/" + ds + "?latitude=" + h.lat + "&longitude=" + h.lon + "&method=2&school=0")).json();
+    const j = res.data, t = {};
+    ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"].forEach(k => { t[k] = j.timings[k].split(" ")[0]; });
+    const hj = j.date.hijri;
+    days.push({ date: d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()), times: t,
+      hijri_ar: hj.day + " " + hj.month.ar + " " + hj.year, hijri_en: hj.day + " " + hj.month.en + " " + hj.year + " AH" });
+  }
+  return { days, method: "ISNA, standard Asr" };
+}
+ 
+function nextLocal(P){
+  const now = new Date(), list = [];
+  P.days.slice(0, 2).forEach((d, di) => PR.forEach(([k, ar]) => {
+    if (k === "Sunrise") return;
+    const [hh, mm] = d.times[k].split(":").map(Number);
+    const t = new Date(now); t.setDate(now.getDate() + di); t.setHours(hh, mm, 0, 0);
+    list.push({ k, ar, t: t.getTime(), time: d.times[k], tomorrow: di === 1 });
+  }));
+  return list.find(x => x.t > now.getTime()) || null;
+}
+function fmtCountdown(ms){
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return pad2(Math.floor(s / 3600)) + ":" + pad2(Math.floor((s % 3600) / 60)) + ":" + pad2(s % 60);
+}
+function prayerNote(P){
+  const t = P.days[0].times;
+  return "Prayer times today: Fajr " + fmt12(t.Fajr) + ", Maghrib " + fmt12(t.Maghrib) + ". Dress warmly for the walk to the masjid before Fajr.".replace(". D", " · D");
+}
+ 
+function prayerCard(full){
+  const P = LP || (X && X.prayer);
+  if (!P) return el("div", "empty", "Prayer times are loading…");
+  const n = nextLocal(P), d0 = P.days[0];
+  const g = el("div", "group");
+  const head = el("div", "group-head");
+  head.appendChild(el("strong", "", "Prayer times · " + (HERE ? HERE.name : "Oakville, ON")));
+  head.appendChild(el("span", "stamp ar", d0.hijri_ar));
+  g.appendChild(head);
+  if (n){
+    const box = el("div", "pcard");
+    box.appendChild(el("span", "label", "Time to next prayer"));
+    const big = el("div", "pcount", fmtCountdown(n.t - Date.now())); big.id = "pcount"; box.appendChild(big);
+    const sub = el("div", "pnext", (n.tomorrow ? "Tomorrow · " : "") + n.k + " at " + fmt12(n.time) + " · " + n.ar);
+    sub.id = "pnext"; sub.dataset.k = n.k + (n.tomorrow ? "T" : ""); box.appendChild(sub);
+    g.appendChild(box);
+  }
+  const grid = el("div", "pray");
+  PR.forEach(([k, ar]) => {
+    const c = el("div", n && n.k === k && !n.tomorrow ? "next" : "");
+    c.appendChild(el("span", "label", k));
+    c.appendChild(el("span", "ar", ar)).style.cssText = "font-size:15px;line-height:1.3";
+    c.appendChild(el("b", "", fmt12(d0.times[k]).replace(" a.m.", "a").replace(" p.m.", "p")));
+    grid.appendChild(c);
+  });
+  g.appendChild(grid);
+  if (full){
+    const n2 = el("div", "hl");
+    n2.appendChild(el("span", "hl-snip", "Method: " + P.method + " · Qibla " + qibla() + "° from north · Friday Jumu'ah: check your masjid's time · " + d0.hijri_en));
+    g.appendChild(n2);
+    const a = el("a", "hl"); a.href = "https://www.google.com/maps/search/mosque+near+" + encodeURIComponent((HERE && HERE.name !== "Your location") ? HERE.name : "me") ; a.target = "_blank"; a.rel = "noopener";
+    a.appendChild(el("span", "hl-title", "Mosques near you ↗")); g.appendChild(a);
+  }
+  return g;
+}
+ 
+async function loadHere(){
+  try { HERE = await getHere(); } catch (e) { HERE = OAK; }
+  let pr = null;
+  try { pr = await fetchPrayer(HERE); LP = pr; } catch (e) { /* keep last prayer data */ }
+  try {
+    const wx = await fetchWx(HERE);
+    if (pr) wx.days[0].wear.push(prayerNote(pr));
+    if (D) D.weather = wx;
+  } catch (e) { /* keep last weather data */ }
+  render();
+}
+setTimeout(loadHere, 1200);
+setInterval(loadHere, 10 * 60 * 1000);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") loadHere(); });
+setInterval(() => {
+  const PP = LP || (X && X.prayer);
+  if (!PP) return;
+  const n = nextLocal(PP), s = document.getElementById("pnext"), c = document.getElementById("pcount");
+  if (!n) return;
+  if (s && s.dataset.k !== n.k + (n.tomorrow ? "T" : "")) { render(); return; }
+  if (c) c.textContent = fmtCountdown(n.t - Date.now());
+}, 1000);
+ 
+/* ===== Personal and News tabs, numbers first on every page ===== */
+let topTab = store.get("topTab", "personal");
+const PERSONAL_TABS = [["weather", "Weather"], ["faith", "Prayer"], ["kitchen", "Kitchen"], ["fun", "Watch & listen"], ["grow", "Grow"], ["events", "Events"]];
+const NEWS_TABS = [["briefings", "Briefings"], ["oakville", "Oakville"], ["ontario", "Ontario"], ["canada", "Canada"], ["egypt", "Egypt"], ["gulf", "Gulf"], ["usa", "USA"], ["international", "International"], ["economy", "Economy"], ["markets", "Markets"]];
+const NEWS_REGIONS = ["oakville", "ontario", "canada", "egypt", "gulf", "usa", "international"];
+ 
+function tabSections(){ return (topTab === "personal" ? PERSONAL_TABS : NEWS_TABS).filter(([id]) => visible(id)).map(([id, name]) => ({ id, name })); }
+function setTop(t){ topTab = t; store.set("topTab", t); view = "home"; angle = "all"; store.set("view", "home"); render(); window.scrollTo({ top: 0 }); }
+ 
+function kpiBar(pairs){
+  const f = el("div", "facts");
+  pairs.forEach(([lab, val]) => { const x = el("div", "fact"); x.appendChild(el("span", "label", lab)); x.appendChild(el("b", "", String(val))); f.appendChild(x); });
+  return f;
+}
+ 
+function personalKpis(id){
+  const W = D.weather, out = [];
+  if (id === "weather"){
+    if (W){ const d0 = W.days[0]; out.push(["Now", W.current.temp + "°"], ["Feels like", W.current.feels + "°"], ["High / low", d0.max + "° / " + d0.min + "°"], ["Rain chance", (d0.pop || 0) + "%"], ["Wind", W.current.wind + " km/h"], ["UV max", d0.uv]); }
+  } else if (id === "faith"){
+    const P = LP || (X && X.prayer), n = P ? nextLocal(P) : null;
+    out.push(["Next prayer", n ? n.k : "—"], ["Time left", n ? fmtCountdown(n.t - Date.now()) : "—"]);
+  } else if (id === "kitchen"){
+    out.push(["Recipes", (kc().recipes || []).length], ["Egyptian", egR().length], ["Saved", (store.get("likedRecipes", []) || []).length]);
+  } else if (id === "fun"){
+    out.push(["Talk shows", TALKS.reduce((a, r) => a + r[1].length, 0)], ["Regions", TALKS.length], ["Films rated", Object.keys(rates() || {}).length]);
+  } else if (id === "grow"){
+    const g = growData(); out.push(["Tips", (g.tips || []).length], ["Areas", (g.areas || []).length], ["Tried", Object.keys(tried() || {}).length]);
+  } else if (id === "events"){
+    const ev = D.events, n = Array.isArray(ev) ? ev.length : (ev && Array.isArray(ev.items) ? ev.items.length : "—");
+    out.push(["Upcoming events", n]);
+  }
+  return out;
+}
+ 
+function regionKpis(id){
+  const items = (D.headlines || {})[id] || [];
+  const out = [["Stories", items.length], ["Updated", ago(D.generated)]];
+  const r = (K && Array.isArray(K.regions)) ? K.regions.find(x => x.id === id) : null;
+  if (r) (r.kpis || []).filter(x => x.value).slice(0, 2).forEach(x => out.push([x.name, x.value]));
+  return out;
+}
+ 
+function ecoBlock(id){
+  const r = (K && Array.isArray(K.regions)) ? K.regions.find(x => x.id === id) : null;
+  if (!r || !(r.kpis || []).length) return null;
+  const g = el("div", "group"); const head = el("div", "group-head"); head.appendChild(el("strong", "", r.name + " economy and markets")); g.appendChild(head);
+  r.kpis.forEach(k => {
+    const c = el("div", "kcard"); c.style.cssText = "display:grid;gap:3px;margin:10px 0";
+    c.appendChild(el("span", "kname", k.name));
+    c.appendChild(el("span", k.value ? "kval" : "kval todo", k.value || "To source"));
+    if (k.trend) c.appendChild(el("span", "ktrend", k.trend));
+    if (k.url){ const m = el("p", "kmeta"); const a = el("a", "", k.source || "Link"); a.href = k.url; a.target = "_blank"; a.rel = "noopener"; m.appendChild(a); if (k.asof) m.appendChild(document.createTextNode(" · " + k.asof)); c.appendChild(m); }
+    if (k.note) c.appendChild(el("p", "kmeta", k.note));
+    g.appendChild(c);
+  });
+  return g;
+}
+ 
+function angleRail(t, add){
+  const items = (D.headlines || {})[t.id] || [];
+  const angles = [...new Set(items.map(it => it.a))];
+  if (angles.length > 1){
+    const sub = el("div", "subrail");
+    ["all", ...angles].forEach(a => { const b = el("button", "chip", a === "all" ? "Everything" : a); b.type = "button"; b.setAttribute("aria-pressed", String(angle === a)); b.onclick = () => { angle = a; render(); }; sub.appendChild(b); });
+    if (!angles.includes(angle)) angle = "all";
+    add(sub);
+  }
+}
+ 
+function personalView(id, add){
+  const T = nm => D.topics.find(x => x.id === nm);
+  add(kpiBar(personalKpis(id)));
+  if (id === "weather"){ if (D.weather) add(weatherCard(true)); else add(el("div", "empty", "Weather is loading.")); }
+  else if (id === "faith"){ add(prayerCard(true)); add(ayahCard()); }
+  else if (id === "kitchen"){ add(kitchenView()); }
+  else if (id === "fun"){ funView().forEach(add); }
+  else if (id === "grow"){ growView().forEach(add); }
+  else if (id === "events"){ const t = T("events"); if (D.events) add(eventsCard(0)); if (t) add(linksGroup(t, "Event calendars")); }
+}
+ 
+function newsView(id, add){
+  if (id === "briefings"){ add(kpiBar([["Briefings", bItems().length], ["Updated", B && B.updated ? bDate(B.updated) : "—"]])); briefingsView().forEach(add); return; }
+  if (id === "economy"){ add(kpiBar([["Regions", (K && K.regions ? K.regions.length : 0)], ["Updated", K && K.updated ? bDate(K.updated) : "—"]])); economyView().forEach(add); return; }
+  if (id === "markets"){
+    add(mkTabs());
+    if (mkTab === "biz") bizView().forEach(add);
+    else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); }
+    return;
+  }
+  const t = D.topics.find(x => x.id === id);
+  if (!t){ add(el("div", "empty", "This section is not available yet.")); return; }
+  add(kpiBar(regionKpis(id)));
+  const eco = ecoBlock(id); if (eco) add(eco);
+  angleRail(t, add);
+  if (id === "oakville" && angle === "all"){ add(gasCard(false)); add(goCard()); }
+  add(topicGroup(t, 0));
+  add(linksGroup(t, "Links"));
+  if (id === "oakville" && angle === "all"){ const hm = D.topics.find(x => x.id === "homes"); if (hm && D.rentals){ add(homesCard(false)); add(linksGroup(hm, "Search home listings")); } }
+}
+ 
+function personalHome(){
+  const box = document.createDocumentFragment();
+  const w = el("div"); w.appendChild(kpiBar(personalKpis("weather")));
+  if (D.weather) w.appendChild(weatherCard(false));
+  box.appendChild(w);
+  const p = el("div"); p.appendChild(kpiBar(personalKpis("faith"))); const pc = LP ? prayerCard(false) : faithMini(); if (pc) p.appendChild(pc); box.appendChild(p);
+  const k = el("div"); k.appendChild(kpiBar(personalKpis("kitchen"))); k.appendChild(kitchenMini()); box.appendChild(k);
+  const g = el("div"); g.appendChild(kpiBar(personalKpis("grow"))); g.appendChild(growMini()); box.appendChild(g);
+  return box;
+}
+ 
+function newsHome(){
+  const box = document.createDocumentFragment();
+  NEWS_REGIONS.forEach(id => {
+    const t = D.topics.find(x => x.id === id); if (!t || !visible(id)) return;
+    const wrap = el("div", "group");
+    const head = el("div", "group-head"); head.appendChild(el("strong", "", t.name)); head.appendChild(el("span", "stamp", ((D.headlines || {})[id] || []).length + " stories")); wrap.appendChild(head);
+    wrap.appendChild(kpiBar(regionKpis(id)));
+    const eco = ecoBlock(id); if (eco) wrap.appendChild(eco);
+    const more = el("button", "kgo", "Open " + t.name + " →"); more.type = "button"; more.onclick = () => go(id); wrap.appendChild(more);
+    box.appendChild(wrap);
+  });
+  return box;
+}
+ 
+function renderRail(){
+  const rail = $("#rail"); rail.textContent = "";
+  const btn = (label, on, fn) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(on)); b.onclick = fn; rail.appendChild(b); };
+  btn("Personal", topTab === "personal", () => setTop("personal"));
+  btn("News", topTab === "news", () => setTop("news"));
+  btn("Home", view === "home", () => go("home"));
+  tabSections().forEach(s => btn(s.name, view === s.id, () => go(s.id)));
+}
+ 
+function render(){
+  if (!D) return;
+  if (view === "all") view = "home";
+  if (view !== "home" && !tabSections().some(s => s.id === view)) view = "home";
+  renderStamp(); renderRail();
+  const main = $("#main"); main.textContent = "";
+  const add = n => n && main.appendChild(n);
+  add(warningsBlock());
+  if (view === "home"){ add(topTab === "personal" ? personalHome() : newsHome()); return; }
+  if (topTab === "personal") personalView(view, add); else newsView(view, add);
+}
+ 
+/* keep the page fresh, without interrupting an open panel */
+setInterval(() => { if (D && $("#sheet").hidden && !document.querySelector("details[open]")) { renderStamp(); render(); } }, 60 * 1000);
+ 
 </script>
 </body>
 </html>
-
+ 
+ 
+Claude finished the response
