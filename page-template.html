@@ -1554,11 +1554,11 @@ setInterval(() => {
 /* phone width: let rows wrap instead of running off the screen */
 (function(){ const st = document.createElement("style"); st.textContent = "#main{overflow-wrap:anywhere}#main *{max-width:100%;box-sizing:border-box}.subrail,.readrow,.gotabs{flex-wrap:wrap}.day,.daywear{min-width:0}"; document.head.appendChild(st); })();
 /* ===== Simpler navigation: Home, Personal, News. Newest news first. ===== */
-const PERS_NAV = [["kitchen", "Kitchen"], ["fun", "Watch & listen"], ["grow", "Grow"], ["events", "Events"]];
-const NEWS_NAV = [["canada", "Canada"], ["egypt", "Egypt"], ["gulf", "Gulf"], ["usa", "USA"], ["international", "International"], ["markets", "Markets"]];
+ 
+ 
 const CANADA_BLOCKS = ["oakville", "ontario", "canada"];
  
-function topOf(id){ if (id === "home") return "home"; if (PERS_NAV.some(x => x[0] === id)) return "personal"; return "news"; }
+ 
  
 function kpiBar(pairs){
   const f = el("div", "facts");
@@ -1612,19 +1612,41 @@ function quickFigures(){
 }
  
 /* ---------- pages ---------- */
+function ecoByCountry(){
+  const wrap = el("div", "group");
+  wrap.appendChild(sectionHead("Key economic indicators by country", K && K.updated ? "Checked " + bDate(K.updated) : ""));
+  ((K && K.regions) || []).forEach(r => {
+    const kp = (r.kpis || []).filter(k => k.value).slice(0, 3);
+    if (!kp.length) return;
+    const sub = el("div", ""); sub.style.cssText = "margin:10px 0";
+    sub.appendChild(el("strong", "", r.name));
+    sub.appendChild(kpiBar(kp.map(k => [k.name, k.value])));
+    wrap.appendChild(sub);
+  });
+  return wrap;
+}
+function briefNews(){
+  const seen = new Set();
+  const all = ["oakville", "ontario", "canada", "egypt", "gulf", "usa", "international"].flatMap(id => headlinesOf(id)).filter(it => !TRAVEL.includes(it.a));
+  return byNewest(all).filter(it => { if (seen.has(it.t)) return false; seen.add(it.t); return true; });
+}
 function homePage(add){
   add(myLinksRow());
   add(quickFigures());
   if (D.weather) add(weatherCard(false));
   add(prayerCard(false));
-  const g = el("div", "group"); g.appendChild(sectionHead("Gas price · Oakville")); add(gasCard(true));
-  add(goCard());
-  add(marketsStrip());
-  const ec = ecoQuick("canada", 4); if (ec) add(ec);
-  if (D.rentals) add(homesCard(true));
-  const latest = byNewest(CANADA_BLOCKS.flatMap(id => headlinesOf(id)).filter(it => !TRAVEL.includes(it.a)));
-  const lw = el("div", "group"); lw.appendChild(sectionHead("Latest in Canada", "Newest first"));
-  lw.appendChild(newsList(latest, 6)); add(lw);
+  const tr = el("div", "group"); tr.appendChild(sectionHead("Train · Oakville and Union", "GO Transit")); add(goCard());
+  if (D.rentals){ const rh = el("div", "group"); rh.appendChild(sectionHead("Rent prices · Oakville", D.rentals.stats ? "Median $" + Math.round(D.rentals.stats.median).toLocaleString("en-CA") : "")); add(homesCard(true)); }
+  add(ecoByCountry());
+  const nb = el("div", "group"); nb.appendChild(sectionHead("News brief", "Newest first")); add(nb);
+  add(newsList(briefNews(), 6));
+}
+ 
+function renderRail(){
+  const rail = $("#rail"); rail.textContent = "";
+  const mk = (id, label) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(view === id)); b.onclick = () => { view = id; angle = "all"; store.set("view", id); render(); window.scrollTo({ top: 0 }); }; rail.appendChild(b); };
+  mk("all", "Quick look");
+  sections().filter(s => visible(s.id)).forEach(s => mk(s.id, s.name));
 }
  
 function personalPage(id, add){
@@ -1663,30 +1685,39 @@ function marketsPage(add){
   else { add(watchCard()); add(marketsStrip()); add(marketRead()); add(marketDetail()); add(ratesCard()); add(housingCard()); add(marketNews()); add(marketsTable()); }
 }
  
-/* ---------- navigation and render ---------- */
-function renderRail(){
-  const rail = $("#rail"); rail.textContent = "";
-  const btn = (label, on, fn) => { const b = el("button", "chip", label); b.type = "button"; b.setAttribute("aria-pressed", String(on)); b.onclick = fn; rail.appendChild(b); };
-  const top = topOf(view);
-  btn("Home", top === "home", () => go("home"));
-  btn("Personal", top === "personal", () => go(PERS_NAV.find(x => visible(x[0]))[0]));
-  btn("News", top === "news", () => go(NEWS_NAV.find(x => visible(x[0]))[0]));
-  const list = top === "personal" ? PERS_NAV : top === "news" ? NEWS_NAV : [];
-  list.filter(x => visible(x[0])).forEach(([id, name]) => btn(name, view === id, () => go(id)));
+/* ---------- single navigation row (original style) ---------- */
+const SECTION_LIST = [["weather", "Weather"], ["faith", "Prayer"], ["canada", "Canada"], ["egypt", "Egypt"], ["gulf", "Gulf"], ["usa", "USA"], ["international", "International"], ["markets", "Markets"], ["homes", "Rentals"], ["kitchen", "Kitchen"], ["fun", "Watch & listen"], ["grow", "Grow"], ["events", "Events"]];
+function sections(){ return SECTION_LIST.filter(([id]) => visible(id)).map(([id, name]) => ({ id, name })); }
+ 
+function weatherPage(add){ add(quickFigures()); add(weatherCard(true)); }
+function faithPage(add){
+  const P = LP || (X && X.prayer), n = P ? nextLocal(P) : null;
+  add(kpiBar([["Next prayer", n ? n.k : "—"], ["Time left", n ? fmtCountdown(n.t - Date.now()) : "—"]]));
+  add(prayerCard(true)); add(ayahCard());
+}
+function homesPage(add){
+  const hm = D.topics.find(x => x.id === "homes");
+  add(kpiBar([["Listings", (D.rentals && D.rentals.listings ? D.rentals.listings.length : 0)], ["Median rent", D.rentals && D.rentals.stats ? "$" + Math.round(D.rentals.stats.median).toLocaleString("en-CA") : "—"]]));
+  if (D.rentals) add(homesCard(false));
+  if (hm) add(linksGroup(hm, "Search home listings"));
 }
  
 function render(){
   if (!D) return;
-  const valid = view === "home" || PERS_NAV.some(x => x[0] === view) || NEWS_NAV.some(x => x[0] === view);
-  if (!valid) view = "home";
+  if (view !== "all" && !SECTION_LIST.some(x => x[0] === view)) view = "all";
   renderStamp(); renderRail();
   const main = $("#main"); main.textContent = "";
   const add = n => n && main.appendChild(n);
-  add(warningsBlock());
-  if (view === "home") homePage(add);
-  else if (PERS_NAV.some(x => x[0] === view)) personalPage(view, add);
+  if (view === "all") homePage(add);
+  else if (view === "weather") weatherPage(add);
+  else if (view === "faith") faithPage(add);
+  else if (view === "homes") homesPage(add);
   else if (view === "canada") canadaPage(add);
   else if (view === "markets") marketsPage(add);
+  else if (view === "kitchen") personalPage("kitchen", add);
+  else if (view === "fun") personalPage("fun", add);
+  else if (view === "grow") personalPage("grow", add);
+  else if (view === "events") personalPage("events", add);
   else regionPage(view, add);
 }
  
