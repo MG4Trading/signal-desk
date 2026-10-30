@@ -1,0 +1,246 @@
+{
+  "manulife": {
+    "asof": "2026-10-30",
+    "note": "Latest verified results: Q3 2025 (reported 13 Nov 2025). Q2 2026 results not yet read.",
+    "news": [
+      "29 Oct 2026: four new mutual funds added, including Manulife Global Growth Fund (Axiom Investors) and Smart Global Dividend ETF Portfolio Fund"
+    ],
+    "updates": [
+      "All-in-One suite now includes All-Equity and All-Fixed Income ETF Portfolio funds"
+    ],
+    "products": [
+      "Manulife Global Growth Fund",
+      "Smart Global Dividend ETF Portfolio Fund",
+      "All-Equity ETF Portfolio Fund",
+      "All-Fixed Income ETF Portfolio Fund",
+      "All-in-One suite"
+    ],
+    "hiring": [
+      "Not verified. Check live roles in the list above."
+    ],
+    "challenges": [
+      "Q3 2025: net outflows of $6.2B in Global Wealth and Asset Management",
+      "Higher-for-longer interest rates and market uncertainty",
+      "Competition in Asia from Sun Life and Great-West Lifeco"
+    ],
+    "performance": [
+      "Q3 2025 net income $1.8B; core earnings $2.0B, up 9%",
+      "Asia core earnings US$550M, up 29%",
+      "Canada core earnings $428M, up 4%",
+      "LICAT ratio 138% (30 Sep 2025)"
+    ],
+    "stock": [
+      "Not checked in this pass. Check the live quote for TSX: MFC."
+    ],
+    "management": [
+      "No leadership change found in the sources reviewed."
+    ],
+    "expansion": [
+      "Four new funds added 29 Oct 2026 (Canada wealth shelf)."
+    ],
+    "alerts": [
+      "Outflows of $6.2B in Q3 2025 are the main watch item; check Q2 2026 results."
+    ]
+  },
+  "teradata": {
+    "asof": "2026-10-30",
+    "note": "Q2 2026 results, call held 4 Aug 2026.",
+    "news": [
+      "Q2 2026 results; full-year non-GAAP EPS guidance raised to $2.65–2.73",
+      "Remaining $450M term loan paid off; net cash $323M"
+    ],
+    "updates": [
+      "Q3 2026 recurring revenue expected to fall 2–4% year over year (revenue recognition timing)"
+    ],
+    "products": [
+      "Autonomous Knowledge Platform with AI Studio (generally available early Q3 2026)",
+      "Teradata Factory: on-premises with GPU support, built with Dell",
+      "Gartner Visionary, 2026 Magic Quadrant for AI platforms"
+    ],
+    "hiring": [
+      "Not verified. Check live roles in the list above."
+    ],
+    "challenges": [
+      "Consulting revenue down 24%",
+      "Cloud ARR growth slowed below low double-digit target; slower cloud migration",
+      "Total ARR growth only 1–2%",
+      "Hardware costs could pressure 2027 margins (Teradata Factory)"
+    ],
+    "performance": [
+      "Revenue $410M, flat",
+      "Recurring revenue $363M, up 3%; cloud ARR up 8%",
+      "Operating margin 21.5% (16.4% a year earlier)",
+      "Non-GAAP EPS $0.69; adjusted free cash flow $127M"
+    ],
+    "stock": [
+      "Not checked in this pass. Check the live quote for NYSE: TDC."
+    ],
+    "management": [
+      "No leadership change found in the sources reviewed."
+    ],
+    "expansion": [
+      "Teradata Factory on-premises GPU offering with Dell; net cash $323M after loan payoff, $40M buyback."
+    ],
+    "alerts": [
+      "Consulting down 24%; total ARR growth 1–2%; Q3 recurring revenue guided down 2–4%."
+    ]
+  },
+  "geotab": {
+    "asof": "2026-10-30",
+    "note": "Scale figures from Geotab Connect, 17 Feb 2026. No revenue figure published in that release.",
+    "news": [
+      "Geotab Connect 2026 (17 Feb): Geotab Ace generally available to all fleets"
+    ],
+    "updates": [
+      "Newer headlines: Geotab Investigations solution, Geotab Build for construction fleets, Ace AI transportation award (dates not confirmed)"
+    ],
+    "products": [
+      "Geotab Ace (AI assistant in MyGeotab)",
+      "Next-generation GO device",
+      "GO Focus Pro AI dash cam",
+      "GO Anywhere trackers, including GO Anywhere Plus with satellite"
+    ],
+    "hiring": [
+      "Not verified. Check live roles in the list above."
+    ],
+    "challenges": [
+      "Not discussed in the February 2026 release"
+    ],
+    "performance": [
+      "Nearly 6 million subscriptions",
+      "More than 100 billion data points a day",
+      "More than $200M a year invested in R&D",
+      "More than 3,000 customers have used Ace in the past year"
+    ],
+    "stock": [
+      "Private company; no stock quote."
+    ],
+    "management": [
+      "No leadership change found in the sources reviewed."
+    ],
+    "expansion": [
+      "Ace generally available to all fleets; new products for construction and investigations."
+    ],
+    "alerts": [
+      "Revenue not published in the sources reviewed."
+    ]
+  },
+  "salesforce": {
+    "asof": "2026-10-30",
+    "note": "Q2 FY27 results (quarter ended 31 Jul 2026).",
+    "news": [
+      "Full-year FY27 revenue guidance raised by $200M to $46.1–46.4B (includes pending Contentful and Fin acquisitions)"
+    ],
+    "updates": [
+      "Q3 FY27 revenue guided to $11.42–11.5B"
+    ],
+    "products": [
+      "Agentforce",
+      "Data 360",
+      "Slackbot",
+      "Headless 360",
+      "Informatica (acquired)"
+    ],
+    "hiring": [
+      "Not verified. The release gives no headcount figures."
+    ],
+    "challenges": [
+      "Restructuring expense $94M in Q2 (vs $4M a year earlier)",
+      "$100M foreign-exchange headwind on revenue guidance",
+      "GAAP operating margin guidance 20.1%"
+    ],
+    "performance": [
+      "Revenue $11.3B, up 11%",
+      "Subscription and support $10.8B, up 12%",
+      "Non-GAAP operating margin 34.1%; GAAP 20.5%",
+      "Current RPO $33.5B, up 14% (constant currency)",
+      "Agentforce and Data 360 ARR about $3.9B, up more than 210%",
+      "Agentforce ARR above $1.5B, up more than 240%"
+    ],
+    "stock": [
+      "Not checked in this pass. Check the live quote for NYSE: CRM."
+    ],
+    "management": [
+      "No leadership change found in the sources reviewed."
+    ],
+    "expansion": [
+      "Pending Contentful and Fin acquisitions; Informatica already consolidated."
+    ],
+    "alerts": [
+      "Restructuring cost $94M in Q2; FX headwind $100M on guidance."
+    ]
+  },
+  "samsara": {
+    "asof": "2026-10-30",
+    "note": "Q2 FY27 results, quarter ended 1 Aug 2026 (reported 3 Sep 2026). Latest verified results.",
+    "news": [
+      "Q2 FY27 results (3 Sep 2026): stock rose after the release"
+    ],
+    "updates": [
+      "Q3 FY27 revenue guided to $514–516M (about 24% growth); FY27 revenue guided to $2.043–2.047B (26% growth)"
+    ],
+    "products": [
+      "AI features: CEO says adoption of latest AI features is up more than 4x in two months"
+    ],
+    "hiring": [
+      "Not verified. Check the live job list above."
+    ],
+    "challenges": [
+      "GAAP operating income only $4.9M (1% margin); risks include retention, tariffs, memory and compute costs, competition"
+    ],
+    "performance": [
+      "Revenue $508.4M, up 30%",
+      "Ending ARR $2.12B, up 30%; net new ARR $134.1M, up 28%",
+      "Customers over $1M ARR: over $500M ARR, growing over 50% for three quarters",
+      "Free cash flow $64.7M (13% margin); GAAP profitable 4th straight quarter"
+    ],
+    "stock": [
+      "Ticker IOT (NYSE). Stock rose after Q2 results. Check the live quote for the current price."
+    ],
+    "management": [
+      "No leadership change found in the Q2 release."
+    ],
+    "expansion": [
+      "Customers over $1M ARR growing over 50% a year; $30.3M arbitration gain vs Motive Technologies"
+    ],
+    "alerts": [
+      "Growth is strong; watch Q3 guidance for slowdown, and the 1% GAAP margin."
+    ]
+  },
+  "clio": {
+    "asof": "2026-10-30",
+    "note": "Private company; no stock. Funding and acquisitions are the main signals.",
+    "news": [
+      "Acquired Page, a regulatory monitoring and horizon scanning company (reported 26–27 Oct 2026)",
+      "Completed the $1B vLex acquisition (May 2026)",
+      "$500M Series G at a $5B valuation (May 2026)"
+    ],
+    "updates": [
+      "Page adds regulatory monitoring to the legal platform (details from the acquisition report)"
+    ],
+    "products": [
+      "Clio legal practice platform, with vLex legal research and Page regulatory monitoring"
+    ],
+    "hiring": [
+      "Not verified. Check the live job list above."
+    ],
+    "challenges": [
+      "Integrating vLex and Page; large valuation needs growth to justify it"
+    ],
+    "performance": [
+      "Valuation $5B (Series G, May 2026). Revenue and ARR not verified in this pass."
+    ],
+    "stock": [
+      "Private company; no public stock."
+    ],
+    "management": [
+      "No leadership change found in the sources reviewed."
+    ],
+    "expansion": [
+      "vLex ($1B) and Page acquisitions expand research and regulatory tools for law firms."
+    ],
+    "alerts": [
+      "Acquisition pace is high; check the Series G and acquisition news for integration updates."
+    ]
+  }
+}
