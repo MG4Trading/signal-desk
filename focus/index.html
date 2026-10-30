@@ -533,6 +533,15 @@ function viewJobs(){
     if (c.people && c.people.length){ b.appendChild(el("span", "label", "People map")); c.people.forEach(([n, t, why]) => { const a = el("a", "role"); a.href = li(n + " " + c.name); a.target = "_blank"; a.rel = "noopener"; const x = el("span", ""); const nn2 = el("span", "", n); nn2.style.fontWeight = "600"; x.appendChild(nn2); x.appendChild(el("div", "note", t + (why ? " · " + why : ""))); a.appendChild(x); a.appendChild(el("span", "note", "LinkedIn ↗")); b.appendChild(a); }); }
     if (c.search && c.search.length){ b.appendChild(el("span", "label", "Find more on LinkedIn")); const r = el("div", "row"); c.search.forEach(([l, q]) => { const a = el("a", "btn sm", l + " ↗"); a.href = li(q); a.target = "_blank"; a.rel = "noopener"; r.appendChild(a); }); b.appendChild(r); }
     if (c.careers){ const a = el("a", "btn sm ghost", "Careers site ↗"); a.href = c.careers; a.target = "_blank"; a.rel = "noopener"; a.style.alignSelf = "flex-start"; b.appendChild(a); }
+    const pf = c.profile || {};
+    if (Object.keys(pf).length){
+      b.appendChild(el("span", "label", "Profile" + (pf.asof ? " · checked " + pf.asof : "")));
+      if (pf.note) b.appendChild(el("div", "note", pf.note));
+      [["Recent news", "news"], ["Updates", "updates"], ["Stock", "stock"], ["Products", "products"], ["Management", "management"], ["Expansion", "expansion"], ["Hiring", "hiring"], ["Challenges", "challenges"], ["Performance", "performance"], ["Alerts", "alerts"]].forEach(([lab, k]) => {
+        const items = pf[k] || []; if (!items.length) return;
+        const sec = el("div", "note"); sec.appendChild(el("strong", "", lab)); const ul = el("ul"); items.forEach(t => ul.appendChild(el("li", "", t))); sec.appendChild(ul); b.appendChild(sec);
+      });
+    }
     d.appendChild(b); cg.appendChild(d);
   });
   out.push(cg);
