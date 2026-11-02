@@ -1,4 +1,4 @@
-<!doctype html>
+[Resource from github at repo://mg4trading/signal-desk/sha/bde96165c039c7c856b97cdcaa5d6ee9160e9413/contents/page-template.html] <!doctype html>
 <html lang="en-CA">
 <head>
 <meta charset="utf-8">
@@ -1569,8 +1569,24 @@ function sectionHead(title, stamp){
   const h = el("div", "group-head"); h.appendChild(el("strong", "", title)); if (stamp) h.appendChild(el("span", "stamp", stamp)); return h;
 }
 function byNewest(items){ return items.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0)); }
-function newsList(items, first){
-  const sorted = byNewest(items), wrap = el("div", "newslist");
+const POLECON = /\b(politic\w*|election\w*|vote\w*|govern\w*|minister\w*|parliament\w*|premier\w*|mayor\w*|council\w*|budget\w*|polic(y|ies)|law\w*|court\w*|senate|congress|president\w*|cabinet|sanction\w*|tariff\w*|trade|inflation|interest rates?|rate cuts?|central bank\w*|bank of canada|federal reserve|economy|economic\w*|gdp|jobs?|unemploy\w*|deficit\w*|tax\w*|housing|rent\w*|mortgage\w*|recession|markets?|stocks?|currency|dollar|oil|opec|imf|treasury|bonds?|wages?|cost of living|exports?|imports?|energy|regulat\w*|ceasefire|war|military|diplomat\w*|summit|treaty|referendum)\b/i;
+const isPolEco = it => POLECON.test((it.t || "") + " " + (it.d || ""));
+function peSort(items){ const s = byNewest(items); return s.filter(isPolEco).concat(s.filter(x => !isPolEco(x))); }
+function peOn(){ return store.get("pe", true); }
+function peToggle(){
+  const on = peOn(), b = el("button", "chip", on ? "Political and economic first" : "All news");
+  b.type = "button"; b.setAttribute("aria-pressed", String(on));
+  b.title = on ? "Tap to show all news, newest first" : "Tap to show political and economic news first";
+  b.onclick = () => { store.set("pe", !on); render(); window.scrollTo({ top: 0 }); };
+  const w = el("div", "readrow"); w.style.cssText = "padding:8px 0"; w.appendChild(b); return w;
+}
+/* mode: "only" = political and economic only (falls back to all if none), "first" = political and economic at top, other mode = newest first */
+function newsList(items, first, mode){
+  const on = !!mode && peOn();
+  let sorted = byNewest(items);
+  if (on && mode === "only"){ const f = sorted.filter(isPolEco); if (f.length) sorted = f; }
+  else if (on && mode === "first") sorted = peSort(items);
+  const wrap = el("div", "newslist");
   const draw = count => {
     wrap.textContent = "";
     sorted.slice(0, count).forEach(it => wrap.appendChild(item(it)));
@@ -1579,6 +1595,18 @@ function newsList(items, first){
   };
   draw(first || 10);
   return wrap;
+}
+/* Daily update: political and economic headlines from the last 24 hours (latest available if none) */
+function dailyPolEco(ids, n){
+  const cut = Date.now() / 1000 - 86400;
+  const pool = ids.flatMap(id => headlinesOf(id)).filter(isPolEco);
+  const recent = byNewest(pool.filter(it => (it.ts || 0) >= cut));
+  const pick = (recent.length ? recent : byNewest(pool)).slice(0, n || 5);
+  const g = el("div", "group");
+  g.appendChild(sectionHead("Daily update · political and economic", recent.length ? "Last 24 hours" : "Latest available"));
+  if (!pick.length){ g.appendChild(el("div", "hl", "No political or economic headlines in the feeds yet.")); return g; }
+  pick.forEach(it => g.appendChild(item(it)));
+  return g;
 }
 const headlinesOf = id => ((D.headlines || {})[id] || []);
 const regionEco = id => (K && Array.isArray(K.regions)) ? K.regions.find(x => x.id === id) : null;
@@ -1638,8 +1666,9 @@ function homePage(add){
   const tr = el("div", "group"); tr.appendChild(sectionHead("Train · Oakville and Union", "GO Transit")); add(goCard());
   if (D.rentals){ const rh = el("div", "group"); rh.appendChild(sectionHead("Rent prices · Oakville", D.rentals.stats ? "Median $" + Math.round(D.rentals.stats.median).toLocaleString("en-CA") : "")); add(homesCard(true)); }
   add(ecoByCountry());
-  const nb = el("div", "group"); nb.appendChild(sectionHead("News brief", "Newest first")); add(nb);
-  add(newsList(briefNews(), 6));
+  const nb = el("div", "group"); nb.appendChild(sectionHead("News brief", peOn() ? "Political and economic first" : "Newest first")); add(nb);
+  add(peToggle());
+  add(newsList(briefNews(), 6, "first"));
 }
  
 function renderRail(){
@@ -1660,25 +1689,28 @@ function personalPage(id, add){
 function canadaPage(add){
   const all = CANADA_BLOCKS.flatMap(id => headlinesOf(id));
   add(kpiBar([["Stories", all.length], ["Updated", ago(D.generated)]]));
-  const oak = el("div", "group"); oak.appendChild(sectionHead("Oakville", (headlinesOf("oakville").length) + " stories")); add(oak);
+  add(peToggle());
+  add(dailyPolEco(["oakville", "ontario", "canada"], 5));
+  const ec0 = ecoFull("canada"); if (ec0) add(ec0);
   add(gasCard(false)); add(goCard());
-  add(newsList(headlinesOf("oakville").filter(it => !TRAVEL.includes(it.a)), 10));
+  const oak = el("div", "group"); oak.appendChild(sectionHead("Oakville", (headlinesOf("oakville").length) + " stories")); add(oak);
+  add(newsList(headlinesOf("oakville").filter(it => !TRAVEL.includes(it.a)), 10, "first"));
   const ont = el("div", "group"); ont.appendChild(sectionHead("Ontario", headlinesOf("ontario").length + " stories")); add(ont);
-  add(newsList(headlinesOf("ontario"), 8));
-  const ec = ecoFull("canada"); if (ec) add(ec);
+  add(newsList(headlinesOf("ontario"), 8, "first"));
   const can = el("div", "group"); can.appendChild(sectionHead("Canada", headlinesOf("canada").length + " stories")); add(can);
-  add(newsList(headlinesOf("canada"), 10));
+  add(newsList(headlinesOf("canada"), 10, "first"));
   const hm = D.topics.find(x => x.id === "homes"); if (hm && D.rentals){ add(homesCard(false)); }
 }
- 
+
 function regionPage(id, add){
   const t = D.topics.find(x => x.id === id), items = headlinesOf(id);
   add(kpiBar([["Stories", items.length], ["Updated", ago(D.generated)]]));
+  add(peToggle());
   const ec = ecoFull(id); if (ec) add(ec);
-  const g = el("div", "group"); g.appendChild(sectionHead((t ? t.name : id) + " news", "Newest first")); add(g);
-  add(newsList(items, 12));
+  const g = el("div", "group"); g.appendChild(sectionHead((t ? t.name : id) + " news", peOn() ? "Political and economic" : "Newest first")); add(g);
+  add(newsList(items, 12, "only"));
 }
- 
+
 function marketsPage(add){
   add(mkTabs());
   if (mkTab === "biz") bizView().forEach(add);
