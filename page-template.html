@@ -1702,10 +1702,34 @@ function canadaPage(add){
   const hm = D.topics.find(x => x.id === "homes"); if (hm && D.rentals){ add(homesCard(false)); }
 }
 
+/* US election card: static figures checked 2 Nov 2026 (update when the build or the sources change) */
+function electionCard(){
+  const g = el("div", "group");
+  g.appendChild(sectionHead("US midterms 2026 · Michigan and national polls", "Polls as of 1 Nov 2026 · vote on 3 Nov"));
+  const mk = (lab, val) => { const x = el("div", "fact"); x.appendChild(el("span", "label", lab)); x.appendChild(el("b", "", val)); return x; };
+  const f1 = el("div", "facts");
+  f1.appendChild(mk("Senate (MI) El-Sayed (D)", "48.8%"));
+  f1.appendChild(mk("Senate (MI) Rogers (R)", "44.7%"));
+  f1.appendChild(mk("Governor (MI) Benson (D)", "51% (Marist)"));
+  f1.appendChild(mk("National generic ballot", "D 50.7 · R 42.6"));
+  g.appendChild(f1);
+  const rows = [
+    "Michigan Senate (open seat): El-Sayed (D) leads Rogers (R) in most recent polls. Win chance about 75% (PollCheck). Marist (15–18 Oct): 50% to 48%.",
+    "Michigan governor: Benson (D) leads James (R). Marist (15–18 Oct): 51% to 45% among likely voters.",
+    "National: Democrats lead the generic ballot by about 8 points (PollCheck average, 1 Nov). Trump approval 42%, disapproval 57% in the Marist Michigan poll.",
+    "Results: none yet. Polls close 8 pm and 9 pm Eastern on 3 Nov."
+  ];
+  rows.forEach(t => g.appendChild(el("p", "kmeta", t)));
+  const src = el("p", "kmeta", "Sources: "); [["PollCheck Michigan Senate", "https://www.pollcheck.co.uk/us-midterms-2026/senate/michigan"], ["Marist Michigan poll", "https://maristpoll.marist.edu/polls/midterm-elections-in-michigan-october-2026/"], ["PollCheck generic ballot", "https://www.pollcheck.co.uk/us-midterms-2026/generic-ballot"]].forEach(([n, u], i) => { const a = el("a", "", n); a.href = u; a.target = "_blank"; a.rel = "noopener"; if (i) src.appendChild(document.createTextNode(" · ")); src.appendChild(a); });
+  g.appendChild(src);
+  return g;
+}
+
 function regionPage(id, add){
   const t = D.topics.find(x => x.id === id), items = headlinesOf(id);
   add(kpiBar([["Stories", items.length], ["Updated", ago(D.generated)]]));
   add(peToggle());
+  if (id === "usa") add(electionCard());
   const ec = ecoFull(id); if (ec) add(ec);
   const g = el("div", "group"); g.appendChild(sectionHead((t ? t.name : id) + " news", peOn() ? "Political and economic" : "Newest first")); add(g);
   add(newsList(items, 12, "only"));
