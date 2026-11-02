@@ -1722,6 +1722,14 @@ function electionCard(){
   rows.forEach(t => g.appendChild(el("p", "kmeta", t)));
   const src = el("p", "kmeta", "Sources: "); [["PollCheck Michigan Senate", "https://www.pollcheck.co.uk/us-midterms-2026/senate/michigan"], ["Marist Michigan poll", "https://maristpoll.marist.edu/polls/midterm-elections-in-michigan-october-2026/"], ["PollCheck generic ballot", "https://www.pollcheck.co.uk/us-midterms-2026/generic-ballot"]].forEach(([n, u], i) => { const a = el("a", "", n); a.href = u; a.target = "_blank"; a.rel = "noopener"; if (i) src.appendChild(document.createTextNode(" · ")); src.appendChild(a); });
   g.appendChild(src);
+  /* live results, written to results.json by the election update; shows nothing until the file exists */
+  const box = el("div", ""); box.id = "usResults"; g.insertBefore(box, src);
+  fetch("results.json?t=" + Math.floor(Date.now() / 600000), { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(j => {
+    if (!j || !Array.isArray(j.lines)) return;
+    box.textContent = "";
+    box.appendChild(el("p", "label", "Results · " + (j.status || "") + (j.asof ? " · " + j.asof : "")));
+    j.lines.forEach(t => box.appendChild(el("p", "kmeta", String(t))));
+  }).catch(() => {});
   return g;
 }
 
