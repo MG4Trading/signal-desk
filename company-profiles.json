@@ -242,5 +242,118 @@
     "alerts": [
       "Acquisition pace is high; check the Series G and acquisition news for integration updates."
     ]
+  },
+  "accenture": {
+    "asof": "2026-11-09",
+    "note": "Q4 and full-year FY2026 results (quarter ended Aug 2026, reported late Sep 2026).",
+    "news": [
+      "Q4 FY26 revenue $18.68B, beat guidance of $17.75–18.40B"
+    ],
+    "updates": [
+      "FY27 guidance: local-currency revenue growth 3–6%; EPS $14.39–14.81"
+    ],
+    "products": [
+      "Consulting and Managed Services segments (no product launches in the results release)"
+    ],
+    "hiring": [
+      "Not verified. Check the live job list above."
+    ],
+    "challenges": [
+      "FY27 growth guided lower than FY26 (3–6% vs 5% in local currency)",
+      "Bookings growth of 5% in local currency"
+    ],
+    "performance": [
+      "Q4 FY26 revenue $18.68B, up 6% (7% local currency)",
+      "Q4 bookings $22.17B, book-to-bill 1.2",
+      "Q4 GAAP operating margin 15.3% (11.6% a year earlier)",
+      "Q4 GAAP EPS $3.29, up 46%",
+      "FY26 revenue $74.18B; free cash flow $11.62B"
+    ],
+    "stock": [
+      "Ticker ACN (NYSE). Check the live quote."
+    ],
+    "management": [
+      "Julie Sweet, Chair and CEO. No change found in the results release."
+    ],
+    "expansion": [
+      "$11.5B returned to shareholders in FY26 ($7.5B buybacks, $4.0B dividends)"
+    ],
+    "alerts": [
+      "Guidance is lower than FY26 growth; watch how AI demand shows up in bookings."
+    ]
+  },
+  "gartner": {
+    "asof": "2026-11-09",
+    "note": "Q3 2026 results (quarter ended 30 Sep 2026).",
+    "news": [
+      "Q3 2026 results; full-year 2026 outlook raised for revenue, adjusted EBITDA, adjusted EPS and free cash flow"
+    ],
+    "updates": [
+      "Divested operation excluded from adjusted EBITDA; new guidance figures are in the earnings supplement (not checked)"
+    ],
+    "products": [
+      "Research and advisory subscriptions (contract value is the main measure)"
+    ],
+    "hiring": [
+      "Not verified. Check the live job list above."
+    ],
+    "challenges": [
+      "Reported revenue down 1.3% in Q3 (1.1% FX neutral)",
+      "Contract value growth slowed to 2.5% year over year (FX neutral)"
+    ],
+    "performance": [
+      "Q3 revenue $1,505M; adjusted revenue up 2.4%",
+      "Contract value $5.3B, up 2.5% (FX neutral)",
+      "Adjusted EPS $3.59, up 30.1%",
+      "Operating cash flow $294M; free cash flow $275M, up 2.2%",
+      "Adjusted EBITDA $364M, up 7.5%"
+    ],
+    "stock": [
+      "Ticker IT (NYSE). Check the live quote."
+    ],
+    "management": [
+      "Gene Hall, CEO. No leadership change in the Q3 release."
+    ],
+    "expansion": [
+      "Repurchased $138M of stock in Q3 (0.9M shares); $1.7B over the last four quarters"
+    ],
+    "alerts": [
+      "Contract value growth is slow; watch Q4 bookings and the full guidance supplement."
+    ]
+  },
+  "deloitte": {
+    "asof": "2026-11-09",
+    "note": "Deloitte is privately owned by its partners, so no stock or quarterly results. Figures not verified in this pass.",
+    "news": [
+      "Recent coverage on AI in consulting and workforce changes (headlines only; not verified in full)"
+    ],
+    "updates": [
+      "Check the Deloitte newsroom for current announcements"
+    ],
+    "products": [
+      "Consulting, audit and tax services; AI offerings (not verified in this pass)"
+    ],
+    "hiring": [
+      "Not verified. Check the live job list above."
+    ],
+    "challenges": [
+      "Workforce changes linked to AI (headline only; not verified)"
+    ],
+    "performance": [
+      "Not verified in this pass; Deloitte publishes annual revenue in its global report"
+    ],
+    "stock": [
+      "Private partnership; no public stock."
+    ],
+    "management": [
+      "No leadership change verified."
+    ],
+    "expansion": [
+      "Not verified in this pass."
+    ],
+    "alerts": [
+      "Verify the workforce headline before using it."
+    ]
   }
 }
+Claude finished the response
