@@ -1,15 +1,20 @@
-"""Focus app data: private calendar, target-job roles and brief actions.
+"""Focus app data: private calendar, target-job roles, company news and brief actions.
 
 Everything personal is encrypted with the passcode in the FOCUS_KEY secret before it is
 published, so the public site only ever holds ciphertext. Without the secret nothing
 personal is written at all.
 """
 import base64, hashlib, html, json, os, re, shutil, time
+import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, date
+from email.utils import parsedate_to_datetime
+from urllib.parse import quote_plus
 from zoneinfo import ZoneInfo
 
 TZ = ZoneInfo("America/Toronto")
 ITER = 200000
+NEWS_DAYS = 30
+NEWS_MAX = 8
 TITLE_OK = re.compile(r"sales op|revenue op|revops|rev ops|sales strateg|sales planning|revenue planning|go[- ]to[- ]market|\bgtm\b|"
                       r"commercial|business operations|deal desk|partner|channel|alliances|strategy & planning|strategy and planning|"
                       r"sales enablement|business development|distribution|wholesal|market entry|quota|capacity|forecast", re.I)
@@ -77,6 +82,51 @@ def calendar(ics_url, get, log):
     out.sort(key=lambda x: x.get("s") or x.get("d"))
     log(f"focus: {len(out)} calendar events")
     return out
+
+
+# ------------------------------------------------------------------ company news (every run)
+def _news_query(c):
+    q = c.get("news_q") or f'"{c["name"]}"'
+    return q + " when:%dd" % NEWS_DAYS
+
+
+def company_news(c, get, log):
+    """Google News RSS for the company, newest first, last NEWS_DAYS days, de-duplicated by title."""
+    url = ("https://news.google.com/rss/search?q=" + quote_plus(_news_query(c))
+           + "&hl=en-CA&gl=CA&ceid=CA:en")
+    raw = get(url, timeout=30)
+    if isinstance(raw, str):
+        raw = raw.encode("utf-8")
+    root = ET.fromstring(raw)
+    cutoff = time.time() - NEWS_DAYS * 86400
+    seen, out = set(), []
+    for it in root.iter("item"):
+        title = (it.findtext("title") or "").strip()
+        link = (it.findtext("link") or "").strip()
+        src = (it.findtext("source") or "").strip()
+        try:
+            ts = parsedate_to_datetime(it.findtext("pubDate") or "").timestamp()
+        except Exception:
+            continue
+        # Google titles end with " - Source"; strip it so the source is shown once.
+        if src and title.endswith(" - " + src):
+            title = title[: -len(src) - 3]
+        key = re.sub(r"\W+", " ", title.lower()).strip()
+        if not title or not link or ts < cutoff or key in seen:
+            continue
+        seen.add(key)
+        out.append({"t": title[:200], "l": link, "s": src[:60], "ts": int(ts)})
+    out.sort(key=lambda x: x["ts"], reverse=True)
+    return out[:NEWS_MAX]
+
+
+# ------------------------------------------------------------------ company profiles (hand-checked, from company-profiles.json)
+def _profiles():
+    try:
+        p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "company-profiles.json")
+        return json.load(open(p, encoding="utf-8"))
+    except Exception:
+        return {}
 
 
 # ------------------------------------------------------------------ job boards
@@ -150,6 +200,7 @@ def jobs(cfg, prev, cal, get, log, drops=None):
     prev_jobs = {c["key"]: c for c in (prev.get("jobs") or [])}
     fresh = not (prev.get("jobs_at") and now - prev["jobs_at"] < 55 * 60)
     briefs = [e for e in cal if e.get("t", "").startswith("🎯")]
+    profiles = _profiles()
     out = []
     for c in cfg.get("companies", []):
         p = prev_jobs.get(c["key"], {})
@@ -160,6 +211,18 @@ def jobs(cfg, prev, cal, get, log, drops=None):
             except Exception as e:
                 err = str(e)[:120]
                 log("focus jobs", c["key"], e)
+        # News is fetched on every run, so each refresh shows the latest coverage.
+        news, news_err = p.get("news", []), ""
+        try:
+            news = company_news(c, get, log)
+        except Exception as e:
+            news_err = str(e)[:120]
+            log("focus news", c["key"], e)
+        # The page already shows profile["news"] under "Recent news", so live headlines go there.
+        profile = dict(profiles.get(c["key"], {}))
+        if news:
+            profile["news"] = ["%s (%s, %s)" % (n["t"], n["s"] or "news", datetime.fromtimestamp(n["ts"], TZ).strftime("%d %b"))
+                               for n in news]
         first = dict(p.get("first", {}))
         for r in roles:
             first.setdefault(r["id"], int(now))
@@ -170,7 +233,9 @@ def jobs(cfg, prev, cal, get, log, drops=None):
         acts += [{"d": x["d"], "t": x["t"], "text": x["text"]} for x in (drops or []) if x["co"].lower() == c["name"].lower()]
         out.append({"key": c["key"], "name": c["name"], "goal": c.get("goal", ""), "careers": c.get("careers", ""),
                     "roles": roles[:12], "first": first, "people": c.get("people", []), "search": c.get("search", []),
-                    "actions": acts[-3:], "err": err})
+                    "actions": acts[-3:], "err": err,
+                    "news": news, "news_at": int(now), "news_err": news_err,
+                    "profile": profile})
     return out, (now if fresh else prev.get("jobs_at", now))
 
 
@@ -237,4 +302,4 @@ def run(root, site, prev_dir, get, log):
         data["jobs"], data["jobs_at"] = prev.get("jobs", []), prev.get("jobs_at")
     json.dump(encrypt(data, key), open(os.path.join(dst, "data.enc"), "w"))
     json.dump(status, open(os.path.join(dst, "status.json"), "w"))
-    log(f"focus: encrypted data written ({sum(len(c['roles']) for c in data['jobs'])} roles)")
+    log(f"focus: encrypted data written ({sum(len(c['roles']) for c in data['jobs'])} roles, {sum(len(c.get('news', [])) for c in data['jobs'])} news)")
