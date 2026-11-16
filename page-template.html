@@ -1750,8 +1750,12 @@ function marketsPage(add){
 }
  
 /* ---------- single navigation row (original style) ---------- */
+/* Personal sections live in the Focus app now: hidden from the hub's tab row, opened with ?v=<id> */
+const PERSONAL = ["homes", "kitchen", "fun", "grow"];
+(function(){ const qv = new URLSearchParams(location.search).get("v"); if (qv && PERSONAL.includes(qv)) view = qv; else if (PERSONAL.includes(view)) view = "all"; })();
+function backToFocus(){ const a = el("a", "chip", "← Back to Focus"); a.href = "focus/"; a.style.cssText = "display:inline-block;text-decoration:none;margin:4px 0 8px"; return a; }
 const SECTION_LIST = [["weather", "Weather"], ["faith", "Prayer"], ["canada", "Canada"], ["egypt", "Egypt"], ["gulf", "Gulf"], ["usa", "USA"], ["international", "International"], ["markets", "Markets"], ["homes", "Rentals"], ["kitchen", "Kitchen"], ["fun", "Watch & listen"], ["grow", "Grow"], ["events", "Events"]];
-function sections(){ return SECTION_LIST.filter(([id]) => visible(id)).map(([id, name]) => ({ id, name })); }
+function sections(){ return SECTION_LIST.filter(([id]) => visible(id) && !PERSONAL.includes(id)).map(([id, name]) => ({ id, name })); }
  
 function weatherPage(add){ add(quickFigures()); add(weatherCard(true)); }
 function faithPage(add){
@@ -1772,6 +1776,7 @@ function render(){
   renderStamp(); renderRail();
   const main = $("#main"); main.textContent = "";
   const add = n => n && main.appendChild(n);
+  if (PERSONAL.includes(view)) add(backToFocus());
   if (view === "all") homePage(add);
   else if (view === "weather") weatherPage(add);
   else if (view === "faith") faithPage(add);
