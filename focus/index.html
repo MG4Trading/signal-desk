@@ -288,6 +288,29 @@ function viewToday(){
   const O = openItems(), hot = O.filter(x => bucket(x) === "now" && x.kind !== "idea").length; const ib = el("button", "btn sm ghost", "📥 " + O.length + " in Inbox" + (hot ? " · " + hot + " 🔥" : "")); ib.type = "button"; ib.onclick = () => go("inbox"); fr.appendChild(ib); p.appendChild(fr);
   p.appendChild(el("div", "note", wk ? "No work today. Lead with family, health and one personal win; add as much as you like below." : "Top 3 first, then anything else. Focus ranks your Inbox so the next thing is always clear."));
   g.appendChild(p); out.push(g);
+  // Assistant priorities: the latest "✅ Priorities" all-day calendar event for today.
+  // Line shape: 1. [HIGH] [REPLY] Task — detail | https://link
+  const pr = ((P && P.cal) || []).filter(e => (e.t || "").startsWith("✅") && (e.d || (e.s || "").slice(0, 10)) === dkey()).pop();
+  if (pr && pr.desc){
+    const pg = grp("Assistant priorities", pr.t.replace(/^✅\s*/, "")), pp = el("div", "pad");
+    pr.desc.split("\n").map(x => x.trim()).filter(Boolean).forEach(line => {
+      const m = line.match(/^(\d+)[.)]\s*(?:\[(HIGH|MED|LOW)\]\s*)?(?:\[([A-Z][A-Z ]*)\]\s*)?(.*?)(?:\s+\|\s+(https:\/\/\S+))?$/);
+      if (!m){ pp.appendChild(el("div", "note", line)); return; }
+      const lvl = m[2] || "", act = (m[3] || "").trim(), text = m[4], url = m[5] || "";
+      const box = el("div", ""); box.style.cssText = "padding:8px 0;border-bottom:1px solid var(--line)";
+      const head = el("div", "note", (lvl === "HIGH" ? "🔴 " : lvl === "MED" ? "🟠 " : lvl === "LOW" ? "⚪ " : "") + text); head.style.fontWeight = lvl === "HIGH" ? "600" : "400"; box.appendChild(head);
+      const r = el("div", "row"); r.style.cssText = "gap:8px;margin-top:6px;flex-wrap:wrap";
+      if (act){
+        const label = act.charAt(0) + act.slice(1).toLowerCase();
+        if (url){ const ab = el("a", "btn sm pri", label + " ↗"); ab.href = url; ab.target = "_blank"; ab.rel = "noopener"; r.appendChild(ab); }
+        else r.appendChild(el("span", "stamp", label));
+      } else if (url){ const ab = el("a", "btn sm pri", "Open ↗"); ab.href = url; ab.target = "_blank"; ab.rel = "noopener"; r.appendChild(ab); }
+      const tb = el("button", "btn sm ghost", "+ Today"); tb.type = "button";
+      tb.onclick = () => { const o = day(); if (o.top.includes(text)) return toast("Already in today's list"); let k = o.top.findIndex(z => !z); if (k < 0) k = o.top.length; o.top[k] = text; o.done[k] = false; saveDay(o); _bc = null; render(); };
+      r.appendChild(tb); box.appendChild(r); pp.appendChild(box);
+    });
+    pg.appendChild(pp); out.push(pg);
+  }
   // Focus zone
   const sp = store.get("sprint", null), z = grp("Focus zone", sp ? "in a sprint" : "one task, no switching"), zp = el("div", "pad");
   const tr = el("div", "row"); tr.style.justifyContent = "space-between"; const tm = el("div", "timer", "--:--"); tm.id = "timer"; tr.appendChild(tm);
