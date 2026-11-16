@@ -74,7 +74,7 @@ def calendar(ics_url, get, log):
         loc = str(ev.get("LOCATION", "") or "").strip()
         if loc:
             item["loc"] = loc[:80]
-        if title.startswith("🎯"):
+        if title.startswith(("🎯", "✅")):  # ✅ = assistant priorities list, shown on the Today tab
             desc = str(ev.get("DESCRIPTION", "") or "")
             desc = re.sub(r"<br\s*/?>", "\n", desc, flags=re.I)
             item["desc"] = html.unescape(re.sub(r"<[^>]+>", "", desc)).strip()[:6000]
