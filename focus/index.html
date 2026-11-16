@@ -137,7 +137,7 @@ ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;f
 <nav><div class="wrap">
   <button type="button" data-tab="today" aria-pressed="true"><span>🧭</span>Today</button>
   <button type="button" data-tab="inbox" aria-pressed="false"><span>📥</span>Inbox<i class="dot" id="ideaDot" hidden></i></button>
-  <button type="button" data-tab="jobs" aria-pressed="false"><span>🎯</span>Target jobs<i class="dot" id="jobDot" hidden></i></button>
+  <button type="button" data-tab="life" aria-pressed="false"><span>🏡</span>Personal</button>
   <button type="button" data-tab="health" aria-pressed="false"><span>🫀</span>Health</button>
   <button type="button" data-href="compass.html" aria-pressed="false"><span>🤝</span>Compass</button>
 </div></nav>
@@ -262,7 +262,7 @@ function header(){
   const w = nx ? t[nx] - n : null;
   $("#hsub").textContent = new Date().toLocaleDateString("en-CA", { weekday:"short", month:"short", day:"numeric" }) + (isWeekend() ? " · weekend" : "") + (nx ? " · " + nx + " in " + (w < 60 ? w + " min" : Math.floor(w / 60) + " h " + (w % 60) + " min") : "");
   const hot = openItems().filter(x => bucket(x) === "now").length; $("#ideaDot").hidden = !hot; $("#ideaDot").textContent = hot;
-  const acts = jobActions().filter(a => !store.get("ja:" + a.id, false)).length; $("#jobDot").hidden = !acts; $("#jobDot").textContent = acts;
+  const acts = jobActions().filter(a => !store.get("ja:" + a.id, false)).length; const jd = $("#jobDot"); if (jd){ jd.hidden = !acts; jd.textContent = acts; }
 }
 
 /* ---------- TODAY ---------- */
@@ -823,13 +823,24 @@ function viewHealth(){
 let tab = store.get("tab", "today");
 function go(t){ tab = t; store.set("tab", t); render(); window.scrollTo({ top:0 }); }
 document.querySelectorAll("nav button").forEach(b => b.onclick = () => b.dataset.href ? (location.href = b.dataset.href) : go(b.dataset.tab));
+/* ---------- PERSONAL: sections moved here from ONE Hub (they open the hub page for that section) ---------- */
+function viewLife(){
+  const g = grp("Personal", "moved from ONE Hub"), p = el("div", "pad");
+  [["🏠", "Rentals", "Oakville listings, median rent and price trend", "homes"], ["🍳", "Kitchen", "Recipes, search and saved dishes", "kitchen"], ["🎧", "Watch & listen", "Talks, shows and podcasts", "fun"], ["🌱", "Grow", "Tips and fresh reads", "grow"]].forEach(([ic, name, sub, v]) => {
+    const a = el("a", "btn", ic + "  " + name + " ↗"); a.href = "../?v=" + v; a.style.cssText = "display:block;text-align:left;margin:8px 0;padding:14px 16px;text-decoration:none";
+    const s = el("div", "note", sub); s.style.marginTop = "4px"; a.appendChild(s); p.appendChild(a);
+  });
+  p.appendChild(el("div", "note", "Job search moved to the Interview Model app."));
+  g.appendChild(p); return [g];
+}
+
 function render(){
   const ae = document.activeElement; if (ae && ae.matches && ae.matches("#main input:not([type=password])") && ae.value){ pending = true; return; }
   pending = false; _bc = null;
-  if (tab === "ideas") tab = "inbox"; document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
+  if (tab === "ideas") tab = "inbox"; if (tab === "jobs") tab = "today"; document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tab === tab)));
   header();
   const m = $("#main"); m.textContent = ""; m.appendChild(motivationBar());
-  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "jobs" ? viewJobs().concat(careersNews()) : tab === "health" ? viewHealth().concat(healthNews()) : viewToday()).forEach(n => n && m.appendChild(n));
+  (tab === "inbox" || tab === "ideas" ? viewInbox() : tab === "life" ? viewLife() : tab === "health" ? viewHealth().concat(healthNews()) : viewToday()).forEach(n => n && m.appendChild(n));
   tick();
 }
 let pending = false;
