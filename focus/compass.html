@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relationship Compass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: concentric rings (you at the centre) on top, a 1–10 ladder of tappable people chips below, a bottom sheet for each approach card. */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --ink:#132a2c; --muted:#5b6f71; --line:#dbe4e4;
+  --accent:#0f6b70; --gold:#e3a72f;
+  --display:"Sora",system-ui,-apple-system,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1617; --surface:#142224; --ink:#e6f0f0; --muted:#94aaac; --line:#24393b;
+  --accent:#4fb7bb; --gold:#f0bd55; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0c1617; --surface:#142224; --ink:#e6f0f0; --muted:#94aaac; --line:#24393b;
+  --accent:#4fb7bb; --gold:#f0bd55; color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.45 var(--body);-webkit-text-size-adjust:100%}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 48px;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+h1{font-size:26px;letter-spacing:-.01em}
+h2{font-size:17px}
+.sub{color:var(--muted);margin:4px 0 0;font-size:15px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}
+.rule{display:flex;gap:8px;align-items:flex-start;font-size:15px}
+.rule b{font-family:var(--display);color:var(--gold);font-size:14px;min-width:16px}
+.note{margin:12px 0 0;font-size:14px;color:var(--muted);border-left:3px solid var(--gold);padding-left:10px}
+.ringbox{display:flex;justify-content:center}
+.ringbox svg{width:100%;max-width:360px;height:auto}
+.legend{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:4px}
+.search{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.search:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.ladder{display:flex;flex-direction:column;gap:8px}
+.rung{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.lvl{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-weight:700;color:#fff;font-size:18px}
+.rung-t{font-size:13px;color:var(--muted);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:600 15px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:8px 12px;border-radius:999px;cursor:pointer}
+.chip:active{transform:scale(.97)}
+.chip .moved{color:var(--gold);margin-left:4px}
+.empty{font-size:14px;color:var(--muted)}
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(5,15,16,.45);opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-height:88%;overflow-y:auto;background:var(--surface);border-radius:20px 20px 0 0;transform:translateY(105%);transition:transform .25s ease;box-shadow:0 -8px 30px rgba(0,0,0,.2)}
+.sheet.on{transform:none}
+@media (prefers-reduced-motion:reduce){.sheet,.scrim{transition:none}}
+.sheet-in{max-width:720px;margin:0 auto;padding:12px 16px 32px;display:flex;flex-direction:column;gap:14px}
+.grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto}
+.shead{display:flex;gap:12px;align-items:center}
+.shead h3{font-size:21px;flex:1}
+.x{border:0;background:var(--bg);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:20px;cursor:pointer}
+.why{margin:0;font-size:16px}
+.stepper{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+.stepper button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:6px 12px;font:600 15px var(--body);cursor:pointer}
+.meter{display:flex;flex-direction:column;gap:4px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden;display:flex}
+.bar i{display:block;background:var(--accent)}
+.meter small{color:var(--muted);font-size:13px;display:flex;justify-content:space-between}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.f{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.f h4{margin:0 0 3px;font:600 12px var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.f p{margin:0;font-size:15.5px}
+.f.say{border-left:4px solid var(--accent)}
+.f.warn{border-left:4px solid #c2453a}
+.f.lens{border-left:4px solid var(--gold)}
+.share{display:inline-block;font:600 12px var(--body);padding:2px 8px;border-radius:999px;background:var(--accent);color:var(--surface);margin-right:6px}
+.brief{display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--gold)}
+.brief .sub{margin:0}
+.brief select{appearance:auto}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.steps li{display:grid;grid-template-columns:88px 1fr;gap:10px;align-items:baseline;font-size:15.5px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:0;padding-bottom:0}
+.steps b{font:600 12px var(--display);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+#bfull{align-self:flex-start}
+.foot{font-size:13px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <a href="./" style="display:inline-block;margin-bottom:8px;color:var(--accent);font-weight:600;text-decoration:none">← Back to Focus</a>
+    <h1>Relationship Compass</h1>
+    <p class="sub">Your playbook for every person you meet. Tap a person type to see how to show up, speak, share and follow up.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="r-h">
+    <h2 id="r-h">The 5 rules for everyone</h2>
+    <div class="rules">
+      <div class="rule"><b>1</b><span>Smile and use their name twice.</span></div>
+      <div class="rule"><b>2</b><span>Listen more than you talk.</span></div>
+      <div class="rule"><b>3</b><span>Remember one detail and ask about it next time.</span></div>
+      <div class="rule"><b>4</b><span>Make small promises and keep every one.</span></div>
+      <div class="rule"><b>5</b><span>End on a high: the last minute is what they remember.</span></div>
+    </div>
+    <p class="note">When you're unsure, go one level more formal. You can always warm up later, but it's hard to take back oversharing.</p>
+  </section>
+
+  <section class="panel brief" aria-labelledby="b-h">
+    <h2 id="b-h">Before I meet</h2>
+    <p class="sub">Pick who you're about to see for a 30-second briefing.</p>
+    <select id="bsel" class="search" aria-label="Who are you about to meet?"></select>
+    <ol class="steps" id="bout"></ol>
+    <button class="chip" id="bfull">Open full card</button>
+  </section>
+
+  <section class="panel" aria-labelledby="c-h">
+    <h2 id="c-h">Your circles</h2>
+    <p class="sub">Level 1 is the inner ring. Tap a dot to open that card.</p>
+    <div class="ringbox"><svg id="rings" viewBox="0 0 340 340" role="img" aria-label="Concentric circles from level 1 near the centre to level 10 on the outside"></svg></div>
+    <div class="legend"><span>● Closest, highest priority</span><span>Widest circle ○</span></div>
+  </section>
+
+  <label for="q" class="sub" style="margin:0">Find a person type</label>
+  <input id="q" class="search" type="search" placeholder="e.g. recruiter, neighbour, Masjid" autocomplete="off">
+  <section class="ladder" id="ladder" aria-label="Levels 1 to 10"></section>
+  <p class="foot">Level changes you make are saved on this device. “Reset” brings back the suggested level.</p>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="s-title"><div class="sheet-in" id="sheetIn"></div></aside>
+
+<script>
+const LEVEL_NAMES={1:"Inner core",2:"Family pillars",3:"Trusted circle",4:"Career gatekeepers & old trust",5:"Community & strategic",6:"Work & network",7:"Neighbourhood",8:"Customers",9:"New faces",10:"Passers-by"};
+const P=[
+{id:"wife",n:"Wife",l:1,share:"Open",listen:70,
+why:"Your anchor relationship. Everything else rests on it.",
+look:"Stay well groomed at home too. Effort tells her she still matters.",
+expect:"Full attention, reliability, and partnership in every big decision.",
+tone:"Warm, soft and playful. Lower your voice when you disagree.",
+shareT:"Dreams, worries and plans, and she hears them first.",
+body:"Phone face-down, turn toward her, eye contact and touch.",
+open:"“How was your day, really?”",close:"“Thank you for today. I noticed how you…”",
+rhythm:"A 10-minute check-in every day; a walk or date once a week.",
+bounds:"Keep private matters between you. No work talk at meals.",
+flags:"Ignoring her small bids for attention, sarcasm, keeping score.",
+culture:"Honour her family in your words, in private and in public.",
+lens:"Bids for connection: couples who answer each other's small bids for attention build lasting trust.",
+next:"Agree one shared goal each month."},
+{id:"kids",n:"My kids",l:1,share:"Age-appropriate",listen:70,
+why:"You are the model for every relationship they will build.",
+look:"Relaxed and present. Dress so you can play.",
+expect:"Safety, consistency, your time, and praise for effort.",
+tone:"Calm and encouraging. Firm without shouting.",
+shareT:"Values, stories and honest answers. Keep adult worries away.",
+body:"Get down to eye level, phone away, hugs and high-fives.",
+open:"“What was the best part and the hardest part of today?”",close:"“I'm proud of how hard you tried.”",
+rhythm:"One-on-one minutes daily; a weekly activity with each child.",
+bounds:"Never compare siblings. Keep adult conflict out of their sight.",
+flags:"Withdrawal, secrecy, sudden changes in friends or mood.",
+culture:"Blend Canadian independence with family values and faith practice.",
+lens:"Growth mindset: praising effort over talent builds resilience.",
+next:"A monthly one-on-one outing with each child."},
+{id:"parents",n:"Parents & siblings",l:2,share:"Wide",listen:60,
+why:"Your roots and lifelong loyalty.",
+look:"Neat and respectful, on visits and on video calls.",
+expect:"Regular contact, respect, and being included in family news.",
+tone:"Respectful and warm. Be patient with repeated advice.",
+shareT:"News and plans. Filter money and marriage matters.",
+body:"Stand to greet, customary greeting for elders, full attention.",
+open:"“I was thinking of you. How is your health, and everyone?”",close:"“Keep us in your prayers. Talk soon.”",
+rhythm:"Weekly call with parents; every two weeks with siblings; video on occasions.",
+bounds:"Don't take sides in sibling disputes. Keep spouse matters private.",
+flags:"Guilt trips, comparisons, old rivalries coming back.",
+culture:"Kindness to parents comes first. Never miss Eid and occasion calls.",
+lens:"Consistency beats intensity: short, regular contact keeps bonds warm across distance.",
+next:"Set a recurring call reminder in iOS Reminders."},
+{id:"inlaws",n:"Wife's family",l:2,share:"Selective",listen:65,
+why:"Honouring them is honouring your wife.",
+look:"One step more formal than with your own family, especially on visits.",
+expect:"Respect, generosity, showing up on occasions.",
+tone:"Courteous and warm. Never sarcastic.",
+shareT:"Achievements and family plans. Your marriage's private matters stay out.",
+body:"Greet elders first, stand, accept hospitality graciously.",
+open:"“It's always good to see you. How is everyone?”",close:"“Thank you for having us. Our home is always open to you.”",
+rhythm:"Occasion calls (Eid, birthdays); a monthly check-in, with or through your wife.",
+bounds:"Never criticise them, and never settle couple issues through them.",
+flags:"Getting pulled into family politics; venting about your spouse.",
+culture:"Bring a gift when visiting and serve elders first.",
+lens:"Reciprocity: small, regular generosity builds lasting goodwill.",
+next:"Note one detail per person to ask about next visit."},
+{id:"extended",n:"Extended family",l:3,share:"Moderate",listen:55,
+why:"A wider support network, and your family's reputation.",
+look:"Smart casual; dress up for gatherings.",
+expect:"Presence at key events, remembering names, kind words.",
+tone:"Friendly, light, respectful to elders.",
+shareT:"Highlights, not problems.",
+body:"Greet everyone in the room, smile, customary greetings.",
+open:"“Ahlan! It's been too long. How are the kids?”",close:"“Let's not wait for the next occasion to meet.”",
+rhythm:"Every occasion, plus a message every quarter.",
+bounds:"Stay out of gossip, money talk and comparisons.",
+flags:"Unsolicited advice about your life; gossip chains.",
+culture:"Keeping family ties is valued. A short message on occasions goes a long way.",
+lens:"Familiarity breeds liking: short, frequent touches beat rare long visits.",
+next:"Send a greeting in the family group chat on each occasion."},
+{id:"closefr",n:"Close friends",l:3,share:"Open",listen:50,
+why:"Chosen family and your most honest mirror.",
+look:"Come as you are.",
+expect:"Loyalty, honesty, and showing up when it counts.",
+tone:"Relaxed, humorous, direct.",
+shareT:"Ideas, struggles and risky plans. Ask for real feedback.",
+body:"Relaxed; side-by-side activities such as sport, coffee or a drive.",
+open:"“What's new with you, and what's on your mind?”",close:"“Let's lock in the next one now.”",
+rhythm:"A weekly text; a monthly meetup, game or workout.",
+bounds:"Keep money lending clear and in writing, or give it as a gift.",
+flags:"They only reach out when they need something.",
+culture:"Invite them home. Hospitality deepens friendship.",
+lens:"Shared challenges such as sport and adventure bond people faster than talk alone.",
+next:"Plan one shared adventure each season."},
+{id:"boss",n:"Boss / manager",l:4,share:"Selective",listen:60,
+why:"Shapes your growth, visibility and reputation.",
+look:"Match or slightly exceed the team's dress code.",
+expect:"Results, reliability, no surprises, solutions with every problem.",
+tone:"Confident, concise, respectful. Lead with data.",
+shareT:"Work ideas and progress. Keep personal life light.",
+body:"Upright posture, steady eye contact, notebook ready.",
+open:"“Quick update: here's where we are, and one decision I need from you.”",close:"“So the next step is ___ by Friday. I'll confirm in writing.”",
+rhythm:"A weekly one-on-one and a short written update every Friday.",
+bounds:"Never criticise peers to them. Don't overshare at events.",
+flags:"Moving goalposts or credit-taking. Document decisions.",
+culture:"Canadian workplaces value directness wrapped in politeness: “I'd suggest…”.",
+lens:"No surprises: predictability is what builds a manager's trust.",
+next:"Each quarter ask: “What would make me more valuable to you?”"},
+{id:"hiring",n:"Hiring manager",l:4,share:"Focused",listen:50,
+why:"The gatekeeper to your next role.",
+look:"One level above their dress code. Polished and simple.",
+expect:"A fit to their problem, proof in numbers, and curiosity.",
+tone:"Energetic yet calm, solution-focused.",
+shareT:"Result stories using the STAR method. No personal detail.",
+body:"Firm handshake, smile, lean in slightly, nod as they speak.",
+open:"“Thank you for your time. I read about your focus on ___, and I'd love to hear how this role supports it.”",close:"“Here's how I'd add value in the first 90 days. What are the next steps?”",
+rhythm:"Thank-you note within 24 hours; follow up after 5–7 business days.",
+bounds:"Let them raise salary first. Never criticise past employers.",
+flags:"Vague scope, unrealistic expectations, signs of high turnover.",
+culture:"Canadian interviews reward modest confidence: “we delivered”, then “my part was…”.",
+lens:"Primacy and recency: the first two minutes and your closing summary stick the most.",
+next:"Send a short 30-60-90 day note after the interview."},
+{id:"longfr",n:"Long-term friends",l:4,share:"Fairly open",listen:55,
+why:"Trust built over years is rare. Protect it.",
+look:"Casual.",
+expect:"Remembering milestones, low-pressure contact.",
+tone:"Warm, a bit nostalgic, but about today too.",
+shareT:"Life updates and plans.",
+body:"Relaxed, your usual greeting.",
+open:"“I saw something that reminded me of you…”",close:"“Let's not let it be this long again.”",
+rhythm:"A monthly message; meet every few months.",
+bounds:"Don't let old roles define who they are now.",
+flags:"Living only in the past; one-sided effort.",
+culture:"Ask about their family by name.",
+lens:"Remembered details are the strongest signal that you care.",
+next:"Add their birthdays to Google Calendar."},
+{id:"mentor",n:"Mentors",l:4,share:"Open on goals",listen:70,
+why:"They shortcut years of trial and error and open doors you can't see yet.",
+look:"Business casual, prepared and on time.",
+expect:"Respect for their time, real action on their advice, updates on results.",
+tone:"Humble, curious, grateful.",
+shareT:"Your goals, obstacles and decisions. Ask focused questions.",
+body:"Take notes, nod, don't interrupt.",
+open:"“I tried what you suggested last time. Here's what happened.”",close:"“Thank you. I'll act on this and report back by ___.”",
+rhythm:"Every 6–8 weeks; a short thank-you after each talk.",
+bounds:"Never treat them as a job lead machine.",
+flags:"Advice that conflicts with your values; one-way taking.",
+culture:"Honour seniority with gratitude; Canadians appreciate a written thank-you.",
+lens:"People invest in those who show progress on their advice.",
+next:"Send a two-line results update after each piece of advice you use."},
+{id:"famfr",n:"Family friends",l:5,share:"Moderate",listen:55,
+why:"Shared family circles; your kids grow up with theirs.",
+look:"Smart casual, family-friendly.",
+expect:"Hospitality, reciprocity, respect for both families.",
+tone:"Warm, polite, including spouses and kids.",
+shareT:"Family news and positive plans.",
+body:"Greet both spouses respectfully and follow their comfort with greetings.",
+open:"“How is the family? The kids must be growing fast.”",close:"“Next time at our place, inshallah.”",
+rhythm:"Seasonal gatherings; messages on occasions.",
+bounds:"Keep marriage and money private. Don't compare kids.",
+flags:"Competition between families; gossip.",
+culture:"Return invitations and bring something when you visit.",
+lens:"Balanced reciprocity: return hospitality within a reasonable time.",
+next:"Host one family gathering each season."},
+{id:"masjid",n:"Masjid friends",l:5,share:"Values-first",listen:60,
+why:"Community, faith and good company.",
+look:"Clean, modest, a good scent; your best on Fridays.",
+expect:"Good manners, reliability, helping with community work.",
+tone:"Calm, humble, kind.",
+shareT:"Values, good news, community ideas. Less business talk.",
+body:"Salam with a smile, handshake, make room for others.",
+open:"“Assalamu alaikum. How is your family?”",close:"“Jazak Allah khair. See you at Jumu'ah.”",
+rhythm:"Weekly in person; volunteer together monthly.",
+bounds:"The Masjid is not a sales floor. Keep business for a separate coffee.",
+flags:"Divisive debates; talk about people who aren't present.",
+culture:"Visit the sick, attend funerals and celebrations.",
+lens:"Shared values build trust faster than anything else.",
+next:"Join one community activity this month."},
+{id:"clients",n:"Business clients & partners",l:5,share:"Insight-led",listen:65,
+why:"Revenue and referrals for MG Business Solutions.",
+look:"Business professional at first; then mirror their style.",
+expect:"Expertise, quick responses, kept promises.",
+tone:"Consultative, confident, plain language.",
+shareT:"Insights and recommendations. Internal numbers stay private.",
+body:"Take notes visibly and summarise back what you heard.",
+open:"“Before I share anything, what does success look like for you this year?”",close:"“I'll send ___ by ___, and I'll need ___ from you.”",
+rhythm:"The agreed cadence, a monthly value update, a quarterly review.",
+bounds:"Under-promise and over-deliver. Confirm scope in writing.",
+flags:"Scope creep and late payments.",
+culture:"Canadian B2B buyers value trust and modest claims over hype.",
+lens:"Mirroring and summarising back make people feel understood.",
+next:"Book a quarterly review with each partner."},
+{id:"strategic",n:"Strategic friends (network)",l:5,share:"Ideas",listen:60,
+why:"Opportunities, partnerships and referrals.",
+look:"Sharp business casual and a consistent personal brand.",
+expect:"Mutual value, generosity, follow-through.",
+tone:"Curious, upbeat, professional.",
+shareT:"Insights and market observations; business plans at a high level.",
+body:"Open stance, ask questions, make notes afterward.",
+open:"“What are you focused on this quarter? Where can I help?”",close:"“I'll send you that introduction by Thursday.”",
+rhythm:"Every 4–6 weeks, a value touch: an article, an intro, a congrats.",
+bounds:"Give before you ask. Never pitch at a first meeting.",
+flags:"Purely transactional contacts; no follow-through.",
+culture:"Canadians prefer soft asks: “Would you be open to…?”",
+lens:"Ben Franklin effect: asking for small advice increases how much people like you.",
+next:"Log each contact with a next-touch date in your planner."},
+{id:"cowork",n:"Coworkers",l:6,share:"Light",listen:55,
+why:"Your daily reputation and how well you collaborate.",
+look:"The team dress code, clean and consistent.",
+expect:"Reliability, fairness, shared credit.",
+tone:"Friendly, positive, professional.",
+shareT:"Light personal topics (weekend, sport); work ideas openly; no complaints.",
+body:"Greet by name, smile, open posture.",
+open:"“Morning! How was your weekend?”",close:"“Thanks for your help on this. I'll return the favour.”",
+rhythm:"Daily greetings; coffee or lunch from time to time.",
+bounds:"No office gossip, politics or salary talk.",
+flags:"Credit-stealing; venting circles.",
+culture:"Canadian politeness: please, thank you, and quick apologies.",
+lens:"Hearing their own name makes people feel seen.",
+next:"Have coffee with a different coworker each month."},
+{id:"recruit",n:"Recruiters",l:6,share:"Targets only",listen:50,
+why:"Doorways to roles. They remember who was easy to work with.",
+look:"Professional; keep your LinkedIn photo and profile current.",
+expect:"Clear targets, quick replies, honesty.",
+tone:"Friendly, crisp, appreciative.",
+shareT:"Target roles, strengths, availability. Not your whole search strategy.",
+body:"On video: camera at eye level, good light, smile.",
+open:"“Thanks for reaching out. Here's what I'm targeting, in one line.”",close:"“Please keep me in mind for similar roles. I'll send my updated resume today.”",
+rhythm:"Reply within 24 hours; check in every 3–4 weeks.",
+bounds:"Avoid naming salary first. No submissions without your approval.",
+flags:"Submitting you without consent, vague clients, pressure tactics.",
+culture:"Stay polite even when you decline. The market is small.",
+lens:"People help those who make their job easy.",
+next:"Refer good candidates to them. It builds reciprocity."},
+{id:"oldfr",n:"Old friends (reconnecting)",l:6,share:"Light, then open",listen:60,
+why:"Dormant ties often bring surprising ideas and opportunities.",
+look:"Casual.",
+expect:"No pressure, and a warm nod to the gap.",
+tone:"Light and genuine, no guilt.",
+shareT:"Light at first; open up gradually.",
+body:"Warm greeting, relaxed.",
+open:"“It's been a while. I saw your news and wanted to say congrats.”",close:"“Great catching up. Let's stay in touch.”",
+rhythm:"Reconnect once; then quarterly if it clicks.",
+bounds:"Never open with a request.",
+flags:"Old conflicts that haven't changed.",
+culture:"Bring up a good memory you share.",
+lens:"Reconnecting with dormant ties often yields fresher ideas than current contacts do.",
+next:"Reconnect with one old friend each month."},
+{id:"team",n:"Teammates & coaches (sport)",l:6,share:"Light to moderate",listen:50,
+why:"Shared sweat builds fast trust, and many of your best contacts come from sport.",
+look:"Proper kit, on time, ready to go.",
+expect:"Effort, reliability, fair play, good humour.",
+tone:"Energetic, encouraging, competitive with respect.",
+shareT:"Training, goals, light life updates; business only if they ask.",
+body:"High-fives, fist bumps, cheer others on.",
+open:"“Ready to go? How's your training been?”",close:"“Great session. Same time next week?”",
+rhythm:"Every session; a group chat for events and races.",
+bounds:"Leave pitching off the field. Respect the coach's call.",
+flags:"Toxic competition; skipping commitments.",
+culture:"Canadian sport culture values good sportsmanship over winning.",
+lens:"Shared challenge and effort bond people quickly.",
+next:"Invite a teammate to a post-workout coffee."},
+{id:"neigh",n:"Neighbours",l:7,share:"Light",listen:50,
+why:"Safety, help when needed, and community.",
+look:"Neat and casual.",
+expect:"Friendliness, quiet, respect for property.",
+tone:"Friendly, brief, polite.",
+shareT:"Weather, community, kids' activities.",
+body:"A wave, a smile, a short driveway chat.",
+open:"“Morning! Great day for it.”",close:"“Let us know if you ever need anything.”",
+rhythm:"A daily wave; a small seasonal gesture.",
+bounds:"Keep family matters private and don't over-visit.",
+flags:"Property issues. Raise them early and politely.",
+culture:"Shovelling a neighbour's walk and sharing Eid or holiday treats go far in Ontario.",
+lens:"Small favours, given freely, build goodwill that lasts.",
+next:"Share sweets with neighbours at the next Eid."},
+{id:"kidsfr",n:"My kids' friends",l:7,share:"Minimal",listen:60,
+why:"Your children's social world, and their safety.",
+look:"Casual and approachable.",
+expect:"Kindness, fairness, safety, clear house rules.",
+tone:"Kind, cheerful, consistent.",
+shareT:"With kids: friendly and minimal. With their parents: logistics and friendly chat.",
+body:"Learn their names, smile, eye level.",
+open:"“Hi! Great to see you. Have fun.”",close:"(To a parent) “Your child is always welcome. Here's my number for pickups.”",
+rhythm:"Connect with their parents at pickups and events.",
+bounds:"Always communicate through parents, never message kids directly, keep visits supervised.",
+flags:"Unsafe behaviour or unknown adults around them. Tell the parents.",
+culture:"Respect each family's rules on food, prayer times and screens.",
+lens:"Being the fair, safe adult earns trust from kids and parents alike.",
+next:"Swap contact details with parents of close friends."},
+{id:"pros",n:"Teachers, doctors & advisors",l:7,share:"Facts first",listen:60,
+why:"They care for your family's learning, health and money. Partnership gets better outcomes.",
+look:"Neat and organised; bring notes.",
+expect:"Respect for their time, clear questions, follow-through at home.",
+tone:"Respectful, calm, collaborative.",
+shareT:"The relevant facts and your questions, nothing more.",
+body:"Sit forward, take notes, summarise what you heard.",
+open:"“Thanks for seeing us. We have three questions today.”",close:"“So we'll do ___. When should we follow up?”",
+rhythm:"Scheduled meetings; a thank-you at term end or after a big help.",
+bounds:"Keep emotions calm; escalate in writing if needed.",
+flags:"Feeling rushed or unheard. Ask for a follow-up or second opinion.",
+culture:"Canadian schools welcome parent involvement; join one school event a term.",
+lens:"Arriving prepared signals respect and gets you more of their attention.",
+next:"Keep a note in your phone with questions for the next visit."},
+{id:"online",n:"Online contacts (LinkedIn, Instagram)",l:8,share:"Public-safe",listen:50,
+why:"Your digital reputation reaches people before you do.",
+look:"Current photo, consistent brand across profiles.",
+expect:"Value, authenticity, quick and polite replies.",
+tone:"Professional, positive, generous.",
+shareT:"Insights and wins you'd be happy for anyone to read.",
+body:"In writing: short paragraphs, their name, no walls of text.",
+open:"“Thanks for connecting, ___. I enjoyed your post on ___.”",close:"“Happy to help anytime. Let's keep in touch.”",
+rhythm:"Comment on 3 posts a week; reply to messages within 48 hours.",
+bounds:"Never argue in comments; no personal details or family updates in public.",
+flags:"Phishing, fake profiles, too-good-to-be-true offers.",
+culture:"Keep posts inclusive for a mixed Canadian audience.",
+lens:"Repeated small, positive touches online build recognition before you ever meet.",
+next:"Move warm online contacts to a coffee or call."},
+{id:"buyers",n:"Daily buyers / customers",l:8,share:"Product stories",listen:60,
+why:"Revenue and word of mouth for U-Thentic.",
+look:"Clean and on-brand.",
+expect:"Quality, speed, honesty, easy returns.",
+tone:"Friendly, helpful, efficient.",
+shareT:"Product knowledge and stories. Nothing personal.",
+body:"A smile, a fast reply, a thank-you every time.",
+open:"“Thanks for your order! How can I make it perfect for you?”",close:"“Thank you. A quick review would mean a lot.”",
+rhythm:"Thank-you at order, follow-up after delivery, a seasonal offer.",
+bounds:"Never argue in public. Move problems to email or DM.",
+flags:"Abusive messages or chargebacks. Document everything.",
+culture:"Canadian customers expect politeness and fairness.",
+lens:"Peak-end rule: customers remember the best moment and the ending.",
+next:"Automate thank-you and review-request messages."},
+{id:"first",n:"First-time people",l:9,share:"Light",listen:70,
+why:"Any first meeting can grow into a circle-5 relationship.",
+look:"Polished, simple, and a smile.",
+expect:"Courtesy and genuine interest in them.",
+tone:"Warm and curious.",
+shareT:"What you do, in one line.",
+body:"Handshake, eye contact, use their name twice.",
+open:"“Hi, I'm Mohamed. What brings you here?”",close:"“Great meeting you, ___. Let's connect on LinkedIn.”",
+rhythm:"Follow up within 48 hours if there's value.",
+bounds:"Skip politics, religion and money at first.",
+flags:"Over-familiarity or a pushy pitch.",
+culture:"Canadian small talk: weather, sport, travel, the commute.",
+lens:"People judge warmth before competence. Lead with warmth.",
+next:"Save their name plus one detail in your phone contacts."},
+{id:"once",n:"One-time people (service, transit)",l:9,share:"None",listen:50,
+why:"Your character shows most with people who can't do anything for you.",
+look:"Tidy.",
+expect:"Courtesy and patience.",
+tone:"Polite, brief, appreciative.",
+shareT:"Pleasantries only.",
+body:"Eye contact, a smile, a thank-you.",
+open:"“Hi, how's your day going?”",close:"“Thank you, have a great day.”",
+rhythm:"One time.",
+bounds:"Keep personal information private.",
+flags:"Scams or pressure. Politely walk away.",
+culture:"Tip fairly and thank drivers and staff by name when you can.",
+lens:"Small kindness to strangers lifts your own mood too.",
+next:"Leave a kind review when service is great."},
+{id:"street",n:"Street person / stranger in need",l:10,share:"None",listen:40,
+why:"Dignity for everyone, and safety for you.",
+look:"As you are.",
+expect:"Respect, nothing more.",
+tone:"Calm, kind, brief.",
+shareT:"Nothing personal.",
+body:"A comfortable distance and a nod of acknowledgement.",
+open:"“Here you go, take care.” or “Sorry, not today. Take care.”",close:"“Take care.”",
+rhythm:"None.",
+bounds:"Never share personal details or where you live.",
+flags:"Aggression: move away calmly, and call 911 if anyone is in danger.",
+culture:"Charity can be given quietly; local food banks and shelters are a good route.",
+lens:"Acknowledging someone is an act of dignity, even when you can't give.",
+next:"Set a monthly giving plan with a local food bank."}
+];
+const KEY="relcompass-levels-v1";
+let over={};
+try{over=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){over={}}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(over))}catch(e){}};
+const lv=p=>over[p.id]||p.l;
+function col(l){const t=(l-1)/9;const dark=matchMedia("(prefers-color-scheme: dark)").matches&&document.documentElement.dataset.theme!=="light"||document.documentElement.dataset.theme==="dark";
+  const light=dark?28+t*30:22+t*40;return `hsl(${184-t*20} ${55-t*20}% ${light}%)`;}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function drawRings(){
+  const svg=document.getElementById("rings");const c=170;let h="";
+  for(let l=10;l>=1;l--){const r=18+l*15;h+=`<circle cx="${c}" cy="${c}" r="${r}" fill="${col(l)}" opacity="${l===1?1:.18+.06*(10-l)}" stroke="var(--surface)" stroke-width="1.5"/>`;}
+  for(let l=1;l<=10;l++){h+=`<text x="${c}" y="${c-(18+l*15)+11}" text-anchor="middle" font-size="9" font-family="Sora" fill="var(--ink)" opacity=".7">${l}</text>`;}
+  h+=`<text x="${c}" y="${c+5}" text-anchor="middle" font-size="12" font-weight="700" font-family="Sora" fill="#fff">You</text>`;
+  for(let l=1;l<=10;l++){const ps=P.filter(p=>lv(p)===l);const r=18+l*15-7;
+    ps.forEach((p,i)=>{const a=(Math.PI*2)*(i+.5)/Math.max(ps.length,1)+l*0.6+Math.PI/2;
+      const x=c+Math.cos(a)*r,y=c+Math.sin(a)*r;
+      h+=`<g class="dot" data-id="${p.id}" tabindex="0" role="button" aria-label="${esc(p.n)}, level ${l}" style="cursor:pointer"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="transparent"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5" fill="var(--gold)" stroke="var(--surface)" stroke-width="1.5"/></g>`;});}
+  svg.innerHTML=h;
+  svg.querySelectorAll(".dot").forEach(g=>{g.onclick=()=>openCard(g.dataset.id);g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openCard(g.dataset.id)}}});
+}
+function drawLadder(){
+  const q=document.getElementById("q").value.trim().toLowerCase();let h="";
+  for(let l=1;l<=10;l++){
+    const ps=P.filter(p=>lv(p)===l&&(!q||p.n.toLowerCase().includes(q)));
+    if(q&&!ps.length)continue;
+    h+=`<div class="rung"><div class="lvl" style="background:${col(l)}">${l}</div><div><div class="rung-t">${LEVEL_NAMES[l]}</div><div class="chips">${
+      ps.length?ps.map(p=>`<button class="chip" data-id="${p.id}">${esc(p.n)}${over[p.id]?'<span class="moved" title="You moved this">•</span>':""}</button>`).join(""):'<span class="empty">No one here yet</span>'}</div></div></div>`;
+  }
+  if(!h)h='<p class="empty">No match. Try another word, such as “friend” or “family”.</p>';
+  const el=document.getElementById("ladder");el.innerHTML=h;
+  el.querySelectorAll(".chip").forEach(b=>b.onclick=()=>openCard(b.dataset.id));
+}
+const F=(t,v,cls="")=>`<div class="f ${cls}"><h4>${t}</h4><p>${v}</p></div>`;
+let lastFocus=null;
+function openCard(id){
+  const p=P.find(x=>x.id===id);const l=lv(p);lastFocus=document.activeElement;
+  document.getElementById("sheetIn").innerHTML=`
+  <div class="grab"></div>
+  <div class="shead"><div class="lvl" style="background:${col(l)}">${l}</div><h3 id="s-title">${esc(p.n)}</h3><button class="x" id="xbtn" aria-label="Close">×</button></div>
+  <p class="why"><b>Why it matters:</b> ${esc(p.why)}</p>
+  <div class="stepper"><span>Level</span><button id="dn" aria-label="Move closer">− Closer</button><button id="up" aria-label="Move further">Further +</button>${over[p.id]?`<button id="rs">Reset to ${p.l}</button>`:""}</div>
+  <div class="meter"><div class="bar"><i style="width:${p.listen}%"></i></div><small><span>Listen ${p.listen}%</span><span>Talk ${100-p.listen}%</span></small></div>
+  <div class="grid">
+    ${F("Opening line",esc(p.open),"say")}
+    ${F("Closing line",esc(p.close),"say")}
+    ${F("Appearance",esc(p.look))}
+    ${F("Tone of voice",esc(p.tone))}
+    ${F("Their expectations",esc(p.expect))}
+    ${F("Sharing thoughts",`<span class="share">${esc(p.share)}</span>${esc(p.shareT)}`)}
+    ${F("Body language",esc(p.body))}
+    ${F("Touchpoint rhythm",esc(p.rhythm))}
+    ${F("Boundaries",esc(p.bounds),"warn")}
+    ${F("Red flags",esc(p.flags),"warn")}
+    ${F("Culture cue",esc(p.culture))}
+    ${F("Psychology lens",esc(p.lens),"lens")}
+    ${F("What's next",esc(p.next),"say")}
+  </div>`;
+  document.getElementById("xbtn").onclick=closeCard;
+  const set=n=>{n=Math.min(10,Math.max(1,n));if(n===p.l)delete over[p.id];else over[p.id]=n;save();drawRings();drawLadder();openCard(id);};
+  document.getElementById("dn").onclick=()=>set(l-1);
+  document.getElementById("up").onclick=()=>set(l+1);
+  const rs=document.getElementById("rs");if(rs)rs.onclick=()=>set(p.l);
+  document.getElementById("sheet").classList.add("on");document.getElementById("scrim").classList.add("on");
+  document.getElementById("xbtn").focus();
+}
+function closeCard(){document.getElementById("sheet").classList.remove("on");document.getElementById("scrim").classList.remove("on");if(lastFocus&&lastFocus.focus)lastFocus.focus();}
+document.getElementById("scrim").onclick=closeCard;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeCard()});
+document.getElementById("q").oninput=drawLadder;
+const bsel=document.getElementById("bsel");
+function fillSel(){const cur=bsel.value||"hiring";
+  bsel.innerHTML=[...P].sort((a,b)=>lv(a)-lv(b)||a.n.localeCompare(b.n)).map(p=>`<option value="${p.id}">${lv(p)} · ${esc(p.n)}</option>`).join("");bsel.value=cur;}
+function brief(){const p=P.find(x=>x.id===bsel.value);if(!p)return;
+  const rows=[["Show up",p.look],["Say first",p.open],["Do",`${p.body} Listen ${p.listen}%, talk ${100-p.listen}%.`],["Share",`${p.share}: ${p.shareT}`],["Avoid",p.bounds],["Leave with",p.close],["After",`${p.next} Rhythm: ${p.rhythm}`]];
+  document.getElementById("bout").innerHTML=rows.map(r=>`<li><b>${r[0]}</b><span>${esc(r[1])}</span></li>`).join("");}
+bsel.onchange=brief;
+document.getElementById("bfull").onclick=()=>openCard(bsel.value);
+const _dl=drawLadder;drawLadder=function(){_dl();fillSel();brief();};
+drawRings();drawLadder();
+new MutationObserver(()=>{drawRings();drawLadder()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
+</body>
+</html>
