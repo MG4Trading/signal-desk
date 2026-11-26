@@ -211,10 +211,58 @@ async function loadPrivate(pass){
     P = await decrypt(await r.json(), pass); store.set("pass", pass); lockErr = ""; return true;
   } catch(e){ if (e && e.message === "none") lockErr = "Private data isn't published yet. Finish setup in Settings."; else { lockErr = "That passcode didn't unlock your data."; } P = null; return false; }
 }
+
+/* ---------- assistant task taps (Done / Planned / Ignored), synced to focus_inbox/taps.json ---------- */
+// Public file on main (focus_inbox/ is ignored by the update workflow, so taps never trigger a rebuild).
+// Holds only date, line number, a short hash of the line, status and plan date. Never task text.
+const TAPS_PATH = "focus_inbox/taps.json", TAPS_REPO = "MG4Trading/signal-desk";
+let TAPS = store.get("taps", {});   // key "YYYY-MM-DD|n" -> { d, n, h, s:"done"|"ignored"|"planned"|"", p, at }
+async function lineHash(line){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(line)); return Array.from(new Uint8Array(b)).slice(0, 6).map(x => x.toString(16).padStart(2, "0")).join(""); }
+async function loadTaps(){
+  try { const r = await fetch("https://raw.githubusercontent.com/" + TAPS_REPO + "/main/" + TAPS_PATH + "?t=" + Date.now(), { cache:"no-store" }); if (!r.ok) return;
+    const j = await r.json(); (j.items || []).forEach(t => { const k = t.d + "|" + t.n, mine = TAPS[k]; if (!mine || (t.at || "") > (mine.at || "")) TAPS[k] = t; });
+    store.set("taps", TAPS);
+  } catch(_){}
+}
+const b64u = s => btoa(unescape(encodeURIComponent(s)));
+let _tapTimer = null;
+function pushTaps(){ clearTimeout(_tapTimer); _tapTimer = setTimeout(pushTapsNow, 1200); }
+async function pushTapsNow(retry = true){
+  const key = S().ghkey; if (!key) return;
+  const keep = dkey(-45), items = Object.values(TAPS).filter(t => t.d >= keep).sort((a, b) => (a.d + pad(a.n)).localeCompare(b.d + pad(b.n)));
+  const url = "https://api.github.com/repos/" + TAPS_REPO + "/contents/" + TAPS_PATH, hd = { Authorization:"Bearer " + key, Accept:"application/vnd.github+json" };
+  try {
+    let sha; const g = await fetch(url + "?ref=main&t=" + Date.now(), { headers:hd, cache:"no-store" });
+    if (g.ok){ const j = await g.json(); sha = j.sha; try { (JSON.parse(decodeURIComponent(escape(atob(j.content.replace(/\n/g, ""))))).items || []).forEach(t => { const k = t.d + "|" + t.n, mine = TAPS[k]; if (!mine || (t.at || "") > (mine.at || "")) TAPS[k] = t; }); } catch(_){} }
+    const body = JSON.stringify({ updated:new Date().toISOString(), items:Object.values(TAPS).filter(t => t.d >= keep) }, null, 1);
+    const p = await fetch(url, { method:"PUT", headers:hd, body:JSON.stringify({ message:"Focus task taps", content:b64u(body), sha, branch:"main" }) });
+    if ((p.status === 409 || p.status === 422) && retry) return pushTapsNow(false);
+    if (!p.ok) toast(p.status === 401 || p.status === 403 ? "Sync key rejected. Check it in Settings." : "Couldn't sync to the assistant. Saved on this device.");
+  } catch(_){ toast("Offline. Saved on this device; will sync next tap."); }
+}
+async function setTap(d, n, line, s, p){
+  const k = d + "|" + n; TAPS[k] = { d, n, h:await lineHash(line), s, p:p || "", at:new Date().toISOString() };
+  store.set("taps", TAPS); render(); pushTaps();
+  if (!S().ghkey && !store.get("tapHint", false)){ store.set("tapHint", true); toast("Saved here. Add the sync key in Settings so the assistant sees it."); }
+}
+const shortD = k => new Date(k + "T12:00").toLocaleDateString("en-CA", { weekday:"short", day:"numeric", month:"short" });
+function planSheet(d, n, line, text){
+  openSheet(b => {
+    b.appendChild(el("strong", "", "Plan this task")); b.appendChild(el("div", "note", text));
+    const r = el("div", "row"); r.style.cssText = "gap:8px;flex-wrap:wrap;margin:10px 0";
+    [["Today", 0], ["Tomorrow", 1], ["In 2 days", 2], ["Next week", 7]].forEach(([l, o]) => { const bt = el("button", "btn sm" + (o === 1 ? " pri" : ""), l + " · " + shortD(dkey(o))); bt.type = "button"; bt.onclick = () => { closeSheet(); setTap(d, n, line, "planned", dkey(o)); toast("Planned for " + shortD(dkey(o))); }; r.appendChild(bt); });
+    b.appendChild(r);
+    const dr = el("div", "row"); dr.style.gap = "8px"; const di = el("input", "inp"); di.type = "date"; di.min = dkey(); di.value = dkey(3);
+    const ok = el("button", "btn sm pri", "Set date"); ok.type = "button"; ok.onclick = () => { if (!di.value) return; closeSheet(); setTap(d, n, line, "planned", di.value); toast("Planned for " + shortD(di.value)); };
+    dr.appendChild(di); dr.appendChild(ok); b.appendChild(dr);
+    const cx = el("button", "btn", "Cancel"); cx.type = "button"; cx.style.marginTop = "12px"; cx.onclick = closeSheet; b.appendChild(cx);
+  });
+}
 async function loadAll(){
   try { const r = await fetch("status.json?t=" + Math.floor(Date.now() / 60000), { cache:"no-store" }); ST = r.ok ? await r.json() : null; } catch(_){ ST = null; }
   try { const r = await fetch("../extras.json?t=" + Math.floor(Date.now() / 600000), { cache:"no-store" }); if (r.ok) X = await r.json(); } catch(_){}
   await loadPrivate();
+  await loadTaps();
   render();
 }
 const calToday = () => ((P && P.cal) || []).filter(e => e.s && e.s.slice(0, 10) === dkey() && !e.t.startsWith("🎯"));
@@ -290,25 +338,53 @@ function viewToday(){
   g.appendChild(p); out.push(g);
   // Assistant priorities: the latest "✅ Priorities" all-day calendar event for today.
   // Line shape: 1. [HIGH] [REPLY] Task — detail | https://link
+  // Each task gets: action ↗, ✓ Done, 📅 Planned (pick a day), Ignore, + Today. Taps sync to focus_inbox/taps.json on main.
   const pr = ((P && P.cal) || []).filter(e => (e.t || "").startsWith("✅") && (e.d || (e.s || "").slice(0, 10)) === dkey()).pop();
   if (pr && pr.desc){
-    const pg = grp("Assistant priorities", pr.t.replace(/^✅\s*/, "")), pp = el("div", "pad");
-    pr.desc.split("\n").map(x => x.trim()).filter(Boolean).forEach(line => {
+    const pd = pr.d || (pr.s || "").slice(0, 10) || dkey();
+    const lines = pr.desc.split("\n").map(x => x.trim()).filter(Boolean);
+    const tasks = [], notes = [], memo = [];
+    lines.forEach(line => {
+      if (/^(Closed|Planned):/i.test(line)){ memo.push(line); return; }
       const m = line.match(/^(\d+)[.)]\s*(?:\[(HIGH|MED|LOW)\]\s*)?(?:\[([A-Z][A-Z ]*)\]\s*)?(.*?)(?:\s+\|\s+(https:\/\/\S+))?$/);
-      if (!m){ pp.appendChild(el("div", "note", line)); return; }
-      const lvl = m[2] || "", act = (m[3] || "").trim(), text = m[4], url = m[5] || "";
-      const box = el("div", ""); box.style.cssText = "padding:8px 0;border-bottom:1px solid var(--line)";
-      const head = el("div", "note", (lvl === "HIGH" ? "🔴 " : lvl === "MED" ? "🟠 " : lvl === "LOW" ? "⚪ " : "") + text); head.style.fontWeight = lvl === "HIGH" ? "600" : "400"; box.appendChild(head);
-      const r = el("div", "row"); r.style.cssText = "gap:8px;margin-top:6px;flex-wrap:wrap";
-      if (act){
-        const label = act.charAt(0) + act.slice(1).toLowerCase();
-        if (url){ const ab = el("a", "btn sm pri", label + " ↗"); ab.href = url; ab.target = "_blank"; ab.rel = "noopener"; r.appendChild(ab); }
-        else r.appendChild(el("span", "stamp", label));
-      } else if (url){ const ab = el("a", "btn sm pri", "Open ↗"); ab.href = url; ab.target = "_blank"; ab.rel = "noopener"; r.appendChild(ab); }
-      const tb = el("button", "btn sm ghost", "+ Today"); tb.type = "button";
-      tb.onclick = () => { const o = day(); if (o.top.includes(text)) return toast("Already in today's list"); let k = o.top.findIndex(z => !z); if (k < 0) k = o.top.length; o.top[k] = text; o.done[k] = false; saveDay(o); _bc = null; render(); };
-      r.appendChild(tb); box.appendChild(r); pp.appendChild(box);
+      if (!m){ notes.push(line); return; }
+      const n = +m[1], tp = TAPS[pd + "|" + n] || null;
+      tasks.push({ line, n, lvl:m[2] || "", act:(m[3] || "").trim(), text:m[4], url:m[5] || "", tp, st:tp ? tp.s : "" });
     });
+    const open = tasks.filter(t => t.st !== "done" && t.st !== "ignored"), closed = tasks.filter(t => t.st === "done" || t.st === "ignored");
+    const nDone = tasks.filter(t => t.st === "done").length;
+    const pg = grp("Assistant priorities", pr.t.replace(/^✅\s*/, "") + (tasks.length ? " · " + nDone + "/" + tasks.length + " done" : "")), pp = el("div", "pad");
+    const mkBtn = (cls, label, fn) => { const b = el("button", "btn sm " + cls, label); b.type = "button"; b.onclick = fn; return b; };
+    const drawTask = t => {
+      const box = el("div", ""); box.style.cssText = "padding:8px 0;border-bottom:1px solid var(--line)" + (t.st === "done" || t.st === "ignored" ? ";opacity:.55" : "");
+      const dot = t.lvl === "HIGH" ? "🔴 " : t.lvl === "MED" ? "🟠 " : t.lvl === "LOW" ? "⚪ " : "";
+      const head = el("div", "note", (t.st === "done" ? "✓ " : t.st === "ignored" ? "⊘ " : dot) + t.text);
+      head.style.fontWeight = t.lvl === "HIGH" && !t.st ? "600" : "400"; if (t.st === "done" || t.st === "ignored") head.style.textDecoration = "line-through";
+      box.appendChild(head);
+      const r = el("div", "row"); r.style.cssText = "gap:8px;margin-top:6px;flex-wrap:wrap;align-items:center";
+      if (t.st === "done" || t.st === "ignored"){
+        r.appendChild(el("span", "stamp", t.st === "done" ? "✓ Done" : "Ignored"));
+        r.appendChild(mkBtn("ghost", "Undo", () => setTap(pd, t.n, t.line, "")));
+      } else {
+        if (t.act || t.url){ const label = t.act ? t.act.charAt(0) + t.act.slice(1).toLowerCase() : "Open";
+          if (t.url){ const ab = el("a", "btn sm pri", label + " ↗"); ab.href = t.url; ab.target = "_blank"; ab.rel = "noopener"; r.appendChild(ab); }
+          else r.appendChild(el("span", "stamp", label)); }
+        r.appendChild(mkBtn("", "✓ Done", () => {
+          const o = day(), k = o.top.indexOf(t.text); if (k >= 0){ o.done[k] = true; saveDay(o); }
+          setTap(pd, t.n, t.line, "done"); toast("Done. Nice work.");
+        }));
+        r.appendChild(mkBtn("", t.st === "planned" ? "📅 " + shortD(t.tp.p) : "📅 Planned", () => planSheet(pd, t.n, t.line, t.text)));
+        r.appendChild(mkBtn("ghost", "Ignore", () => { setTap(pd, t.n, t.line, "ignored"); toast("Ignored. The assistant won't list it again."); }));
+        r.appendChild(mkBtn("ghost", "+ Today", () => { const o = day(); if (o.top.includes(t.text)) return toast("Already in today's list"); let k = o.top.findIndex(z => !z); if (k < 0) k = o.top.length; o.top[k] = t.text; o.done[k] = false; saveDay(o); _bc = null; render(); toast("Added to today"); }));
+        if (t.st === "planned") r.appendChild(mkBtn("ghost", "Undo", () => setTap(pd, t.n, t.line, "")));
+      }
+      box.appendChild(r); pp.appendChild(box);
+    };
+    open.forEach(drawTask);
+    if (closed.length){ const lb = el("span", "label", "Done and ignored · " + closed.length); lb.style.marginTop = "10px"; pp.appendChild(lb); closed.forEach(drawTask); }
+    notes.forEach(x => { const nt = el("div", "note", x); nt.style.marginTop = "8px"; pp.appendChild(nt); });
+    if (memo.length){ const fd = el("details", "fold"); fd.appendChild(el("summary", "", "Closed and planned earlier")); memo.forEach(x => fd.appendChild(el("div", "note", x))); pp.appendChild(fd); }
+    if (!S().ghkey) pp.appendChild(el("div", "note", "Taps are saved on this device only. Add the assistant sync key in Settings so the 5 am / 5 pm list respects them."));
     pg.appendChild(pp); out.push(pg);
   }
   // Focus zone
@@ -595,6 +671,13 @@ function settings(b){
   if (P){ const r = el("div", "row"); r.appendChild(el("span", "note", "Unlocked on this phone.")); const lk = el("button", "btn sm", "Lock"); lk.type = "button"; lk.onclick = () => { store.del("pass"); P = null; closeSheet(); render(); }; r.appendChild(lk); b.appendChild(r); }
   else { if (lockErr) b.appendChild(el("div", "note", lockErr)); lockForm(b); }
   const st = ST || {}; b.appendChild(el("div", "note", "Passcode secret " + (st.key ? "✓" : "✗ not set") + " · Calendar link " + (st.cal ? (st.cal_ok === false ? "⚠︎ check the link" : "✓") : "✗ not set") + " · Target jobs " + (st.jobs ? "✓" : "✗")));
+  b.appendChild(el("span", "label", "Assistant sync key (GitHub)"));
+  const gk = el("input", "inp"); gk.type = "password"; gk.autocomplete = "off"; gk.placeholder = S().ghkey ? "Saved ✓ (paste a new key to replace)" : "Paste the github_pat_… key";
+  gk.onchange = () => { const v = gk.value.trim(); setS({ ghkey:v }); gk.value = ""; toast(v ? "Key saved. Syncing…" : "Key removed"); if (v) pushTapsNow(); settings2(); }; b.appendChild(gk);
+  const gh = el("details", "fold"); gh.appendChild(el("summary", "", "Create the sync key (2 minutes, once per device)"));
+  const gol = el("ol", "steps"); ["On GitHub: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.", "Name it “Focus taps”. Expiration: 1 year. Repository access: Only select repositories → MG4Trading/signal-desk.", "Permissions → Repository permissions → Contents: Read and write. Nothing else.", "Generate, copy the key and paste it above. It stays on this device only and is not in your backup."].forEach(x => gol.appendChild(el("li", "", x)));
+  gh.appendChild(gol); b.appendChild(gh);
+  if (S().ghkey){ const rk = el("button", "btn sm ghost", "Remove sync key"); rk.type = "button"; rk.onclick = () => { setS({ ghkey:"" }); settings2(); }; b.appendChild(rk); }
   b.appendChild(el("span", "label", "iPhone Reminders shortcut name"));
   const sc = el("input", "inp"); sc.value = s.shortcut; sc.onchange = () => setS({ shortcut:sc.value.trim() || "Focus Reminder" }); b.appendChild(sc);
   b.appendChild(el("span", "label", "My meal rhythm (stays on this phone)")); const fx = el("textarea", "inp"); fx.rows = 4; fx.value = S().fuel || ""; fx.placeholder = "One line per meal"; fx.onchange = () => setS({ fuel: fx.value.trim() }); b.appendChild(fx);
@@ -612,7 +695,7 @@ function settings(b){
   how3.appendChild(ol3); b.appendChild(how3);
   const tg = el("button", "btn sm", (s.tickIOS ? "✓ " : "") + "Tick off in Reminders when done in Focus"); tg.type = "button"; tg.setAttribute("aria-pressed", String(s.tickIOS)); tg.onclick = () => { setS({ tickIOS:!S().tickIOS }); settings2(); }; b.appendChild(tg);
   b.appendChild(el("span", "label", "Backup"));
-  const br = el("div", "row"); const ex = el("button", "btn sm", "Copy backup"); ex.type = "button"; ex.onclick = () => { const o = {}; Object.keys(localStorage).filter(k => k.startsWith("fz:") && k !== "fz:pass").forEach(k => o[k] = localStorage.getItem(k)); copy(JSON.stringify(o)); };
+  const br = el("div", "row"); const ex = el("button", "btn sm", "Copy backup"); ex.type = "button"; ex.onclick = () => { const o = {}; Object.keys(localStorage).filter(k => k.startsWith("fz:") && k !== "fz:pass").forEach(k => o[k] = localStorage.getItem(k)); try { const s2 = JSON.parse(o["fz:set"] || "{}"); delete s2.ghkey; o["fz:set"] = JSON.stringify(s2); } catch(_){} copy(JSON.stringify(o)); };
   const im = el("button", "btn sm", "Restore"); im.type = "button"; im.onclick = () => { const t = prompt("Paste your backup"); if (!t) return; try { const o = JSON.parse(t); Object.entries(o).forEach(([k, v]) => { if (k.startsWith("fz:")) localStorage.setItem(k, v); }); toast("Restored"); closeSheet(); render(); } catch(_){ toast("That backup didn't read"); } };
   br.appendChild(ex); br.appendChild(im); b.appendChild(br);
   const cl = el("button", "btn", "Done"); cl.type = "button"; cl.onclick = closeSheet; b.appendChild(cl);
